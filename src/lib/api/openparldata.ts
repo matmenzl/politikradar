@@ -77,7 +77,6 @@ async function fetchApi<T>(endpoint: string, params: Record<string, string> = {}
   const defaultParams: Record<string, string> = {
     lang: "de",
     lang_format: "flat",
-    hide_null: "true",
   };
   const allParams = { ...defaultParams, ...params };
   const queryString = new URLSearchParams(allParams).toString();
