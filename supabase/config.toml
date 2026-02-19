@@ -1,0 +1,4 @@
+project_id = "eynghyszcvknnflqphzv"
+
+[functions.tag-affairs]
+verify_jwt = false
