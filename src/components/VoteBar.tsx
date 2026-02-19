@@ -1,7 +1,16 @@
-const VoteBar = ({ ja, nein, enthaltungen }: { ja: number; nein: number; enthaltungen: number }) => {
+const VoteBar = ({ ja, nein, enthaltungen, compact = false }: { ja: number; nein: number; enthaltungen: number; compact?: boolean }) => {
   const total = ja + nein + enthaltungen;
   const jaPercent = (ja / total) * 100;
   const neinPercent = (nein / total) * 100;
+
+  if (compact) {
+    return (
+      <div className="flex rounded-full overflow-hidden h-1.5 w-16 bg-secondary">
+        <div className="bg-success" style={{ width: `${jaPercent}%` }} />
+        <div className="bg-destructive" style={{ width: `${neinPercent}%` }} />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-3">
