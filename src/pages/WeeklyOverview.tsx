@@ -1,16 +1,22 @@
 import { Link } from "react-router-dom";
-import { ArrowLeft, Share2, Vote, BarChart3, Activity, ChevronLeft, ChevronRight, FileText, Loader2 } from "lucide-react";
+import { ArrowLeft, Share2, Vote, BarChart3, Activity, ChevronLeft, ChevronRight, FileText, Loader2, Building2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useState, useEffect } from "react";
 import ShareModal from "@/components/ShareModal";
 import VoteBar from "@/components/VoteBar";
 import {
   fetchWeeklyData,
+  fetchBodies,
+  groupBodiesByLevel,
+  getBodyLabel,
+  LEVEL_LABELS,
   getCurrentISOWeek,
   getWeekDateRange,
   formatDateRange,
   type WeeklyStats,
+  type Body,
 } from "@/lib/api/openparldata";
 
 const WeeklyOverview = () => {
@@ -18,18 +24,25 @@ const WeeklyOverview = () => {
   const initial = getCurrentISOWeek();
   const [year, setYear] = useState(initial.year);
   const [week, setWeek] = useState(initial.week);
+  const [bodyKey, setBodyKey] = useState("CHE");
+  const [bodies, setBodies] = useState<Body[]>([]);
   const [data, setData] = useState<WeeklyStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Fetch available bodies once
+  useEffect(() => {
+    fetchBodies().then(setBodies).catch(console.error);
+  }, []);
+
   useEffect(() => {
     setLoading(true);
     setError(null);
-    fetchWeeklyData(year, week)
+    fetchWeeklyData(year, week, bodyKey)
       .then(setData)
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false));
-  }, [year, week]);
+  }, [year, week, bodyKey]);
 
   const goToPreviousWeek = () => {
     if (week <= 1) {
@@ -52,6 +65,8 @@ const WeeklyOverview = () => {
   const { from, to } = getWeekDateRange(year, week);
   const dateRangeLabel = formatDateRange(from, to);
   const closestVoting = data?.closestVoting;
+  const selectedBody = bodies.find((b) => b.key === bodyKey);
+  const grouped = groupBodiesByLevel(bodies);
 
   return (
     <div className="min-h-screen bg-background">
@@ -70,8 +85,40 @@ const WeeklyOverview = () => {
       </header>
 
       <main className="max-w-4xl mx-auto px-6 py-10 space-y-8">
+        {/* Parliament selector */}
+        <div className="opacity-0 animate-fade-in" style={{ animationDelay: "0ms" }}>
+          <div className="flex items-center gap-3 flex-wrap">
+            <div className="flex items-center gap-2 text-muted-foreground">
+              <Building2 className="w-4 h-4" />
+              <span className="text-xs font-medium uppercase tracking-wider">Parlament</span>
+            </div>
+            <Select value={bodyKey} onValueChange={setBodyKey}>
+              <SelectTrigger className="w-auto min-w-[220px] h-9 text-sm">
+                <SelectValue placeholder="Parlament wählen…" />
+              </SelectTrigger>
+              <SelectContent className="max-h-80">
+                {Object.entries(grouped).sort(([a], [b]) => {
+                  const order = ["national", "cantonal", "communal", "other"];
+                  return order.indexOf(a) - order.indexOf(b);
+                }).map(([level, levelBodies]) => (
+                  <SelectGroup key={level}>
+                    <SelectLabel className="text-xs uppercase tracking-wider text-muted-foreground">
+                      {LEVEL_LABELS[level] || level}
+                    </SelectLabel>
+                    {levelBodies.sort((a, b) => getBodyLabel(a).localeCompare(getBodyLabel(b))).map((body) => (
+                      <SelectItem key={body.key} value={body.key}>
+                        {getBodyLabel(body)}
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
         {/* Week header with navigation */}
-        <div className="space-y-2 opacity-0 animate-fade-in" style={{ animationDelay: "0ms" }}>
+        <div className="space-y-2 opacity-0 animate-fade-in" style={{ animationDelay: "50ms" }}>
           <div className="flex items-center gap-3">
             <Button variant="ghost" size="icon" className="h-8 w-8" onClick={goToPreviousWeek}>
               <ChevronLeft className="w-4 h-4" />
@@ -85,7 +132,7 @@ const WeeklyOverview = () => {
           </div>
           <h1 className="font-serif text-3xl md:text-4xl font-bold text-foreground">{dateRangeLabel}</h1>
           <p className="text-xs text-muted-foreground">
-            Quelle: <a href="https://openparldata.ch" target="_blank" rel="noopener noreferrer" className="underline hover:text-foreground">OpenParlData.ch</a> · Schweizer Parlament · CC BY 4.0
+            {selectedBody ? getBodyLabel(selectedBody) : bodyKey} · Quelle: <a href="https://openparldata.ch" target="_blank" rel="noopener noreferrer" className="underline hover:text-foreground">OpenParlData.ch</a> · CC BY 4.0
           </p>
         </div>
 

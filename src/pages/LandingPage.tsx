@@ -24,7 +24,7 @@ const LandingPage = () => {
             className="inline-block px-3 py-1 rounded-full border border-border text-xs font-medium text-muted-foreground tracking-wide uppercase opacity-0 animate-fade-in"
             style={{ animationDelay: "0ms" }}
           >
-            Prototyp · Schweizer Parlament
+            Nationale, kantonale & kommunale Parlamente
           </div>
 
           <h1
@@ -77,7 +77,7 @@ const LandingPage = () => {
       {/* Footer */}
       <footer className="px-6 py-5 border-t border-border/50">
         <div className="max-w-4xl mx-auto text-center text-xs text-muted-foreground">
-          PolitikRadar Weekly · Prototyp · Keine Echtzeitdaten
+          PolitikRadar Weekly · Prototyp · Daten via OpenParlData.ch
         </div>
       </footer>
     </div>
