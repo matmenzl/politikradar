@@ -205,7 +205,19 @@ const WeeklyOverview = () => {
           </div>
         )}
 
-        {!loading && !error && data && (
+        {!loading && !error && data && data.totalAffairs === 0 && data.totalVotings === 0 && data.totalMeetings === 0 && (
+          <div className="text-center py-16 space-y-3 opacity-0 animate-fade-in" style={{ animationDelay: "100ms" }}>
+            <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-muted">
+              <Activity className="w-5 h-5 text-muted-foreground" />
+            </div>
+            <p className="text-lg font-serif font-semibold text-foreground">Keine Daten für diese Woche</p>
+            <p className="text-sm text-muted-foreground max-w-md mx-auto">
+              Für «{selectedBody ? getBodyLabel(selectedBody) : bodyKey}» liegen in der Kalenderwoche {week} keine parlamentarischen Aktivitäten vor. Versuche eine andere Woche oder ein anderes Parlament.
+            </p>
+          </div>
+        )}
+
+        {!loading && !error && data && (data.totalAffairs > 0 || data.totalVotings > 0 || data.totalMeetings > 0) && (
           <div className="space-y-8">
             <div className="grid gap-5 md:grid-cols-2">
               {/* Card 1: Gesamtaktivität */}
