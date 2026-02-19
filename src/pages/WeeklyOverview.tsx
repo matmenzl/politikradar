@@ -8,6 +8,7 @@ import { useState, useEffect, useMemo } from "react";
 import { toast } from "sonner";
 import ShareModal from "@/components/ShareModal";
 import VoteBar from "@/components/VoteBar";
+import PartyOverviewCard from "@/components/PartyOverviewCard";
 import { supabase } from "@/integrations/supabase/client";
 import {
   fetchWeeklyData,
@@ -400,6 +401,9 @@ const WeeklyOverview = () => {
                 </CardContent>
               </Card>
             </div>
+
+            {/* Card 5: Party Overview */}
+            <PartyOverviewCard votings={data.votings} />
           </div>
         )}
       </main>
