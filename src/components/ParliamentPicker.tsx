@@ -54,12 +54,12 @@ export default function ParliamentPicker({ bodies, value, onValueChange, loading
       </PopoverTrigger>
       <PopoverContent className="w-[320px] p-0" align="start">
         <Command filter={(value, search) => {
-          const body = bodies.find((b) => b.key === value);
+          const body = bodies.find((b) => b.key?.toLowerCase() === value?.toLowerCase());
           if (!body) return 0;
           const label = getBodyLabel(body).toLowerCase();
           const canton = (body.canton_key || "").toLowerCase();
           const s = search.toLowerCase();
-          if (label.includes(s) || canton.includes(s) || value.toLowerCase().includes(s)) return 1;
+          if (label.includes(s) || canton.includes(s) || (value || "").toLowerCase().includes(s)) return 1;
           return 0;
         }}>
           <CommandInput placeholder="Parlament suchen…" />
