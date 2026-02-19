@@ -33,7 +33,8 @@ const WeeklyOverview = () => {
   const [hasUserSelected, setHasUserSelected] = useState(!!urlBody);
   const [bodies, setBodies] = useState<Body[]>([]);
 
-  const setBodyKey = (key: string) => {
+  const setBodyKey = (key: string | undefined) => {
+    if (!key) return;
     setBodyKeyState(key);
     setHasUserSelected(true);
     setSearchParams({ body: key }, { replace: true });
