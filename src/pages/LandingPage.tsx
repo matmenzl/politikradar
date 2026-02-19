@@ -53,6 +53,7 @@ const LandingPage = () => {
       const q = searchQuery.toLowerCase().trim();
       result = result.filter((b) =>
         getBodyLabel(b).toLowerCase().includes(q) ||
+        (b.canton_key && b.canton_key.toLowerCase().includes(q)) ||
         (b.canton && b.canton.toLowerCase().includes(q))
       );
     }
@@ -197,7 +198,7 @@ const LandingPage = () => {
             ) : (
               <div className="grid gap-2 sm:grid-cols-2 md:grid-cols-3">
                 {filteredBodies.map((body) => {
-                  const level = body.level || "other";
+                  const level = body.level || (body.type === "country" ? "national" : body.type === "canton" ? "cantonal" : body.type === "city" || body.type === "municipality" ? "communal" : "other");
                   return (
                     <Link
                       key={body.id}
@@ -211,7 +212,7 @@ const LandingPage = () => {
                         <p className="text-sm font-medium text-foreground truncate">{getBodyLabel(body)}</p>
                         <p className="text-xs text-muted-foreground">
                           {LEVEL_LABELS[level] || level}
-                          {body.canton && ` · ${body.canton}`}
+                          {body.canton_key && ` · ${body.canton_key}`}
                         </p>
                       </div>
                       <ArrowRight className="w-3.5 h-3.5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
