@@ -20,7 +20,9 @@ export interface Body {
   name_it?: string;
   name_en?: string;
   level?: string;
+  type?: string; // API field: "country", "canton", "city", "municipality"
   canton?: string;
+  canton_key?: string;
   url_external?: string;
 }
 
@@ -112,10 +114,22 @@ export function getBodyLabel(body: Body): string {
   return body.name_de || body.key;
 }
 
+// Map API type to our level categories
+function typeToLevel(type?: string): string {
+  if (!type) return "other";
+  switch (type) {
+    case "country": return "national";
+    case "canton": return "cantonal";
+    case "city":
+    case "municipality": return "communal";
+    default: return "other";
+  }
+}
+
 export function groupBodiesByLevel(bodies: Body[]): Record<string, Body[]> {
   const groups: Record<string, Body[]> = {};
   for (const b of bodies) {
-    const level = b.level || "other";
+    const level = b.level || typeToLevel(b.type) || "other";
     if (!groups[level]) groups[level] = [];
     groups[level].push(b);
   }
