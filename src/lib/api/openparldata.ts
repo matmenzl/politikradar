@@ -24,7 +24,20 @@ export interface Body {
   canton?: string;
   canton_key?: string;
   url_external?: string;
+  indexed?: boolean;
 }
+
+// Fallback for national parliament (not returned by paginated /bodies endpoint)
+const CHE_BODY: Body = {
+  id: 42,
+  key: "CHE",
+  name_de: "Schweiz",
+  name_fr: "Suisse",
+  name_it: "Svizzera",
+  name_en: "Switzerland",
+  type: "country",
+  indexed: true,
+};
 
 export interface Voting {
   id: number;
@@ -100,11 +113,25 @@ export async function fetchBodies(): Promise<Body[]> {
   const limit = 200;
   let hasMore = true;
   while (hasMore) {
-    const res = await fetchApi<Body>("/bodies", { limit: String(limit), offset: String(offset) });
-    allBodies = allBodies.concat(res.data);
+    const res = await fetchApi<any>("/bodies", { limit: String(limit), offset: String(offset) });
+    // Map API fields: body_key → key
+    const mapped: Body[] = res.data.map((b: any) => ({
+      ...b,
+      key: b.body_key || b.key,
+    }));
+    allBodies = allBodies.concat(mapped);
     hasMore = res.meta.has_more;
     offset += limit;
   }
+
+  // Only keep indexed bodies (those with actual parliamentary data)
+  allBodies = allBodies.filter((b) => b.indexed === true);
+
+  // Ensure CHE (national parliament) is present
+  if (!allBodies.find((b) => b.key === "CHE")) {
+    allBodies.unshift(CHE_BODY);
+  }
+
   bodiesCache = allBodies;
   return bodiesCache;
 }
