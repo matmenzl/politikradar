@@ -232,6 +232,151 @@ export function findClosestVoting(votings: Voting[]): Voting | null {
   });
 }
 
+// Individual vote per person per voting
+export interface Vote {
+  id: number;
+  voting_id: number;
+  person_id: number;
+  vote: string; // "yes" | "no" | "abstention" | "absent" | etc.
+  vote_display_de?: string;
+  person_fullname: string;
+  person_party_de?: string;
+  person_parliamentary_group_name_de?: string;
+}
+
+export async function fetchVotesForVoting(votingId: number): Promise<Vote[]> {
+  let allVotes: Vote[] = [];
+  let offset = 0;
+  const limit = 200;
+  let hasMore = true;
+  while (hasMore) {
+    const res = await fetchApi<Vote>(`/votings/${votingId}/votes`, { limit: String(limit), offset: String(offset) });
+    allVotes = allVotes.concat(res.data);
+    hasMore = res.meta.has_more;
+    offset += limit;
+  }
+  return allVotes;
+}
+
+export interface PartyWeeklyStats {
+  party: string;
+  totalYes: number;
+  totalNo: number;
+  totalAbstention: number;
+  totalAbsent: number;
+  totalVotes: number;
+  cohesion: number; // 0-100, how unified the party voted
+  deviators: { name: string; votingTitle: string; vote: string; majorityVote: string }[];
+}
+
+export async function fetchPartyWeeklyStats(votings: Voting[]): Promise<PartyWeeklyStats[]> {
+  if (votings.length === 0) return [];
+
+  // Fetch votes for all votings in parallel (max 10 at a time to avoid overload)
+  const batchSize = 10;
+  const allVotesPerVoting: { voting: Voting; votes: Vote[] }[] = [];
+  
+  for (let i = 0; i < votings.length; i += batchSize) {
+    const batch = votings.slice(i, i + batchSize);
+    const results = await Promise.all(
+      batch.map(async (v) => ({ voting: v, votes: await fetchVotesForVoting(v.id) }))
+    );
+    allVotesPerVoting.push(...results);
+  }
+
+  // Aggregate by party
+  const partyMap = new Map<string, {
+    yes: number; no: number; abstention: number; absent: number;
+    votingResults: { votingTitle: string; personVotes: { name: string; vote: string }[] }[];
+  }>();
+
+  for (const { voting, votes } of allVotesPerVoting) {
+    // Group votes by party for this voting
+    const partyVotesInVoting = new Map<string, { name: string; vote: string }[]>();
+    
+    for (const v of votes) {
+      const party = v.person_party_de || v.person_parliamentary_group_name_de || "Unbekannt";
+      if (!partyVotesInVoting.has(party)) partyVotesInVoting.set(party, []);
+      partyVotesInVoting.get(party)!.push({ name: v.person_fullname, vote: v.vote });
+
+      if (!partyMap.has(party)) {
+        partyMap.set(party, { yes: 0, no: 0, abstention: 0, absent: 0, votingResults: [] });
+      }
+      const stats = partyMap.get(party)!;
+      if (v.vote === "yes") stats.yes++;
+      else if (v.vote === "no") stats.no++;
+      else if (v.vote === "abstention") stats.abstention++;
+      else stats.absent++;
+    }
+
+    // Store per-voting results for deviator detection
+    for (const [party, personVotes] of partyVotesInVoting) {
+      const stats = partyMap.get(party)!;
+      stats.votingResults.push({
+        votingTitle: voting.affair_title_de || voting.title_de || `#${voting.id}`,
+        personVotes,
+      });
+    }
+  }
+
+  // Calculate cohesion and find deviators
+  const results: PartyWeeklyStats[] = [];
+  for (const [party, stats] of partyMap) {
+    const total = stats.yes + stats.no + stats.abstention;
+    const deviators: PartyWeeklyStats["deviators"] = [];
+
+    // For each voting, find the majority vote and flag deviators
+    for (const vr of stats.votingResults) {
+      const castVotes = vr.personVotes.filter((pv) => pv.vote === "yes" || pv.vote === "no");
+      if (castVotes.length < 2) continue;
+      const yesCount = castVotes.filter((pv) => pv.vote === "yes").length;
+      const noCount = castVotes.filter((pv) => pv.vote === "no").length;
+      const majorityVote = yesCount >= noCount ? "yes" : "no";
+      
+      for (const pv of castVotes) {
+        if (pv.vote !== majorityVote) {
+          deviators.push({
+            name: pv.name,
+            votingTitle: vr.votingTitle,
+            vote: pv.vote === "yes" ? "Ja" : "Nein",
+            majorityVote: majorityVote === "yes" ? "Ja" : "Nein",
+          });
+        }
+      }
+    }
+
+    // Cohesion: across all votings, what % voted with the majority?
+    let totalCast = 0;
+    let totalWithMajority = 0;
+    for (const vr of stats.votingResults) {
+      const castVotes = vr.personVotes.filter((pv) => pv.vote === "yes" || pv.vote === "no");
+      if (castVotes.length < 2) continue;
+      const yesCount = castVotes.filter((pv) => pv.vote === "yes").length;
+      const noCount = castVotes.filter((pv) => pv.vote === "no").length;
+      const majorityCount = Math.max(yesCount, noCount);
+      totalCast += castVotes.length;
+      totalWithMajority += majorityCount;
+    }
+
+    const cohesion = totalCast > 0 ? Math.round((totalWithMajority / totalCast) * 100) : 100;
+
+    results.push({
+      party,
+      totalYes: stats.yes,
+      totalNo: stats.no,
+      totalAbstention: stats.abstention,
+      totalAbsent: stats.absent,
+      totalVotes: total,
+      cohesion,
+      deviators,
+    });
+  }
+
+  // Sort by total votes descending
+  results.sort((a, b) => b.totalVotes - a.totalVotes);
+  return results;
+}
+
 export interface WeeklyStats {
   totalAffairs: number;
   totalVotings: number;
