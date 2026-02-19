@@ -93,8 +93,18 @@ let bodiesCache: Body[] | null = null;
 
 export async function fetchBodies(): Promise<Body[]> {
   if (bodiesCache) return bodiesCache;
-  const res = await fetchApi<Body>("/bodies", { limit: "100" });
-  bodiesCache = res.data;
+  // Fetch all bodies by paginating through results
+  let allBodies: Body[] = [];
+  let offset = 0;
+  const limit = 200;
+  let hasMore = true;
+  while (hasMore) {
+    const res = await fetchApi<Body>("/bodies", { limit: String(limit), offset: String(offset) });
+    allBodies = allBodies.concat(res.data);
+    hasMore = res.meta.has_more;
+    offset += limit;
+  }
+  bodiesCache = allBodies;
   return bodiesCache;
 }
 
