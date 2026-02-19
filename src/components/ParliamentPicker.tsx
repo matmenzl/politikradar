@@ -71,8 +71,8 @@ export default function ParliamentPicker({ bodies, value, onValueChange, loading
                   <CommandItem
                     key={body.key}
                     value={body.key}
-                    onSelect={(v) => {
-                      onValueChange(v);
+                    onSelect={() => {
+                      onValueChange(body.key);
                       setOpen(false);
                     }}
                   >
