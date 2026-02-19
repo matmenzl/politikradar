@@ -160,7 +160,7 @@ const WeeklyOverview = () => {
               <Building2 className="w-4 h-4" />
               <span className="text-xs font-medium uppercase tracking-wider">Parlament wechseln</span>
             </div>
-            <Select value={bodyKey} onValueChange={setBodyKey}>
+            <Select value={bodies.length > 0 ? bodyKey : undefined} onValueChange={setBodyKey}>
               <SelectTrigger className="w-auto min-w-[220px] h-9 text-sm">
                 <SelectValue placeholder={bodies.length === 0 ? "Parlament wird geladen…" : "Parlament wählen…"} />
               </SelectTrigger>
