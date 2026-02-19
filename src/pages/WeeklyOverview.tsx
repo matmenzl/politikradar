@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { ArrowLeft, Share2, Vote, BarChart3, Activity, ChevronLeft, ChevronRight, FileText, Loader2, Building2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -20,11 +20,12 @@ import {
 } from "@/lib/api/openparldata";
 
 const WeeklyOverview = () => {
+  const [searchParams] = useSearchParams();
   const [shareOpen, setShareOpen] = useState(false);
   const initial = getCurrentISOWeek();
   const [year, setYear] = useState(initial.year);
   const [week, setWeek] = useState(initial.week);
-  const [bodyKey, setBodyKey] = useState("CHE");
+  const [bodyKey, setBodyKey] = useState(searchParams.get("body") || "CHE");
   const [bodies, setBodies] = useState<Body[]>([]);
   const [data, setData] = useState<WeeklyStats | null>(null);
   const [loading, setLoading] = useState(true);
