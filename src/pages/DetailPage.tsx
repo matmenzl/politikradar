@@ -1,5 +1,5 @@
 import { Link, useParams, useSearchParams } from "react-router-dom";
-import { ArrowLeft, Loader2, ExternalLink, Calendar, FileText, Vote, Tag } from "lucide-react";
+import { ArrowLeft, Loader2, ExternalLink, Calendar, FileText, Vote, Tag, Sparkles } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -41,11 +41,15 @@ const DetailPage = () => {
   const [affair, setAffair] = useState<AffairDetail | null>(null);
   const [relatedVotings, setRelatedVotings] = useState<Voting[]>([]);
   const [tags, setTags] = useState<string[]>([]);
+  const [summary, setSummary] = useState<string>("");
+  const [summaryLoading, setSummaryLoading] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!id) return;
     setLoading(true);
+    setSummary("");
+    setSummaryLoading(false);
     setVoting(null);
     setAffair(null);
     setRelatedVotings([]);
@@ -101,6 +105,38 @@ const DetailPage = () => {
     }
   }, [id, type]);
 
+  const generateSummary = async () => {
+    if (!affair) return;
+    setSummaryLoading(true);
+    try {
+      const body: Record<string, unknown> = { title: affair.title_de };
+      if (affair.type_de || affair.type_name_de || affair.type_harmonized_de) {
+        body.type = affair.type_de || affair.type_name_de || affair.type_harmonized_de;
+      }
+      if (affair.status_de || affair.state_name_de) {
+        body.status = affair.status_de || affair.state_name_de;
+      }
+      if (affair.begin_date) body.beginDate = affair.begin_date;
+      if (affair.end_date) body.endDate = affair.end_date;
+      if (voting) {
+        body.votingResults = {
+          yes: voting.results_yes,
+          no: voting.results_no,
+          abstention: voting.results_abstention,
+          decision: voting.decision,
+        };
+        if (voting.date) body.date = voting.date;
+      }
+      const { data, error } = await supabase.functions.invoke("summarize-affair", { body });
+      if (error) throw error;
+      setSummary(data?.summary || "Keine Zusammenfassung verfügbar.");
+    } catch (e) {
+      console.error("Summary error:", e);
+      setSummary("Zusammenfassung konnte nicht erstellt werden.");
+    } finally {
+      setSummaryLoading(false);
+    }
+  };
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
@@ -163,6 +199,40 @@ const DetailPage = () => {
             </div>
           )}
         </div>
+
+        {/* AI Summary */}
+        {affair && (
+          <Card className="opacity-0 animate-fade-in" style={{ animationDelay: "50ms" }}>
+            <CardContent className="p-6 space-y-3">
+              {!summary && !summaryLoading && (
+                <Button
+                  variant="outline"
+                  className="w-full gap-2"
+                  onClick={generateSummary}
+                >
+                  <Sparkles className="w-4 h-4" />
+                  Zusammenfassung generieren
+                </Button>
+              )}
+              {summaryLoading && (
+                <div className="flex items-center gap-3 py-2">
+                  <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
+                  <span className="text-sm text-muted-foreground">Zusammenfassung wird erstellt…</span>
+                </div>
+              )}
+              {summary && !summaryLoading && (
+                <>
+                  <div className="flex items-center gap-2">
+                    <Sparkles className="w-4 h-4 text-muted-foreground" />
+                    <h2 className="font-serif text-lg font-semibold">Zusammenfassung</h2>
+                  </div>
+                  <p className="text-sm text-foreground leading-relaxed">{summary}</p>
+                  <p className="text-xs text-muted-foreground pt-1">Erstellt mit KI · Angaben ohne Gewähr</p>
+                </>
+              )}
+            </CardContent>
+          </Card>
+        )}
 
         {/* Voting detail */}
         {voting && (
