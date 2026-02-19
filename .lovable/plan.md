@@ -1,40 +1,70 @@
 
 
-# Parlament-Auswahl: UX bereinigen
+## Problem: Nationale Parlament-Auswahl funktioniert nicht korrekt
 
-## Problem
-1. **Kein klarer Hinweis** auf das vorausgewählte Parlament (Schweizerische Eidgenossenschaft) beim Direktzugriff auf `/weekly`
-2. **Redundanz** zwischen Landing Page (Parlament-Karten) und Weekly Overview (Dropdown) -- zwei verschiedene UI-Patterns fuer dieselbe Aktion
-3. **Body-Key statt Name** wird kurz angezeigt, bevor die Bodies geladen sind
+### Analyse der API
 
-## Loesung
+Durch direkte API-Tests habe ich folgende Probleme identifiziert:
 
-### 1. Seitentitel deklariert das aktive Parlament
-- Unter der Wochennavigation (KW-Header) wird der **vollstaendige Parlamentsname** prominent als Untertitel angezeigt
-- Statt nur "CHE" im kleinen Dropdown steht z.B. **"Schweizerische Eidgenossenschaft"** klar sichtbar als Kontext
-- Das Label "Parlament" mit dem Dropdown bleibt, wird aber als **Wechsel-Option** positioniert, nicht als primaerer Kontext
+1. **CHE (Schweiz) fehlt in der Bodies-Liste**: Der Endpunkt `/bodies` (paginiert) liefert das nationale Parlament "Schweiz" (body_key: `CHE`, id: 42) **nicht** zurueck. Es existiert aber unter `/bodies/42`. Das bedeutet, `fetchBodies()` laedt die Schweiz nie in die Bodies-Liste, und der Parlament-Picker kann sie nicht anzeigen.
 
-### 2. Dropdown besser beschriftet
-- SelectTrigger zeigt den **vollen Namen** des aktuell gewaehlten Parlaments (tut es bereits, wenn Bodies geladen)
-- Waehrend die Bodies noch laden: Platzhalter "Parlament wird geladen..." statt den rohen Key "CHE"
-- Ueber dem Dropdown ein klarerer Label-Text: **"Parlament wechseln"** statt nur "Parlament"
+2. **cmdk Lowercase-Problem**: Die `cmdk`-Bibliothek wandelt `value` intern in Kleinbuchstaben um. Wenn ein Kanton wie `ZH` ausgewaehlt wird, erhaelt `onSelect` den Wert `zh`. Der bisherige Fix mit `body.key?.toLowerCase() === value?.toLowerCase()` im Filter hilft, aber die Auswahl selbst (der angezeigte Wert und der gespeicherte State) wird trotzdem korrekt ueber `body.key` direkt gesetzt.
 
-### 3. Default deutlich machen
-- Wenn kein `?body=` Parameter vorhanden ist (Direktzugriff), wird ein dezenter Hinweis angezeigt:
-  *"Standardmaessig: Nationales Parlament. Waehle ein anderes Parlament im Dropdown."*
-- Dieser Hinweis verschwindet, sobald der User aktiv ein Parlament gewaehlt hat
+3. **Fehlende CHE-Fallback**: Da CHE nie in der Bodies-Liste auftaucht, zeigt der Picker "Parlament waehlen..." statt "Schweiz" an, auch wenn `bodyKey === "CHE"` korrekt gesetzt ist.
 
-### 4. URL-Sync
-- Wenn der User im Dropdown ein Parlament wechselt, wird der `?body=`-Parameter in der URL aktualisiert (mit `useSearchParams`), damit die Auswahl teilbar und bookmarkbar ist
+### Loesung
 
-## Technische Aenderungen
+#### 1. CHE manuell in die Bodies-Liste einfuegen (`src/lib/api/openparldata.ts`)
 
-### `src/pages/WeeklyOverview.tsx`
-- `useSearchParams` statt nur `useState` fuer `bodyKey`, damit URL und State synchron bleiben
-- Label-Text von "Parlament" zu "Parlament wechseln" aendern
-- Prominenten Parlamentsnamen im Seitenkopf anzeigen (neben/unter dem Datums-Header)
-- Hinweistext bei Default-Auswahl (kein URL-Parameter) hinzufuegen
-- Ladezustand abfangen: Solange Bodies nicht geladen, "Lade Parlament..." anzeigen statt den Key
+Nach dem Laden aller Bodies pruefen, ob CHE vorhanden ist. Falls nicht, wird das nationale Parlament manuell hinzugefuegt:
 
-### Keine Aenderungen an der Landing Page
-Die Landing Page bleibt wie sie ist -- sie dient als Einstiegspunkt und leitet korrekt mit `?body=X` weiter.
+```typescript
+const CHE_BODY: Body = {
+  id: 42,
+  key: "CHE",
+  name_de: "Schweiz",
+  name_fr: "Suisse",
+  name_it: "Svizzera",
+  name_en: "Switzerland",
+  type: "country",
+};
+```
+
+In `fetchBodies()` nach dem Laden pruefen:
+```typescript
+if (!allBodies.find(b => b.key === "CHE")) {
+  allBodies.unshift(CHE_BODY);
+}
+```
+
+#### 2. Body-Interface um fehlende Felder erweitern (`src/lib/api/openparldata.ts`)
+
+Das `Body`-Interface hat kein `key`-Feld -- die API liefert es als `body_key`. Pruefen ob das Mapping korrekt laeuft, ggf. `body_key` auf `key` mappen im Fetch.
+
+#### 3. Nur indexierte Parlamente laden (Performance)
+
+Die API liefert 1405 Bodies, aber viele davon haben keine Daten (`indexed: false`). Nur `indexed: true` Bodies haben tatsaechlich parlamentarische Daten. Dies wuerde die Liste von ~1400 auf ~50 reduzieren und die Performance massiv verbessern.
+
+```typescript
+// Nur Bodies mit Daten laden
+const res = await fetchApi<Body>("/bodies", { 
+  limit: String(limit), 
+  offset: String(offset),
+  indexed: "true"  // Falls die API das unterstuetzt
+});
+```
+
+Falls die API keinen `indexed`-Filter unterstuetzt, clientseitig filtern.
+
+### Technische Schritte
+
+1. **`src/lib/api/openparldata.ts`**: 
+   - API-Antwort-Felder korrekt auf `Body`-Interface mappen (insbesondere `body_key` zu `key`)
+   - CHE als Fallback hinzufuegen falls nicht in der Liste
+   - Optional: Nur indexierte Bodies laden/filtern fuer bessere Performance
+
+2. **`src/components/ParliamentPicker.tsx`**: 
+   - Keine Aenderungen noetig, sofern die Bodies-Liste korrekt befuellt wird
+
+3. **Kein Breaking Change**: Die Abstimmungs-/Geschaefts-API-Aufrufe verwenden `body_key` korrekt und funktionieren bereits mit jedem gültigen Key.
+
