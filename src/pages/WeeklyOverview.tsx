@@ -1,9 +1,9 @@
 import { Link, useSearchParams } from "react-router-dom";
-import { ArrowLeft, Share2, Vote, BarChart3, Activity, ChevronLeft, ChevronRight, FileText, Loader2, Building2, Tag, Sparkles } from "lucide-react";
+import { ArrowLeft, Share2, Vote, BarChart3, Activity, ChevronLeft, ChevronRight, FileText, Loader2, Tag, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
+import ParliamentPicker from "@/components/ParliamentPicker";
 import { useState, useEffect, useMemo } from "react";
 import { toast } from "sonner";
 import ShareModal from "@/components/ShareModal";
@@ -13,9 +13,7 @@ import { supabase } from "@/integrations/supabase/client";
 import {
   fetchWeeklyData,
   fetchBodies,
-  groupBodiesByLevel,
   getBodyLabel,
-  LEVEL_LABELS,
   getCurrentISOWeek,
   getWeekDateRange,
   formatDateRange,
@@ -135,7 +133,6 @@ const WeeklyOverview = () => {
   const dateRangeLabel = formatDateRange(from, to);
   const closestVoting = data?.closestVoting;
   const selectedBody = bodies.find((b) => b.key === bodyKey);
-  const grouped = groupBodiesByLevel(bodies);
 
   return (
     <div className="min-h-screen bg-background">
@@ -157,32 +154,13 @@ const WeeklyOverview = () => {
         {/* Parliament selector */}
         <div className="opacity-0 animate-fade-in" style={{ animationDelay: "0ms" }}>
           <div className="flex items-center gap-3 flex-wrap">
-            <div className="flex items-center gap-2 text-muted-foreground">
-              <Building2 className="w-4 h-4" />
-              <span className="text-xs font-medium uppercase tracking-wider">Parlament wechseln</span>
-            </div>
-            <Select value={bodies.length > 0 ? bodyKey : undefined} onValueChange={setBodyKey}>
-              <SelectTrigger className="w-auto min-w-[220px] h-9 text-sm">
-                <SelectValue placeholder={bodies.length === 0 ? "Parlament wird geladen…" : "Parlament wählen…"} />
-              </SelectTrigger>
-              <SelectContent className="max-h-80">
-                {Object.entries(grouped).sort(([a], [b]) => {
-                  const order = ["national", "cantonal", "communal", "other"];
-                  return order.indexOf(a) - order.indexOf(b);
-                }).map(([level, levelBodies]) => (
-                  <SelectGroup key={level}>
-                    <SelectLabel className="text-xs uppercase tracking-wider text-muted-foreground">
-                      {LEVEL_LABELS[level] || level}
-                    </SelectLabel>
-                    {levelBodies.sort((a, b) => getBodyLabel(a).localeCompare(getBodyLabel(b))).map((body) => (
-                      <SelectItem key={body.key} value={body.key}>
-                        {getBodyLabel(body)}
-                      </SelectItem>
-                    ))}
-                  </SelectGroup>
-                ))}
-              </SelectContent>
-            </Select>
+            <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Parlament wechseln</span>
+            <ParliamentPicker
+              bodies={bodies}
+              value={bodyKey}
+              onValueChange={setBodyKey}
+              loading={bodies.length === 0}
+            />
           </div>
         </div>
 
