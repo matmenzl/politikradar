@@ -12,6 +12,18 @@ interface ApiResponse<T> {
   data: T[];
 }
 
+export interface Body {
+  id: number;
+  key: string;
+  name_de?: string;
+  name_fr?: string;
+  name_it?: string;
+  name_en?: string;
+  level?: string;
+  canton?: string;
+  url_external?: string;
+}
+
 export interface Voting {
   id: number;
   body_key: string;
@@ -60,8 +72,7 @@ export interface Meeting {
 }
 
 async function fetchApi<T>(endpoint: string, params: Record<string, string> = {}): Promise<ApiResponse<T>> {
-  const defaultParams = {
-    body_key: "CHE",
+  const defaultParams: Record<string, string> = {
     lang: "de",
     lang_format: "flat",
     hide_null: "true",
@@ -77,8 +88,38 @@ async function fetchApi<T>(endpoint: string, params: Record<string, string> = {}
   return response.json();
 }
 
+// Cache bodies to avoid refetching
+let bodiesCache: Body[] | null = null;
+
+export async function fetchBodies(): Promise<Body[]> {
+  if (bodiesCache) return bodiesCache;
+  const res = await fetchApi<Body>("/bodies", { limit: "100" });
+  bodiesCache = res.data;
+  return bodiesCache;
+}
+
+export function getBodyLabel(body: Body): string {
+  return body.name_de || body.key;
+}
+
+export function groupBodiesByLevel(bodies: Body[]): Record<string, Body[]> {
+  const groups: Record<string, Body[]> = {};
+  for (const b of bodies) {
+    const level = b.level || "other";
+    if (!groups[level]) groups[level] = [];
+    groups[level].push(b);
+  }
+  return groups;
+}
+
+export const LEVEL_LABELS: Record<string, string> = {
+  national: "National",
+  cantonal: "Kantonal",
+  communal: "Kommunal",
+  other: "Weitere",
+};
+
 export function getWeekDateRange(year: number, week: number): { from: string; to: string } {
-  // ISO week: find Monday of given week
   const jan4 = new Date(year, 0, 4);
   const dayOfWeek = jan4.getDay() || 7;
   const mondayOfWeek1 = new Date(jan4);
@@ -117,16 +158,15 @@ export function getCurrentISOWeek(): { year: number; week: number } {
   d.setUTCDate(d.getUTCDate() + 4 - dayNum);
   const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
   const weekNo = Math.ceil(((d.getTime() - yearStart.getTime()) / 86400000 + 1) / 7);
-  // Return previous week for more complete data
   if (weekNo <= 1) {
     return { year: d.getUTCFullYear() - 1, week: 52 };
   }
   return { year: d.getUTCFullYear(), week: weekNo - 1 };
 }
 
-export async function fetchVotingsForWeek(from: string, to: string) {
-  // API date filters may not work reliably, so we fetch recent data and filter client-side
+export async function fetchVotingsForWeek(from: string, to: string, bodyKey: string = "CHE") {
   const res = await fetchApi<Voting>("/votings", {
+    body_key: bodyKey,
     sort_by: "-date",
     limit: "500",
   });
@@ -139,8 +179,9 @@ export async function fetchVotingsForWeek(from: string, to: string) {
   return { data: filtered, total: filtered.length };
 }
 
-export async function fetchAffairsForWeek(from: string, to: string) {
+export async function fetchAffairsForWeek(from: string, to: string, bodyKey: string = "CHE") {
   const res = await fetchApi<Affair>("/affairs", {
+    body_key: bodyKey,
     sort_by: "-begin_date",
     limit: "500",
     exclude_null: "begin_date",
@@ -155,8 +196,9 @@ export async function fetchAffairsForWeek(from: string, to: string) {
   return { data: filtered, total: filtered.length };
 }
 
-export async function fetchMeetingsForWeek(from: string, to: string) {
+export async function fetchMeetingsForWeek(from: string, to: string, bodyKey: string = "CHE") {
   const res = await fetchApi<Meeting>("/meetings", {
+    body_key: bodyKey,
     sort_by: "-begin_date",
     limit: "200",
     exclude_null: "begin_date",
@@ -189,13 +231,13 @@ export interface WeeklyStats {
   votings: Voting[];
 }
 
-export async function fetchWeeklyData(year: number, week: number): Promise<WeeklyStats> {
+export async function fetchWeeklyData(year: number, week: number, bodyKey: string = "CHE"): Promise<WeeklyStats> {
   const { from, to } = getWeekDateRange(year, week);
 
   const [votingsRes, affairsRes, meetingsRes] = await Promise.all([
-    fetchVotingsForWeek(from, to),
-    fetchAffairsForWeek(from, to),
-    fetchMeetingsForWeek(from, to),
+    fetchVotingsForWeek(from, to, bodyKey),
+    fetchAffairsForWeek(from, to, bodyKey),
+    fetchMeetingsForWeek(from, to, bodyKey),
   ]);
 
   return {
