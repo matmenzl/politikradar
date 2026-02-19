@@ -9,6 +9,14 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { Voting, Affair } from "@/lib/api/openparldata";
 
+interface AffairDetail extends Affair {
+  type_name_de?: string;
+  state_name_de?: string;
+  number?: string;
+  type_harmonized_de?: string;
+  url_external_de?: string;
+}
+
 const BASE_URL = "https://api.openparldata.ch/v1";
 
 async function fetchDetail<T>(endpoint: string, id: string): Promise<T | null> {
@@ -28,7 +36,7 @@ const DetailPage = () => {
   const type = searchParams.get("type") || "voting";
 
   const [voting, setVoting] = useState<Voting | null>(null);
-  const [affair, setAffair] = useState<Affair | null>(null);
+  const [affair, setAffair] = useState<AffairDetail | null>(null);
   const [relatedVotings, setRelatedVotings] = useState<Voting[]>([]);
   const [tags, setTags] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
@@ -43,7 +51,23 @@ const DetailPage = () => {
 
     if (type === "voting") {
       fetchDetail<Voting>("/votings", id)
-        .then(setVoting)
+        .then(async (v) => {
+          setVoting(v);
+          // Also fetch the linked affair for context
+          if (v?.affair_id) {
+            try {
+              const a = await fetchDetail<AffairDetail>("/affairs", String(v.affair_id));
+              if (a) setAffair(a);
+              // Fetch other votings on the same affair
+              const res = await fetch(`${BASE_URL}/affairs/${v.affair_id}/votings?lang=de&lang_format=flat&hide_null=true`);
+              if (res.ok) {
+                const json = await res.json();
+                const others = (json.data || []).filter((rv: Voting) => rv.id !== v.id);
+                setRelatedVotings(others);
+              }
+            } catch {}
+          }
+        })
         .finally(() => setLoading(false));
     } else if (type === "affair") {
       fetchDetail<Affair>("/affairs", id)
@@ -186,6 +210,90 @@ const DetailPage = () => {
               </CardContent>
             </Card>
 
+            {/* Linked affair context */}
+            {affair && (
+              <Card className="opacity-0 animate-fade-in" style={{ animationDelay: "120ms" }}>
+                <CardContent className="p-6 space-y-4">
+                  <h2 className="font-serif text-lg font-semibold">Zugehöriges Geschäft</h2>
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <DetailRow label="Geschäftstitel">
+                      <span className="text-right">{affair.title_de || "–"}</span>
+                    </DetailRow>
+                    {affair.number && (
+                      <DetailRow label="Geschäftsnummer">{affair.number}</DetailRow>
+                    )}
+                    {(affair.type_name_de || affair.type_harmonized_de) && (
+                      <DetailRow label="Geschäftstyp">{affair.type_name_de || affair.type_harmonized_de}</DetailRow>
+                    )}
+                    {affair.state_name_de && (
+                      <DetailRow label="Status">
+                        <Badge variant="secondary" className="text-xs">{affair.state_name_de}</Badge>
+                      </DetailRow>
+                    )}
+                    {affair.begin_date && (
+                      <DetailRow label="Eingereicht">
+                        <div className="flex items-center gap-1.5">
+                          <Calendar className="w-3.5 h-3.5 text-muted-foreground" />
+                          {new Date(affair.begin_date).toLocaleDateString("de-CH")}
+                        </div>
+                      </DetailRow>
+                    )}
+                  </div>
+                  <div className="flex gap-2 pt-1">
+                    <Link to={`/detail/${affair.id}?type=affair`}>
+                      <Button variant="outline" size="sm" className="gap-2 text-xs">
+                        <FileText className="w-3.5 h-3.5" />
+                        Geschäft ansehen
+                      </Button>
+                    </Link>
+                    {affair.url_external_de && (
+                      <a href={affair.url_external_de} target="_blank" rel="noopener noreferrer">
+                        <Button variant="outline" size="sm" className="gap-2 text-xs">
+                          <ExternalLink className="w-3.5 h-3.5" />
+                          parlament.ch
+                        </Button>
+                      </a>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Related votings on same affair */}
+            {relatedVotings.length > 0 && (
+              <Card className="opacity-0 animate-fade-in" style={{ animationDelay: "130ms" }}>
+                <CardContent className="p-6 space-y-4">
+                  <h2 className="font-serif text-lg font-semibold">
+                    Weitere Abstimmungen zum selben Geschäft ({relatedVotings.length})
+                  </h2>
+                  <div className="space-y-2">
+                    {relatedVotings.map((v) => (
+                      <Link
+                        key={v.id}
+                        to={`/detail/${v.id}?type=voting`}
+                        className="flex items-center justify-between py-2 px-3 -mx-3 rounded-lg hover:bg-secondary/50 transition-colors"
+                      >
+                        <div className="flex-1 min-w-0 mr-3">
+                          <p className="text-sm text-foreground truncate">
+                            {v.title_de || `Abstimmung #${v.id}`}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            {v.date ? new Date(v.date).toLocaleDateString("de-CH") : ""}
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-2 flex-shrink-0">
+                          <VoteBar ja={v.results_yes} nein={v.results_no} enthaltungen={v.results_abstention} compact />
+                          <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${v.decision === "ja" ? "bg-success/10 text-success" : "bg-destructive/10 text-destructive"}`}>
+                            {v.results_yes}:{v.results_no}
+                          </span>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
             {/* Party breakdown */}
             <VotingPartyBreakdown votingId={voting.id} />
 
@@ -193,7 +301,7 @@ const DetailPage = () => {
               <a href={voting.url_external_de} target="_blank" rel="noopener noreferrer">
                 <Button variant="outline" className="w-full gap-2">
                   <ExternalLink className="w-4 h-4" />
-                  Auf parlament.ch ansehen
+                  Abstimmungsprotokoll auf parlament.ch
                 </Button>
               </a>
             )}
