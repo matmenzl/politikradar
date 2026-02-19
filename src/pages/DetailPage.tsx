@@ -242,7 +242,7 @@ const DetailPage = () => {
                     )}
                   </div>
                   <div className="flex gap-2 pt-1">
-                    <Link to={`/detail/${affair.id}?type=affair`}>
+                    <Link to={`/detail/${affair.id}?type=affair${bodyParam ? `&body=${encodeURIComponent(bodyParam)}` : ""}`}>
                       <Button variant="outline" size="sm" className="gap-2 text-xs">
                         <FileText className="w-3.5 h-3.5" />
                         Geschäft ansehen
@@ -272,7 +272,7 @@ const DetailPage = () => {
                     {relatedVotings.map((v) => (
                       <Link
                         key={v.id}
-                        to={`/detail/${v.id}?type=voting`}
+                        to={`/detail/${v.id}?type=voting${bodyParam ? `&body=${encodeURIComponent(bodyParam)}` : ""}`}
                         className="flex items-center justify-between py-2 px-3 -mx-3 rounded-lg hover:bg-secondary/50 transition-colors"
                       >
                         <div className="flex-1 min-w-0 mr-3">
@@ -357,7 +357,7 @@ const DetailPage = () => {
                     {relatedVotings.map((v) => (
                       <Link
                         key={v.id}
-                        to={`/detail/${v.id}?type=voting`}
+                        to={`/detail/${v.id}?type=voting${bodyParam ? `&body=${encodeURIComponent(bodyParam)}` : ""}`}
                         className="flex items-center justify-between py-2 px-3 -mx-3 rounded-lg hover:bg-secondary/50 transition-colors"
                       >
                         <div className="flex-1 min-w-0 mr-3">
