@@ -1,8 +1,9 @@
 import { Link } from "react-router-dom";
-import { ArrowRight, Building2, Landmark, MapPin, Loader2 } from "lucide-react";
+import { ArrowRight, Building2, Landmark, MapPin, Loader2, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useState, useEffect } from "react";
+import { Input } from "@/components/ui/input";
+import { useState, useEffect, useMemo } from "react";
 import {
   fetchBodies,
   groupBodiesByLevel,
@@ -17,11 +18,18 @@ const LEVEL_ICONS: Record<string, React.ReactNode> = {
   communal: <MapPin className="w-5 h-5" />,
 };
 
-const LEVEL_ORDER = ["national", "cantonal", "communal", "other"];
+const LEVEL_FILTERS = [
+  { key: "all", label: "Alle" },
+  { key: "national", label: "National" },
+  { key: "cantonal", label: "Kantonal" },
+  { key: "communal", label: "Kommunal" },
+] as const;
 
 const LandingPage = () => {
   const [bodies, setBodies] = useState<Body[]>([]);
   const [loadingBodies, setLoadingBodies] = useState(true);
+  const [activeLevel, setActiveLevel] = useState<string>("all");
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     fetchBodies()
@@ -31,6 +39,33 @@ const LandingPage = () => {
   }, []);
 
   const grouped = groupBodiesByLevel(bodies);
+
+  const filteredBodies = useMemo(() => {
+    let result: Body[] = [];
+
+    if (activeLevel === "all") {
+      result = bodies;
+    } else {
+      result = grouped[activeLevel] || [];
+    }
+
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase().trim();
+      result = result.filter((b) =>
+        getBodyLabel(b).toLowerCase().includes(q) ||
+        (b.canton && b.canton.toLowerCase().includes(q))
+      );
+    }
+
+    return result.sort((a, b) => getBodyLabel(a).localeCompare(getBodyLabel(b)));
+  }, [bodies, grouped, activeLevel, searchQuery]);
+
+  const levelCounts = useMemo(() => ({
+    all: bodies.length,
+    national: grouped["national"]?.length || 0,
+    cantonal: grouped["cantonal"]?.length || 0,
+    communal: grouped["communal"]?.length || 0,
+  }), [bodies, grouped]);
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -116,59 +151,80 @@ const LandingPage = () => {
               </p>
             </div>
 
+            {/* Filter Tabs */}
+            <div className="flex flex-col sm:flex-row items-center gap-4">
+              <div className="flex items-center gap-1 p-1 rounded-lg bg-secondary/50">
+                {LEVEL_FILTERS.map(({ key, label }) => (
+                  <button
+                    key={key}
+                    onClick={() => setActiveLevel(key)}
+                    className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
+                      activeLevel === key
+                        ? "bg-background text-foreground shadow-sm"
+                        : "text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    {label}
+                    <span className="ml-1.5 text-xs text-muted-foreground">
+                      {levelCounts[key as keyof typeof levelCounts] || 0}
+                    </span>
+                  </button>
+                ))}
+              </div>
+
+              <div className="relative flex-1 w-full sm:max-w-xs">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Input
+                  placeholder="Parlament suchen…"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-9 h-9"
+                />
+              </div>
+            </div>
+
             {loadingBodies ? (
               <div className="flex items-center justify-center py-12">
                 <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
                 <span className="ml-2 text-sm text-muted-foreground">Lade Parlamente…</span>
               </div>
+            ) : filteredBodies.length === 0 ? (
+              <div className="text-center py-12">
+                <p className="text-muted-foreground">
+                  {searchQuery ? `Keine Parlamente gefunden für «${searchQuery}»` : "Keine Parlamente in dieser Kategorie."}
+                </p>
+              </div>
             ) : (
-              <div className="grid gap-4 md:grid-cols-3">
-                {LEVEL_ORDER.filter((level) => grouped[level]?.length > 0).map((level) => {
-                  const levelBodies = grouped[level].sort((a, b) =>
-                    getBodyLabel(a).localeCompare(getBodyLabel(b))
-                  );
-                  const preview = levelBodies.slice(0, 5);
-                  const remaining = levelBodies.length - preview.length;
-
+              <div className="grid gap-2 sm:grid-cols-2 md:grid-cols-3">
+                {filteredBodies.map((body) => {
+                  const level = body.level || "other";
                   return (
-                    <Card key={level} className="hover:shadow-lg hover:border-accent/30 transition-all duration-300">
-                      <CardHeader className="pb-2">
-                        <div className="flex items-center gap-2 text-accent">
-                          {LEVEL_ICONS[level] || <Building2 className="w-5 h-5" />}
-                          <CardTitle className="font-serif text-lg">
-                            {LEVEL_LABELS[level] || level}
-                          </CardTitle>
-                        </div>
-                        <p className="text-2xl font-bold text-foreground">
-                          {levelBodies.length}
-                          <span className="text-sm font-normal text-muted-foreground ml-1.5">
-                            {levelBodies.length === 1 ? "Parlament" : "Parlamente"}
-                          </span>
+                    <Link
+                      key={body.id}
+                      to={`/weekly?body=${body.key}`}
+                      className="flex items-center gap-3 p-3 rounded-lg border border-border/50 hover:border-accent/40 hover:shadow-md transition-all group bg-card"
+                    >
+                      <div className="text-accent flex-shrink-0">
+                        {LEVEL_ICONS[level] || <Building2 className="w-4 h-4" />}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-foreground truncate">{getBodyLabel(body)}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {LEVEL_LABELS[level] || level}
+                          {body.canton && ` · ${body.canton}`}
                         </p>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="space-y-1.5">
-                          {preview.map((body) => (
-                            <Link
-                              key={body.key}
-                              to={`/weekly?body=${body.key}`}
-                              className="flex items-center justify-between py-1 px-2 -mx-2 rounded-md text-sm hover:bg-secondary/50 transition-colors group"
-                            >
-                              <span className="text-foreground truncate">{getBodyLabel(body)}</span>
-                              <ArrowRight className="w-3 h-3 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
-                            </Link>
-                          ))}
-                          {remaining > 0 && (
-                            <p className="text-xs text-muted-foreground pt-1">
-                              + {remaining} weitere
-                            </p>
-                          )}
-                        </div>
-                      </CardContent>
-                    </Card>
+                      </div>
+                      <ArrowRight className="w-3.5 h-3.5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
+                    </Link>
                   );
                 })}
               </div>
+            )}
+
+            {!loadingBodies && filteredBodies.length > 0 && (
+              <p className="text-center text-xs text-muted-foreground">
+                {filteredBodies.length} {filteredBodies.length === 1 ? "Parlament" : "Parlamente"} angezeigt
+              </p>
             )}
           </section>
         </div>
