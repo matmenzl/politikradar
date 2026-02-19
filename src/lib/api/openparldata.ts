@@ -1,0 +1,209 @@
+const BASE_URL = "https://api.openparldata.ch/v1";
+
+interface ApiResponse<T> {
+  meta: {
+    offset: number;
+    limit: number;
+    total_records: number;
+    total_pages: number;
+    current_page: number;
+    has_more: boolean;
+  };
+  data: T[];
+}
+
+export interface Voting {
+  id: number;
+  body_key: string;
+  date: string;
+  affair_id: number;
+  results_yes: number;
+  results_no: number;
+  results_abstention: number;
+  results_absent: number;
+  decision: string;
+  title_de?: string;
+  meaning_of_yes_de?: string;
+  meaning_of_no_de?: string;
+  affair_title_de?: string;
+  affair_title_fr?: string;
+  url_external_de?: string;
+  meeting_id?: number;
+  group_external_id?: string;
+}
+
+export interface Affair {
+  id: number;
+  body_key: string;
+  external_id?: string;
+  title_de?: string;
+  title_fr?: string;
+  begin_date?: string;
+  end_date?: string;
+  status_de?: string;
+  type_de?: string;
+  type_harmonized?: string;
+  updated_at?: string;
+  url_external_de?: string;
+}
+
+export interface Meeting {
+  id: number;
+  body_key: string;
+  name_de?: string;
+  begin_date?: string;
+  end_date?: string;
+  state?: string;
+  location?: string;
+  type?: string;
+  group_external_id?: string;
+}
+
+async function fetchApi<T>(endpoint: string, params: Record<string, string> = {}): Promise<ApiResponse<T>> {
+  const defaultParams = {
+    body_key: "CHE",
+    lang: "de",
+    lang_format: "flat",
+    hide_null: "true",
+  };
+  const allParams = { ...defaultParams, ...params };
+  const queryString = new URLSearchParams(allParams).toString();
+  const url = `${BASE_URL}${endpoint}?${queryString}`;
+
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error(`API error: ${response.status} ${response.statusText}`);
+  }
+  return response.json();
+}
+
+export function getWeekDateRange(year: number, week: number): { from: string; to: string } {
+  // ISO week: find Monday of given week
+  const jan4 = new Date(year, 0, 4);
+  const dayOfWeek = jan4.getDay() || 7;
+  const mondayOfWeek1 = new Date(jan4);
+  mondayOfWeek1.setDate(jan4.getDate() - dayOfWeek + 1);
+
+  const monday = new Date(mondayOfWeek1);
+  monday.setDate(mondayOfWeek1.getDate() + (week - 1) * 7);
+
+  const friday = new Date(monday);
+  friday.setDate(monday.getDate() + 4);
+
+  const format = (d: Date) => d.toISOString().split("T")[0];
+  return { from: format(monday), to: format(friday) };
+}
+
+export function formatDateRange(from: string, to: string): string {
+  const fromDate = new Date(from + "T00:00:00");
+  const toDate = new Date(to + "T00:00:00");
+  const fromDay = fromDate.getDate();
+  const toDay = toDate.getDate();
+  const months = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"];
+  const toMonth = months[toDate.getMonth()];
+  const year = toDate.getFullYear();
+
+  if (fromDate.getMonth() === toDate.getMonth()) {
+    return `${fromDay}.–${toDay}. ${toMonth} ${year}`;
+  }
+  const fromMonth = months[fromDate.getMonth()];
+  return `${fromDay}. ${fromMonth} – ${toDay}. ${toMonth} ${year}`;
+}
+
+export function getCurrentISOWeek(): { year: number; week: number } {
+  const now = new Date();
+  const d = new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()));
+  const dayNum = d.getUTCDay() || 7;
+  d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+  const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+  const weekNo = Math.ceil(((d.getTime() - yearStart.getTime()) / 86400000 + 1) / 7);
+  // Return previous week for more complete data
+  if (weekNo <= 1) {
+    return { year: d.getUTCFullYear() - 1, week: 52 };
+  }
+  return { year: d.getUTCFullYear(), week: weekNo - 1 };
+}
+
+export async function fetchVotingsForWeek(from: string, to: string) {
+  // API date filters may not work reliably, so we fetch recent data and filter client-side
+  const res = await fetchApi<Voting>("/votings", {
+    sort_by: "-date",
+    limit: "500",
+  });
+  const fromDate = new Date(from + "T00:00:00");
+  const toDate = new Date(to + "T23:59:59");
+  const filtered = res.data.filter((v) => {
+    const d = new Date(v.date);
+    return d >= fromDate && d <= toDate;
+  });
+  return { data: filtered, total: filtered.length };
+}
+
+export async function fetchAffairsForWeek(from: string, to: string) {
+  const res = await fetchApi<Affair>("/affairs", {
+    sort_by: "-begin_date",
+    limit: "500",
+    exclude_null: "begin_date",
+  });
+  const fromDate = new Date(from + "T00:00:00");
+  const toDate = new Date(to + "T23:59:59");
+  const filtered = res.data.filter((a) => {
+    if (!a.begin_date) return false;
+    const d = new Date(a.begin_date);
+    return d >= fromDate && d <= toDate;
+  });
+  return { data: filtered, total: filtered.length };
+}
+
+export async function fetchMeetingsForWeek(from: string, to: string) {
+  const res = await fetchApi<Meeting>("/meetings", {
+    sort_by: "-begin_date",
+    limit: "200",
+    exclude_null: "begin_date",
+  });
+  const fromDate = new Date(from + "T00:00:00");
+  const toDate = new Date(to + "T23:59:59");
+  const filtered = res.data.filter((m) => {
+    if (!m.begin_date) return false;
+    const d = new Date(m.begin_date);
+    return d >= fromDate && d <= toDate;
+  });
+  return { data: filtered, total: filtered.length };
+}
+
+export function findClosestVoting(votings: Voting[]): Voting | null {
+  if (votings.length === 0) return null;
+  return votings.reduce((closest, v) => {
+    const margin = Math.abs(v.results_yes - v.results_no);
+    const closestMargin = Math.abs(closest.results_yes - closest.results_no);
+    return margin < closestMargin ? v : closest;
+  });
+}
+
+export interface WeeklyStats {
+  totalAffairs: number;
+  totalVotings: number;
+  totalMeetings: number;
+  closestVoting: Voting | null;
+  recentAffairs: Affair[];
+  votings: Voting[];
+}
+
+export async function fetchWeeklyData(year: number, week: number): Promise<WeeklyStats> {
+  const { from, to } = getWeekDateRange(year, week);
+
+  const [votingsRes, affairsRes, meetingsRes] = await Promise.all([
+    fetchVotingsForWeek(from, to),
+    fetchAffairsForWeek(from, to),
+    fetchMeetingsForWeek(from, to),
+  ]);
+
+  return {
+    totalAffairs: affairsRes.total,
+    totalVotings: votingsRes.total,
+    totalMeetings: meetingsRes.total,
+    closestVoting: findClosestVoting(votingsRes.data),
+    recentAffairs: affairsRes.data.slice(0, 8),
+    votings: votingsRes.data,
+  };
+}
