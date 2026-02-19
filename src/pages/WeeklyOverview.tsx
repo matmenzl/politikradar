@@ -239,7 +239,7 @@ const WeeklyOverview = () => {
               </Card>
 
               {/* Card 2: Knappste Abstimmung */}
-              <Link to={closestVoting ? `/detail/${closestVoting.id}?type=voting` : "#"} className="block">
+              <Link to={closestVoting ? `/detail/${closestVoting.id}?type=voting&body=${encodeURIComponent(bodyKey)}` : "#"} className="block">
               <Card className="group hover:shadow-lg hover:border-accent/30 transition-all duration-300 opacity-0 animate-fade-in cursor-pointer" style={{ animationDelay: "200ms" }}>
                 <CardHeader className="pb-3">
                   <div className="flex items-center gap-2 text-muted-foreground">
@@ -284,7 +284,7 @@ const WeeklyOverview = () => {
                 <CardContent>
                   <div className="space-y-2 max-h-48 overflow-y-auto">
                     {data.votings.slice(0, 8).map((v) => (
-                      <Link key={v.id} to={`/detail/${v.id}?type=voting`} className="flex items-center justify-between py-1.5 border-b border-border/30 last:border-0 hover:bg-secondary/30 rounded px-1 -mx-1 transition-colors">
+                      <Link key={v.id} to={`/detail/${v.id}?type=voting&body=${encodeURIComponent(bodyKey)}`} className="flex items-center justify-between py-1.5 border-b border-border/30 last:border-0 hover:bg-secondary/30 rounded px-1 -mx-1 transition-colors">
                         <span className="text-sm text-foreground truncate mr-3 flex-1">
                           {v.affair_title_de || v.title_de || `Abstimmung #${v.id}`}
                         </span>
@@ -349,7 +349,7 @@ const WeeklyOverview = () => {
 
                   <div className="space-y-2 max-h-64 overflow-y-auto">
                     {filteredAffairs.map((a) => (
-                      <Link key={a.id} to={`/detail/${a.id}?type=affair`} className="block py-1.5 border-b border-border/30 last:border-0 hover:bg-secondary/30 rounded px-1 -mx-1 transition-colors">
+                      <Link key={a.id} to={`/detail/${a.id}?type=affair&body=${encodeURIComponent(bodyKey)}`} className="block py-1.5 border-b border-border/30 last:border-0 hover:bg-secondary/30 rounded px-1 -mx-1 transition-colors">
                         <p className="text-sm text-foreground">{a.title_de || `Geschäft #${a.id}`}</p>
                         <div className="flex flex-wrap gap-1.5 mt-1">
                           {a.type_de && <span className="text-xs text-muted-foreground">{a.type_de}</span>}

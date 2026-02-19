@@ -34,6 +34,8 @@ const DetailPage = () => {
   const { id } = useParams<{ id: string }>();
   const [searchParams] = useSearchParams();
   const type = searchParams.get("type") || "voting";
+  const bodyParam = searchParams.get("body") || "";
+  const backUrl = bodyParam ? `/weekly?body=${encodeURIComponent(bodyParam)}` : "/weekly";
 
   const [voting, setVoting] = useState<Voting | null>(null);
   const [affair, setAffair] = useState<AffairDetail | null>(null);
@@ -113,7 +115,7 @@ const DetailPage = () => {
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="text-center space-y-4">
           <p className="text-muted-foreground">Daten nicht gefunden.</p>
-          <Link to="/weekly" className="text-accent hover:underline">← Zurück zur Übersicht</Link>
+          <Link to={backUrl} className="text-accent hover:underline">← Zurück zur Übersicht</Link>
         </div>
       </div>
     );
@@ -123,7 +125,7 @@ const DetailPage = () => {
     <div className="min-h-screen bg-background">
       <header className="sticky top-0 z-10 bg-background/80 backdrop-blur-md border-b border-border/50 px-6 py-4">
         <div className="max-w-3xl mx-auto">
-          <Link to="/weekly" className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
+          <Link to={backUrl} className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
             <ArrowLeft className="w-4 h-4" />
             <span className="text-sm">Zurück zur Übersicht</span>
           </Link>
