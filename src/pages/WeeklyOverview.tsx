@@ -23,13 +23,21 @@ import {
 } from "@/lib/api/openparldata";
 
 const WeeklyOverview = () => {
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [shareOpen, setShareOpen] = useState(false);
   const initial = getCurrentISOWeek();
   const [year, setYear] = useState(initial.year);
   const [week, setWeek] = useState(initial.week);
-  const [bodyKey, setBodyKey] = useState(searchParams.get("body") || "CHE");
+  const urlBody = searchParams.get("body");
+  const [bodyKey, setBodyKeyState] = useState(urlBody || "CHE");
+  const [hasUserSelected, setHasUserSelected] = useState(!!urlBody);
   const [bodies, setBodies] = useState<Body[]>([]);
+
+  const setBodyKey = (key: string) => {
+    setBodyKeyState(key);
+    setHasUserSelected(true);
+    setSearchParams({ body: key }, { replace: true });
+  };
   const [data, setData] = useState<WeeklyStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -149,11 +157,11 @@ const WeeklyOverview = () => {
           <div className="flex items-center gap-3 flex-wrap">
             <div className="flex items-center gap-2 text-muted-foreground">
               <Building2 className="w-4 h-4" />
-              <span className="text-xs font-medium uppercase tracking-wider">Parlament</span>
+              <span className="text-xs font-medium uppercase tracking-wider">Parlament wechseln</span>
             </div>
             <Select value={bodyKey} onValueChange={setBodyKey}>
               <SelectTrigger className="w-auto min-w-[220px] h-9 text-sm">
-                <SelectValue placeholder="Parlament wählen…" />
+                <SelectValue placeholder={bodies.length === 0 ? "Parlament wird geladen…" : "Parlament wählen…"} />
               </SelectTrigger>
               <SelectContent className="max-h-80">
                 {Object.entries(grouped).sort(([a], [b]) => {
@@ -190,8 +198,16 @@ const WeeklyOverview = () => {
             </Button>
           </div>
           <h1 className="font-serif text-3xl md:text-4xl font-bold text-foreground">{dateRangeLabel}</h1>
+          <p className="text-lg font-medium text-foreground/80">
+            {bodies.length === 0 ? "Lade Parlament…" : (selectedBody ? getBodyLabel(selectedBody) : bodyKey)}
+          </p>
+          {!hasUserSelected && (
+            <p className="text-xs text-muted-foreground italic">
+              Standardmässig: Nationales Parlament. Wähle ein anderes Parlament im Dropdown oben.
+            </p>
+          )}
           <p className="text-xs text-muted-foreground">
-            {selectedBody ? getBodyLabel(selectedBody) : bodyKey} · Quelle: <a href="https://openparldata.ch" target="_blank" rel="noopener noreferrer" className="underline hover:text-foreground">OpenParlData.ch</a> · CC BY 4.0
+            Quelle: <a href="https://openparldata.ch" target="_blank" rel="noopener noreferrer" className="underline hover:text-foreground">OpenParlData.ch</a> · CC BY 4.0
           </p>
         </div>
 
