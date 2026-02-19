@@ -14,7 +14,42 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      weekly_digests: {
+        Row: {
+          closest_votings: Json
+          created_at: string
+          date_range: Json
+          id: string
+          stats: Json
+          summary: string
+          topic_radar: Json
+          week: number
+          year: number
+        }
+        Insert: {
+          closest_votings?: Json
+          created_at?: string
+          date_range?: Json
+          id?: string
+          stats?: Json
+          summary?: string
+          topic_radar?: Json
+          week: number
+          year: number
+        }
+        Update: {
+          closest_votings?: Json
+          created_at?: string
+          date_range?: Json
+          id?: string
+          stats?: Json
+          summary?: string
+          topic_radar?: Json
+          week?: number
+          year?: number
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
