@@ -28,8 +28,8 @@ const WeeklyOverview = () => {
   const [year, setYear] = useState(initial.year);
   const [week, setWeek] = useState(initial.week);
   const urlBody = searchParams.get("body");
-  const [bodyKey, setBodyKeyState] = useState(urlBody || "CHE");
-  const [hasUserSelected, setHasUserSelected] = useState(!!urlBody);
+  const [bodyKey, setBodyKeyState] = useState(urlBody && urlBody !== "undefined" ? urlBody : "CHE");
+  const [hasUserSelected, setHasUserSelected] = useState(!!urlBody && urlBody !== "undefined");
   const [bodies, setBodies] = useState<Body[]>([]);
 
   const setBodyKey = (key: string | undefined) => {
