@@ -109,12 +109,18 @@ const LandingPage = () => {
             </p>
 
             <div
-              className="opacity-0 animate-fade-in"
+              className="flex flex-wrap justify-center gap-3 opacity-0 animate-fade-in"
               style={{ animationDelay: "300ms" }}
             >
               <Button asChild size="lg" className="gap-2 px-8 rounded-full">
                 <Link to="/weekly">
                   Zur Wochenübersicht
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
+              </Button>
+              <Button asChild size="lg" variant="outline" className="gap-2 px-8 rounded-full">
+                <Link to="/digest">
+                  🇨🇭 Politikwoche
                   <ArrowRight className="w-4 h-4" />
                 </Link>
               </Button>
