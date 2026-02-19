@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import LandingPage from "./pages/LandingPage";
 import WeeklyOverview from "./pages/WeeklyOverview";
+import WeeklyDigest from "./pages/WeeklyDigest";
 import DetailPage from "./pages/DetailPage";
 import NotFound from "./pages/NotFound";
 
@@ -19,6 +20,7 @@ const App = () => (
         <Routes>
           <Route path="/" element={<LandingPage />} />
           <Route path="/weekly" element={<WeeklyOverview />} />
+          <Route path="/digest" element={<WeeklyDigest />} />
           <Route path="/detail/:id" element={<DetailPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>

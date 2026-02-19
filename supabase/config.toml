@@ -5,3 +5,6 @@ verify_jwt = false
 
 [functions.summarize-affair]
 verify_jwt = false
+
+[functions.weekly-digest]
+verify_jwt = false
