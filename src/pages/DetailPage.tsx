@@ -4,6 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import VoteBar from "@/components/VoteBar";
+import VotingPartyBreakdown from "@/components/VotingPartyBreakdown";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { Voting, Affair } from "@/lib/api/openparldata";
@@ -184,6 +185,9 @@ const DetailPage = () => {
                 </div>
               </CardContent>
             </Card>
+
+            {/* Party breakdown */}
+            <VotingPartyBreakdown votingId={voting.id} />
 
             {voting.url_external_de && (
               <a href={voting.url_external_de} target="_blank" rel="noopener noreferrer">
