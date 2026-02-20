@@ -119,7 +119,7 @@ const LandingPage = () => {
                 </Link>
               </Button>
               <Button asChild size="lg" variant="outline" className="gap-2 px-8 rounded-full">
-                <Link to="/digest">
+                <Link to="/">
                   🇨🇭 Politikwoche
                   <ArrowRight className="w-4 h-4" />
                 </Link>
