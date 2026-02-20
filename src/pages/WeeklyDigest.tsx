@@ -4,6 +4,7 @@ import ParliamentBrowser from "@/components/ParliamentBrowser";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
@@ -25,7 +26,7 @@ interface DigestData {
     totalMeetings: number;
     activeBodies: { key: string; name: string; votings: number; affairs: number }[];
   };
-  topic_radar: { tag: string; count: number; bodies: string[] }[];
+  topic_radar: { tag: string; count: number; bodies: string[]; affairs?: { id: number; title: string; bodyKey: string }[] }[];
   closest_votings: {
     voting: {
       id: number;
@@ -217,23 +218,48 @@ const WeeklyDigest = () => {
                     Welche Themen diese Woche in den Parlamenten behandelt wurden
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-3">
-                  {data.topic_radar.map((topic) => (
-                    <div key={topic.tag} className="space-y-1">
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm font-medium text-foreground">{topic.tag}</span>
-                        <span className="text-xs text-muted-foreground">
-                          {topic.count}× in {topic.bodies.length} {topic.bodies.length === 1 ? "Parlament" : "Parlamenten"}
-                        </span>
-                      </div>
-                      <div className="h-2 bg-secondary rounded-full overflow-hidden">
-                        <div
-                          className="h-full bg-accent rounded-full transition-all"
-                          style={{ width: `${(topic.count / maxTopicCount) * 100}%` }}
-                        />
-                      </div>
-                    </div>
-                  ))}
+                <CardContent>
+                  <Accordion type="multiple" className="w-full">
+                    {data.topic_radar.map((topic) => (
+                      <AccordionItem key={topic.tag} value={topic.tag} className="border-b-0">
+                        <AccordionTrigger className="py-3 hover:no-underline">
+                          <div className="flex-1 space-y-1.5 text-left mr-4">
+                            <div className="flex items-center justify-between">
+                              <span className="text-sm font-medium text-foreground">{topic.tag}</span>
+                              <span className="text-xs text-muted-foreground mr-2">
+                                {topic.count}× in {topic.bodies.length} {topic.bodies.length === 1 ? "Parlament" : "Parlamenten"}
+                              </span>
+                            </div>
+                            <div className="h-2 bg-secondary rounded-full overflow-hidden">
+                              <div
+                                className="h-full bg-accent rounded-full transition-all"
+                                style={{ width: `${(topic.count / maxTopicCount) * 100}%` }}
+                              />
+                            </div>
+                          </div>
+                        </AccordionTrigger>
+                        <AccordionContent>
+                          {topic.affairs && topic.affairs.length > 0 ? (
+                            <ul className="space-y-1.5 pl-1">
+                              {topic.affairs.map((affair, i) => (
+                                <li key={`${affair.id}-${i}`}>
+                                  <Link
+                                    to={`/detail/${affair.id}?type=affair&body=${encodeURIComponent(affair.bodyKey)}`}
+                                    className="flex items-start gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors py-1 group"
+                                  >
+                                    <span className="text-xs mt-0.5">›</span>
+                                    <span className="group-hover:underline">{affair.title}</span>
+                                  </Link>
+                                </li>
+                              ))}
+                            </ul>
+                          ) : (
+                            <p className="text-xs text-muted-foreground">Keine Geschäftsdetails verfügbar.</p>
+                          )}
+                        </AccordionContent>
+                      </AccordionItem>
+                    ))}
+                  </Accordion>
                 </CardContent>
               </Card>
             )}

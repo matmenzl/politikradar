@@ -194,7 +194,7 @@ serve(async (req) => {
       .slice(0, 5);
 
     // AI tagging for topic radar (top 30 affairs)
-    let topicRadar: { tag: string; count: number; bodies: string[] }[] = [];
+    let topicRadar: { tag: string; count: number; bodies: string[]; affairs: { id: number; title: string; bodyKey: string }[] }[] = [];
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
 
     if (LOVABLE_API_KEY && allAffairTitles.length > 0) {
@@ -259,18 +259,21 @@ serve(async (req) => {
           const toolCall = tagData.choices?.[0]?.message?.tool_calls?.[0];
           if (toolCall?.function?.arguments) {
             const parsed = JSON.parse(toolCall.function.arguments);
-            const tagCounts = new Map<string, { count: number; bodies: Set<string> }>();
+            const tagCounts = new Map<string, { count: number; bodies: Set<string>; affairs: { id: number; title: string; bodyKey: string }[] }>();
             for (const r of parsed.results || []) {
               const affair = topAffairs.find((a) => a.id === r.id);
               for (const tag of r.tags || []) {
-                if (!tagCounts.has(tag)) tagCounts.set(tag, { count: 0, bodies: new Set() });
+                if (!tagCounts.has(tag)) tagCounts.set(tag, { count: 0, bodies: new Set(), affairs: [] });
                 const entry = tagCounts.get(tag)!;
                 entry.count++;
-                if (affair) entry.bodies.add(affair.bodyKey);
+                if (affair) {
+                  entry.bodies.add(affair.bodyKey);
+                  entry.affairs.push({ id: affair.id, title: affair.title, bodyKey: affair.bodyKey });
+                }
               }
             }
             topicRadar = Array.from(tagCounts.entries())
-              .map(([tag, { count, bodies: bs }]) => ({ tag, count, bodies: Array.from(bs) }))
+              .map(([tag, { count, bodies: bs, affairs }]) => ({ tag, count, bodies: Array.from(bs), affairs }))
               .sort((a, b) => b.count - a.count)
               .slice(0, 10);
           }
