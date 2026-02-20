@@ -12,8 +12,8 @@ import { supabase } from "@/integrations/supabase/client";
 import {
   getCurrentISOWeek,
   getWeekDateRange,
-  formatDateRange,
-} from "@/lib/api/openparldata";
+  formatDateRange } from
+"@/lib/api/openparldata";
 import VoteBar from "@/components/VoteBar";
 
 interface DigestData {
@@ -24,9 +24,9 @@ interface DigestData {
     totalVotings: number;
     totalAffairs: number;
     totalMeetings: number;
-    activeBodies: { key: string; name: string; votings: number; affairs: number }[];
+    activeBodies: {key: string;name: string;votings: number;affairs: number;}[];
   };
-  topic_radar: { tag: string; count: number; bodies: string[]; affairs?: { id: number; title: string; bodyKey: string }[] }[];
+  topic_radar: {tag: string;count: number;bodies: string[];affairs?: {id: number;title: string;bodyKey: string;}[];}[];
   closest_votings: {
     voting: {
       id: number;
@@ -43,7 +43,7 @@ interface DigestData {
     margin: number;
   }[];
   summary: string;
-  date_range: { from: string; to: string };
+  date_range: {from: string;to: string;};
 }
 
 const WeeklyDigest = () => {
@@ -59,28 +59,28 @@ const WeeklyDigest = () => {
     setError(null);
     setData(null);
 
-    supabase.functions
-      .invoke("weekly-digest", { body: { year, week } })
-      .then(({ data: result, error: fnError }) => {
-        if (fnError) throw fnError;
-        if (result?.error) throw new Error(result.error);
-        setData(result);
-      })
-      .catch((e) => {
-        console.error("Digest error:", e);
-        setError(e.message || "Fehler beim Laden");
-        toast.error("Wochenübersicht konnte nicht geladen werden");
-      })
-      .finally(() => setLoading(false));
+    supabase.functions.
+    invoke("weekly-digest", { body: { year, week } }).
+    then(({ data: result, error: fnError }) => {
+      if (fnError) throw fnError;
+      if (result?.error) throw new Error(result.error);
+      setData(result);
+    }).
+    catch((e) => {
+      console.error("Digest error:", e);
+      setError(e.message || "Fehler beim Laden");
+      toast.error("Wochenübersicht konnte nicht geladen werden");
+    }).
+    finally(() => setLoading(false));
   }, [year, week]);
 
   const goToPreviousWeek = () => {
-    if (week <= 1) { setYear(year - 1); setWeek(52); }
-    else setWeek(week - 1);
+    if (week <= 1) {setYear(year - 1);setWeek(52);} else
+    setWeek(week - 1);
   };
   const goToNextWeek = () => {
-    if (week >= 52) { setYear(year + 1); setWeek(1); }
-    else setWeek(week + 1);
+    if (week >= 52) {setYear(year + 1);setWeek(1);} else
+    setWeek(week + 1);
   };
 
   const { from, to } = getWeekDateRange(year, week);
@@ -104,7 +104,7 @@ const WeeklyDigest = () => {
             Nationale, kantonale &amp; kommunale Parlamente
           </div>
           <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl font-bold leading-tight text-foreground">
-            Was diese Woche im Parlament wirklich wichtig war
+            Was diese Woche in Schweizer Parlamenten Wichtiges passiert ist.   
           </h1>
           <p className="text-lg md:text-xl text-muted-foreground leading-relaxed max-w-lg mx-auto">
             Visuell und datenbasiert – die wichtigsten parlamentarischen Aktivitäten der Woche auf einen Blick.
@@ -147,50 +147,50 @@ const WeeklyDigest = () => {
           </p>
         </div>
 
-        {loading && (
-          <div className="space-y-6">
+        {loading &&
+        <div className="space-y-6">
             <div className="flex items-center gap-3 py-8 justify-center">
               <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
               <span className="text-muted-foreground text-sm">Daten werden über alle Parlamente aggregiert… Dies kann einen Moment dauern.</span>
             </div>
             <div className="grid gap-5 md:grid-cols-4">
-              {[1, 2, 3, 4].map((i) => (
-                <Skeleton key={i} className="h-24 rounded-lg" />
-              ))}
+              {[1, 2, 3, 4].map((i) =>
+            <Skeleton key={i} className="h-24 rounded-lg" />
+            )}
             </div>
           </div>
-        )}
+        }
 
-        {error && (
-          <div className="text-center py-16 space-y-2">
+        {error &&
+        <div className="text-center py-16 space-y-2">
             <p className="text-destructive font-medium">Fehler beim Laden</p>
             <p className="text-sm text-muted-foreground">{error}</p>
           </div>
-        )}
+        }
 
-        {!loading && !error && data && (
-          <div className="space-y-8">
+        {!loading && !error && data &&
+        <div className="space-y-8">
             {/* Stats cards */}
             <div className="grid gap-4 grid-cols-2 md:grid-cols-4 opacity-0 animate-fade-in" style={{ animationDelay: "100ms" }}>
               {[
-                { icon: Building2, label: "Aktive Parlamente", value: data.stats.totalBodies },
-                { icon: Vote, label: "Abstimmungen", value: data.stats.totalVotings },
-                { icon: BarChart3, label: "Geschäfte", value: data.stats.totalAffairs },
-                { icon: Activity, label: "Sitzungen", value: data.stats.totalMeetings },
-              ].map((stat) => (
-                <Card key={stat.label}>
+            { icon: Building2, label: "Aktive Parlamente", value: data.stats.totalBodies },
+            { icon: Vote, label: "Abstimmungen", value: data.stats.totalVotings },
+            { icon: BarChart3, label: "Geschäfte", value: data.stats.totalAffairs },
+            { icon: Activity, label: "Sitzungen", value: data.stats.totalMeetings }].
+            map((stat) =>
+            <Card key={stat.label}>
                   <CardContent className="p-4 text-center">
                     <stat.icon className="w-5 h-5 mx-auto mb-2 text-muted-foreground" />
                     <p className="text-3xl font-bold text-foreground">{stat.value}</p>
                     <p className="text-xs text-muted-foreground mt-1">{stat.label}</p>
                   </CardContent>
                 </Card>
-              ))}
+            )}
             </div>
 
             {/* AI Summary */}
-            {data.summary && (
-              <Card className="opacity-0 animate-fade-in" style={{ animationDelay: "200ms" }}>
+            {data.summary &&
+          <Card className="opacity-0 animate-fade-in" style={{ animationDelay: "200ms" }}>
                 <CardHeader className="pb-3">
                   <div className="flex items-center gap-2 text-muted-foreground">
                     <Sparkles className="w-4 h-4" />
@@ -203,11 +203,11 @@ const WeeklyDigest = () => {
                   <p className="text-xs text-muted-foreground">Erstellt mit KI · Angaben ohne Gewähr</p>
                 </CardContent>
               </Card>
-            )}
+          }
 
             {/* Topic Radar */}
-            {data.topic_radar.length > 0 && (
-              <Card className="opacity-0 animate-fade-in" style={{ animationDelay: "300ms" }}>
+            {data.topic_radar.length > 0 &&
+          <Card className="opacity-0 animate-fade-in" style={{ animationDelay: "300ms" }}>
                 <CardHeader className="pb-3">
                   <div className="flex items-center gap-2 text-muted-foreground">
                     <TrendingUp className="w-4 h-4" />
@@ -220,8 +220,8 @@ const WeeklyDigest = () => {
                 </CardHeader>
                 <CardContent>
                   <Accordion type="multiple" className="w-full">
-                    {data.topic_radar.map((topic) => (
-                      <AccordionItem key={topic.tag} value={topic.tag} className="border-b-0">
+                    {data.topic_radar.map((topic) =>
+                <AccordionItem key={topic.tag} value={topic.tag} className="border-b-0">
                         <AccordionTrigger className="py-3 hover:no-underline">
                           <div className="flex-1 space-y-1.5 text-left mr-4">
                             <div className="flex items-center justify-between">
@@ -232,41 +232,41 @@ const WeeklyDigest = () => {
                             </div>
                             <div className="h-2 bg-secondary rounded-full overflow-hidden">
                               <div
-                                className="h-full bg-accent rounded-full transition-all"
-                                style={{ width: `${(topic.count / maxTopicCount) * 100}%` }}
-                              />
+                          className="h-full bg-accent rounded-full transition-all"
+                          style={{ width: `${topic.count / maxTopicCount * 100}%` }} />
+
                             </div>
                           </div>
                         </AccordionTrigger>
                         <AccordionContent>
-                          {topic.affairs && topic.affairs.length > 0 ? (
-                            <ul className="space-y-1.5 pl-1">
-                              {topic.affairs.map((affair, i) => (
-                                <li key={`${affair.id}-${i}`}>
+                          {topic.affairs && topic.affairs.length > 0 ?
+                    <ul className="space-y-1.5 pl-1">
+                              {topic.affairs.map((affair, i) =>
+                      <li key={`${affair.id}-${i}`}>
                                   <Link
-                                    to={`/detail/${affair.id}?type=affair&body=${encodeURIComponent(affair.bodyKey)}`}
-                                    className="flex items-start gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors py-1 group"
-                                  >
+                          to={`/detail/${affair.id}?type=affair&body=${encodeURIComponent(affair.bodyKey)}`}
+                          className="flex items-start gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors py-1 group">
+
                                     <span className="text-xs mt-0.5">›</span>
                                     <span className="group-hover:underline">{affair.title}</span>
                                   </Link>
                                 </li>
-                              ))}
-                            </ul>
-                          ) : (
-                            <p className="text-xs text-muted-foreground">Keine Geschäftsdetails verfügbar.</p>
-                          )}
+                      )}
+                            </ul> :
+
+                    <p className="text-xs text-muted-foreground">Keine Geschäftsdetails verfügbar.</p>
+                    }
                         </AccordionContent>
                       </AccordionItem>
-                    ))}
+                )}
                   </Accordion>
                 </CardContent>
               </Card>
-            )}
+          }
 
             {/* Closest Votings */}
-            {data.closest_votings.length > 0 && (
-              <Card className="opacity-0 animate-fade-in" style={{ animationDelay: "400ms" }}>
+            {data.closest_votings.length > 0 &&
+          <Card className="opacity-0 animate-fade-in" style={{ animationDelay: "400ms" }}>
                 <CardHeader className="pb-3">
                   <div className="flex items-center gap-2 text-muted-foreground">
                     <Vote className="w-4 h-4" />
@@ -278,12 +278,12 @@ const WeeklyDigest = () => {
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  {data.closest_votings.map((cv) => (
-                    <Link
-                      key={cv.voting.id}
-                      to={`/detail/${cv.voting.id}?type=voting&body=${encodeURIComponent(cv.voting.body_key)}`}
-                      className="block p-3 -mx-3 rounded-lg hover:bg-secondary/50 transition-colors"
-                    >
+                  {data.closest_votings.map((cv) =>
+              <Link
+                key={cv.voting.id}
+                to={`/detail/${cv.voting.id}?type=voting&body=${encodeURIComponent(cv.voting.body_key)}`}
+                className="block p-3 -mx-3 rounded-lg hover:bg-secondary/50 transition-colors">
+
                       <div className="flex items-center justify-between mb-2">
                         <div className="flex-1 min-w-0 mr-3">
                           <p className="text-sm font-medium text-foreground truncate">
@@ -299,20 +299,20 @@ const WeeklyDigest = () => {
                         </div>
                       </div>
                       <VoteBar
-                        ja={cv.voting.results_yes}
-                        nein={cv.voting.results_no}
-                        enthaltungen={cv.voting.results_abstention}
-                        compact
-                      />
+                  ja={cv.voting.results_yes}
+                  nein={cv.voting.results_no}
+                  enthaltungen={cv.voting.results_abstention}
+                  compact />
+
                     </Link>
-                  ))}
+              )}
                 </CardContent>
               </Card>
-            )}
+          }
 
             {/* Active Parliaments */}
-            {data.stats.activeBodies.length > 0 && (
-              <Card className="opacity-0 animate-fade-in" style={{ animationDelay: "500ms" }}>
+            {data.stats.activeBodies.length > 0 &&
+          <Card className="opacity-0 animate-fade-in" style={{ animationDelay: "500ms" }}>
                 <CardHeader className="pb-3">
                   <div className="flex items-center gap-2 text-muted-foreground">
                     <Building2 className="w-4 h-4" />
@@ -322,12 +322,12 @@ const WeeklyDigest = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-2">
-                    {data.stats.activeBodies.slice(0, 10).map((body, i) => (
-                      <Link
-                        key={body.key}
-                        to={`/weekly?body=${encodeURIComponent(body.key)}`}
-                        className="flex items-center justify-between py-2 px-3 -mx-3 rounded-lg hover:bg-secondary/50 transition-colors"
-                      >
+                    {data.stats.activeBodies.slice(0, 10).map((body, i) =>
+                <Link
+                  key={body.key}
+                  to={`/weekly?body=${encodeURIComponent(body.key)}`}
+                  className="flex items-center justify-between py-2 px-3 -mx-3 rounded-lg hover:bg-secondary/50 transition-colors">
+
                         <div className="flex items-center gap-3">
                           <span className="text-xs font-medium text-muted-foreground w-5">{i + 1}.</span>
                           <span className="text-sm font-medium text-foreground">{body.name}</span>
@@ -337,24 +337,24 @@ const WeeklyDigest = () => {
                           <span>{body.votings} Abstimmungen</span>
                         </div>
                       </Link>
-                    ))}
+                )}
                   </div>
                 </CardContent>
               </Card>
-            )}
+          }
 
             {/* No data state */}
-            {data.stats.totalBodies === 0 && (
-              <div className="text-center py-16 space-y-3">
+            {data.stats.totalBodies === 0 &&
+          <div className="text-center py-16 space-y-3">
                 <Activity className="w-10 h-10 mx-auto text-muted-foreground" />
                 <p className="text-lg font-serif font-semibold">Keine Daten für diese Woche</p>
                 <p className="text-sm text-muted-foreground">
                   In der Kalenderwoche {week} wurden keine parlamentarischen Aktivitäten erfasst.
                 </p>
               </div>
-            )}
+          }
           </div>
-        )}
+        }
 
         {/* Parliament Browser */}
         <div className="opacity-0 animate-fade-in" style={{ animationDelay: "600ms" }}>
@@ -367,8 +367,8 @@ const WeeklyDigest = () => {
           PolitikRadar · Daten via <a href="https://openparldata.ch" target="_blank" rel="noopener noreferrer" className="underline hover:text-foreground">OpenParlData.ch</a> · CC BY 4.0
         </div>
       </footer>
-    </div>
-  );
+    </div>);
+
 };
 
 export default WeeklyDigest;
