@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { Loader2, ChevronLeft, ChevronRight, Sparkles, BarChart3, Vote, Building2, Activity, TrendingUp } from "lucide-react";
+import ParliamentBrowser from "@/components/ParliamentBrowser";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -91,12 +92,7 @@ const WeeklyDigest = () => {
       <header className="sticky top-0 z-10 bg-background/80 backdrop-blur-md border-b border-border/50 px-6 py-4">
         <div className="max-w-4xl mx-auto flex items-center justify-between">
           <span className="font-serif text-lg font-semibold text-foreground">PolitikRadar</span>
-          <div className="flex items-center gap-2">
-            <Link to="/parliaments">
-              <Badge variant="outline" className="text-xs cursor-pointer hover:bg-secondary/50 transition-colors">Parlamente</Badge>
-            </Link>
-            <Badge variant="secondary" className="text-xs">Alle Parlamente</Badge>
-          </div>
+          <Badge variant="secondary" className="text-xs">Alle Parlamente</Badge>
         </div>
       </header>
 
@@ -306,6 +302,11 @@ const WeeklyDigest = () => {
             )}
           </div>
         )}
+
+        {/* Parliament Browser */}
+        <div className="opacity-0 animate-fade-in" style={{ animationDelay: "600ms" }}>
+          <ParliamentBrowser />
+        </div>
       </main>
 
       <footer className="px-6 py-5 border-t border-border/50">

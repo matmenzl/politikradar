@@ -3,7 +3,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import LandingPage from "./pages/LandingPage";
+
 import WeeklyOverview from "./pages/WeeklyOverview";
 import WeeklyDigest from "./pages/WeeklyDigest";
 import DetailPage from "./pages/DetailPage";
@@ -20,7 +20,7 @@ const App = () => (
         <Routes>
           <Route path="/" element={<WeeklyDigest />} />
           <Route path="/weekly" element={<WeeklyOverview />} />
-          <Route path="/parliaments" element={<LandingPage />} />
+          
           <Route path="/detail/:id" element={<DetailPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
