@@ -292,7 +292,7 @@ const WeeklyDigest = () => {
                           <p className="text-xs text-muted-foreground">{cv.bodyName}</p>
                         </div>
                         <div className="flex items-center gap-2 flex-shrink-0">
-                          <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${cv.voting.decision === "ja" ? "bg-success/10 text-success" : "bg-destructive/10 text-destructive"}`}>
+                          <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${(cv.voting.decision ? ["ja","accepted","angenommen"].includes(cv.voting.decision.toLowerCase()) : cv.voting.results_yes > cv.voting.results_no) ? "bg-success/10 text-success" : "bg-destructive/10 text-destructive"}`}>
                             {cv.voting.results_yes}:{cv.voting.results_no}
                           </span>
                           <Badge variant="outline" className="text-xs">Δ{cv.margin}</Badge>
