@@ -19,6 +19,7 @@ import {
   formatDateRange,
   type WeeklyStats,
   type Body,
+  isVotingAccepted,
 } from "@/lib/api/openparldata";
 
 const WeeklyOverview = () => {
@@ -263,7 +264,7 @@ const WeeklyOverview = () => {
                   </CardTitle>
                   <CardDescription className="text-sm leading-relaxed">
                     {closestVoting
-                      ? `Entschied: ${closestVoting.decision === "ja" ? "Annahme" : "Ablehnung"} – Differenz von nur ${Math.abs(closestVoting.results_yes - closestVoting.results_no)} Stimmen.`
+                      ? `Entschied: ${isVotingAccepted(closestVoting) ? "Annahme" : "Ablehnung"} – Differenz von nur ${Math.abs(closestVoting.results_yes - closestVoting.results_no)} Stimmen.`
                       : "Keine Abstimmungen in dieser Woche erfasst."}
                   </CardDescription>
                 </CardHeader>
@@ -289,7 +290,7 @@ const WeeklyOverview = () => {
                   <CardTitle className="font-serif text-xl leading-snug">Abstimmungsergebnisse</CardTitle>
                   <CardDescription className="text-sm leading-relaxed">
                     {data.votings.length > 0
-                      ? `${data.votings.length} Abstimmungen – ${data.votings.filter(v => v.decision === "ja").length} angenommen, ${data.votings.filter(v => v.decision !== "ja").length} abgelehnt.`
+                      ? `${data.votings.length} Abstimmungen – ${data.votings.filter(v => isVotingAccepted(v)).length} angenommen, ${data.votings.filter(v => !isVotingAccepted(v)).length} abgelehnt.`
                       : "Keine Abstimmungsdaten vorhanden."}
                   </CardDescription>
                 </CardHeader>
@@ -300,7 +301,7 @@ const WeeklyOverview = () => {
                         <span className="text-sm text-foreground truncate mr-3 flex-1">
                           {v.affair_title_de || v.title_de || `Abstimmung #${v.id}`}
                         </span>
-                        <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${v.decision === "ja" ? "bg-success/10 text-success" : "bg-destructive/10 text-destructive"}`}>
+                        <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${isVotingAccepted(v) ? "bg-success/10 text-success" : "bg-destructive/10 text-destructive"}`}>
                           {v.results_yes}:{v.results_no}
                         </span>
                       </Link>

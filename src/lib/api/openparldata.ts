@@ -59,6 +59,14 @@ export interface Voting {
   group_external_id?: string;
 }
 
+export function isVotingAccepted(v: Pick<Voting, 'decision' | 'results_yes' | 'results_no'>): boolean {
+  if (v.decision) {
+    const d = v.decision.toLowerCase();
+    return d === "ja" || d === "accepted" || d === "angenommen";
+  }
+  return v.results_yes > v.results_no;
+}
+
 export interface Affair {
   id: number;
   body_key: string;
