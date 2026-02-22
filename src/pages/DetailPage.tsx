@@ -253,9 +253,16 @@ const DetailPage = () => {
                 />
                 <div className="grid gap-3 sm:grid-cols-2">
                   <DetailRow label="Entscheid">
-                    <span className={`text-sm font-medium px-2 py-0.5 rounded-full ${voting.decision === "ja" ? "bg-success/10 text-success" : "bg-destructive/10 text-destructive"}`}>
-                      {voting.decision === "ja" ? "Angenommen" : "Abgelehnt"}
-                    </span>
+                    {(() => {
+                      const accepted = voting.decision
+                        ? voting.decision.toLowerCase() === "ja" || voting.decision.toLowerCase() === "accepted" || voting.decision.toLowerCase() === "angenommen"
+                        : voting.results_yes > voting.results_no;
+                      return (
+                        <span className={`text-sm font-medium px-2 py-0.5 rounded-full ${accepted ? "bg-success/10 text-success" : "bg-destructive/10 text-destructive"}`}>
+                          {accepted ? "Angenommen" : "Abgelehnt"}
+                        </span>
+                      );
+                    })()}
                   </DetailRow>
                   <DetailRow label="Datum">
                     {voting.date ? new Date(voting.date).toLocaleDateString("de-CH") : "–"}
@@ -355,7 +362,7 @@ const DetailPage = () => {
                         </div>
                         <div className="flex items-center gap-2 flex-shrink-0">
                           <VoteBar ja={v.results_yes} nein={v.results_no} enthaltungen={v.results_abstention} compact />
-                          <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${v.decision === "ja" ? "bg-success/10 text-success" : "bg-destructive/10 text-destructive"}`}>
+                          <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${(v.decision ? (v.decision.toLowerCase() === "ja" || v.decision.toLowerCase() === "accepted" || v.decision.toLowerCase() === "angenommen") : v.results_yes > v.results_no) ? "bg-success/10 text-success" : "bg-destructive/10 text-destructive"}`}>
                             {v.results_yes}:{v.results_no}
                           </span>
                         </div>
