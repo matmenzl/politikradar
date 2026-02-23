@@ -173,18 +173,20 @@ const WeeklyDigest = () => {
             {/* Stats cards */}
             <div className="grid gap-4 grid-cols-2 md:grid-cols-4 opacity-0 animate-fade-in" style={{ animationDelay: "100ms" }}>
               {[
-            { icon: Building2, label: "Aktive Parlamente", value: data.stats.totalBodies },
-            { icon: Vote, label: "Abstimmungen", value: data.stats.totalVotings },
-            { icon: BarChart3, label: "Geschäfte", value: data.stats.totalAffairs },
-            { icon: Activity, label: "Sitzungen", value: data.stats.totalMeetings }].
+            { icon: Building2, label: "Aktive Parlamente", value: data.stats.totalBodies, href: "/list/bodies" },
+            { icon: Vote, label: "Abstimmungen", value: data.stats.totalVotings, href: "/list/votings" },
+            { icon: BarChart3, label: "Geschäfte", value: data.stats.totalAffairs, href: "/list/affairs" },
+            { icon: Activity, label: "Sitzungen", value: data.stats.totalMeetings, href: "/list/meetings" }].
             map((stat) =>
-            <Card key={stat.label}>
-                  <CardContent className="p-4 text-center">
-                    <stat.icon className="w-5 h-5 mx-auto mb-2 text-muted-foreground" />
-                    <p className="text-3xl font-bold text-foreground">{stat.value}</p>
-                    <p className="text-xs text-muted-foreground mt-1">{stat.label}</p>
-                  </CardContent>
-                </Card>
+            <Link key={stat.label} to={stat.href}>
+                  <Card className="hover:bg-secondary/30 transition-colors cursor-pointer">
+                    <CardContent className="p-4 text-center">
+                      <stat.icon className="w-5 h-5 mx-auto mb-2 text-muted-foreground" />
+                      <p className="text-3xl font-bold text-foreground">{stat.value}</p>
+                      <p className="text-xs text-muted-foreground mt-1">{stat.label}</p>
+                    </CardContent>
+                  </Card>
+                </Link>
             )}
             </div>
 
