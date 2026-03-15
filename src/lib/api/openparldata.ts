@@ -216,10 +216,7 @@ export function getCurrentISOWeek(): { year: number; week: number } {
   d.setUTCDate(d.getUTCDate() + 4 - dayNum);
   const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
   const weekNo = Math.ceil(((d.getTime() - yearStart.getTime()) / 86400000 + 1) / 7);
-  if (weekNo <= 1) {
-    return { year: d.getUTCFullYear() - 1, week: 52 };
-  }
-  return { year: d.getUTCFullYear(), week: weekNo - 1 };
+  return { year: d.getUTCFullYear(), week: weekNo };
 }
 
 export async function fetchVotingsForWeek(from: string, to: string, bodyKey: string = "CHE") {
