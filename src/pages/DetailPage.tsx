@@ -9,7 +9,7 @@ import EmbedCodeModal from "@/components/EmbedCodeModal";
 import StoryPreviewModal, { type StorySlide, type PartyVoteData } from "@/components/StoryPreviewModal";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { type Voting, type Affair, isVotingAccepted } from "@/lib/api/openparldata";
+import { type Voting, type Affair, isVotingAccepted, fetchVotesForVoting } from "@/lib/api/openparldata";
 
 interface AffairDetail extends Affair {
   type_name_de?: string;
