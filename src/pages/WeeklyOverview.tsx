@@ -138,20 +138,21 @@ const WeeklyOverview = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="sticky top-0 z-10 bg-background/80 backdrop-blur-md border-b border-border/50 px-4 md:px-6 py-3 md:py-4">
-        <div className="max-w-4xl mx-auto flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
-            <ArrowLeft className="w-4 h-4" />
-            <span className="font-serif text-lg font-semibold text-foreground">PolitikRadar</span>
+      <header className="sticky top-0 z-10 bg-background/80 backdrop-blur-md border-b border-border/50 px-3 sm:px-4 md:px-6 py-3 md:py-4">
+        <div className="max-w-4xl mx-auto flex items-center justify-between gap-2">
+          <Link to="/" className="flex items-center gap-1.5 sm:gap-2 text-muted-foreground hover:text-foreground transition-colors min-w-0">
+            <ArrowLeft className="w-4 h-4 flex-shrink-0" />
+            <span className="font-serif text-base sm:text-lg font-semibold text-foreground truncate">PolitikRadar</span>
           </Link>
-          <Button variant="outline" size="sm" className="gap-2 rounded-full" onClick={() => setShareOpen(true)}>
+          <Button variant="outline" size="sm" className="gap-1.5 sm:gap-2 rounded-full flex-shrink-0 text-xs sm:text-sm" onClick={() => setShareOpen(true)}>
             <Share2 className="w-3.5 h-3.5" />
-            Teilen
+            <span className="hidden xs:inline">Teilen</span>
+            <span className="xs:hidden">↗</span>
           </Button>
         </div>
       </header>
 
-      <main className="max-w-4xl mx-auto px-4 md:px-6 py-6 md:py-10 space-y-6 md:space-y-8">
+      <main className="max-w-4xl mx-auto px-3 sm:px-4 md:px-6 py-4 sm:py-6 md:py-10 space-y-4 sm:space-y-6 md:space-y-8">
         {/* Parliament selector */}
         <div className="opacity-0 animate-fade-in" style={{ animationDelay: "0ms" }}>
           <div className="flex items-center gap-3 flex-wrap">
