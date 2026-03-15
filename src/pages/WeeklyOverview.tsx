@@ -138,20 +138,21 @@ const WeeklyOverview = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="sticky top-0 z-10 bg-background/80 backdrop-blur-md border-b border-border/50 px-4 md:px-6 py-3 md:py-4">
-        <div className="max-w-4xl mx-auto flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
-            <ArrowLeft className="w-4 h-4" />
-            <span className="font-serif text-lg font-semibold text-foreground">PolitikRadar</span>
+      <header className="sticky top-0 z-10 bg-background/80 backdrop-blur-md border-b border-border/50 px-3 sm:px-4 md:px-6 py-3 md:py-4">
+        <div className="max-w-4xl mx-auto flex items-center justify-between gap-2">
+          <Link to="/" className="flex items-center gap-1.5 sm:gap-2 text-muted-foreground hover:text-foreground transition-colors min-w-0">
+            <ArrowLeft className="w-4 h-4 flex-shrink-0" />
+            <span className="font-serif text-base sm:text-lg font-semibold text-foreground truncate">PolitikRadar</span>
           </Link>
-          <Button variant="outline" size="sm" className="gap-2 rounded-full" onClick={() => setShareOpen(true)}>
+          <Button variant="outline" size="sm" className="gap-1.5 sm:gap-2 rounded-full flex-shrink-0 text-xs sm:text-sm" onClick={() => setShareOpen(true)}>
             <Share2 className="w-3.5 h-3.5" />
-            Teilen
+            <span className="hidden xs:inline">Teilen</span>
+            <span className="xs:hidden">↗</span>
           </Button>
         </div>
       </header>
 
-      <main className="max-w-4xl mx-auto px-4 md:px-6 py-6 md:py-10 space-y-6 md:space-y-8">
+      <main className="max-w-4xl mx-auto px-3 sm:px-4 md:px-6 py-4 sm:py-6 md:py-10 space-y-4 sm:space-y-6 md:space-y-8">
         {/* Parliament selector */}
         <div className="opacity-0 animate-fade-in" style={{ animationDelay: "0ms" }}>
           <div className="flex items-center gap-3 flex-wrap">
@@ -166,28 +167,28 @@ const WeeklyOverview = () => {
         </div>
 
         {/* Week header with navigation */}
-        <div className="space-y-2 opacity-0 animate-fade-in" style={{ animationDelay: "50ms" }}>
-          <div className="flex items-center gap-3">
-            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={goToPreviousWeek}>
+        <div className="space-y-1.5 sm:space-y-2 opacity-0 animate-fade-in" style={{ animationDelay: "50ms" }}>
+          <div className="flex items-center gap-2 sm:gap-3">
+            <Button variant="ghost" size="icon" className="h-7 w-7 sm:h-8 sm:w-8" onClick={goToPreviousWeek}>
               <ChevronLeft className="w-4 h-4" />
             </Button>
-            <p className="text-xs font-medium uppercase tracking-widest text-muted-foreground">
+            <p className="text-[10px] sm:text-xs font-medium uppercase tracking-widest text-muted-foreground">
               Kalenderwoche {week}
             </p>
-            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={goToNextWeek}>
+            <Button variant="ghost" size="icon" className="h-7 w-7 sm:h-8 sm:w-8" onClick={goToNextWeek}>
               <ChevronRight className="w-4 h-4" />
             </Button>
           </div>
-          <h1 className="font-serif text-2xl md:text-4xl font-bold text-foreground">{dateRangeLabel}</h1>
-          <p className="text-lg font-medium text-foreground/80">
+          <h1 className="font-serif text-xl sm:text-2xl md:text-4xl font-bold text-foreground">{dateRangeLabel}</h1>
+          <p className="text-base sm:text-lg font-medium text-foreground/80">
             {bodies.length === 0 ? "Lade Parlament…" : (selectedBody ? getBodyLabel(selectedBody) : bodyKey)}
           </p>
           {!hasUserSelected && (
-            <p className="text-xs text-muted-foreground italic">
+            <p className="text-[10px] sm:text-xs text-muted-foreground italic">
               Standardmässig: Nationales Parlament. Wähle ein anderes Parlament im Dropdown oben.
             </p>
           )}
-          <p className="text-xs text-muted-foreground">
+          <p className="text-[10px] sm:text-xs text-muted-foreground">
             Quelle: <a href="https://openparldata.ch" target="_blank" rel="noopener noreferrer" className="underline hover:text-foreground">OpenParlData.ch</a> · CC BY 4.0
           </p>
         </div>
@@ -219,31 +220,31 @@ const WeeklyOverview = () => {
         )}
 
         {!loading && !error && data && (data.totalAffairs > 0 || data.totalVotings > 0 || data.totalMeetings > 0) && (
-          <div className="space-y-5 md:space-y-8">
-            <div className="grid gap-4 md:gap-5 md:grid-cols-2">
+          <div className="space-y-4 sm:space-y-5 md:space-y-8">
+            <div className="grid gap-3 sm:gap-4 md:gap-5 md:grid-cols-2">
               {/* Card 1: Gesamtaktivität */}
-              <Card className="group hover:shadow-lg hover:border-accent/30 transition-all duration-300 opacity-0 animate-fade-in" style={{ animationDelay: "100ms" }}>
-                <CardHeader className="pb-2 md:pb-3 p-4 md:p-6">
+              <Card className="group hover:shadow-lg hover:border-accent/30 transition-all duration-300 opacity-0 animate-fade-in overflow-hidden" style={{ animationDelay: "100ms" }}>
+                <CardHeader className="pb-2 md:pb-3 p-3 sm:p-4 md:p-6">
                   <div className="flex items-center gap-2 text-muted-foreground">
-                    <Activity className="w-4 h-4" />
-                    <span className="text-xs font-medium uppercase tracking-wider">Wochenüberblick in Zahlen</span>
+                    <Activity className="w-4 h-4 flex-shrink-0" />
+                    <span className="text-[10px] sm:text-xs font-medium uppercase tracking-wider">Wochenüberblick in Zahlen</span>
                   </div>
-                  <CardTitle className="font-serif text-lg md:text-xl leading-snug">Gesamtaktivität</CardTitle>
-                  <CardDescription className="text-sm leading-relaxed">
+                  <CardTitle className="font-serif text-base sm:text-lg md:text-xl leading-snug">Gesamtaktivität</CardTitle>
+                  <CardDescription className="text-xs sm:text-sm leading-relaxed">
                     {data.totalAffairs > 0 || data.totalVotings > 0
                       ? `${data.totalAffairs} Geschäfte, ${data.totalVotings} Abstimmungen und ${data.totalMeetings} Sitzungen in dieser Woche.`
                       : "Keine parlamentarische Aktivität in dieser Woche erfasst."}
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="p-4 md:p-6 pt-0">
-                  <div className="grid grid-cols-3 gap-2 md:gap-3">
+                <CardContent className="p-3 sm:p-4 md:p-6 pt-0">
+                  <div className="grid grid-cols-3 gap-1.5 sm:gap-2 md:gap-3">
                     {[
                       { label: "Geschäfte", value: data.totalAffairs, href: `/list/affairs?body=${encodeURIComponent(bodyKey)}` },
                       { label: "Abstimmungen", value: data.totalVotings, href: `/list/votings?body=${encodeURIComponent(bodyKey)}` },
                       { label: "Sitzungen", value: data.totalMeetings, href: `/list/meetings?body=${encodeURIComponent(bodyKey)}` },
                     ].map((stat) => (
                       <Link key={stat.label} to={stat.href} className="bg-secondary/50 rounded-lg p-2 md:p-3 hover:bg-secondary/80 transition-colors">
-                        <p className="text-xl md:text-2xl font-semibold text-foreground">{stat.value}</p>
+                        <p className="text-lg sm:text-xl md:text-2xl font-semibold text-foreground">{stat.value}</p>
                         <p className="text-[10px] md:text-xs text-muted-foreground">{stat.label}</p>
                       </Link>
                     ))}
@@ -253,22 +254,22 @@ const WeeklyOverview = () => {
 
               {/* Card 2: Knappste Abstimmung */}
               <Link to={closestVoting ? `/detail/${closestVoting.id}?type=voting&body=${encodeURIComponent(bodyKey)}` : "#"} className="block">
-              <Card className="group hover:shadow-lg hover:border-accent/30 transition-all duration-300 opacity-0 animate-fade-in cursor-pointer" style={{ animationDelay: "200ms" }}>
-                <CardHeader className="pb-2 md:pb-3 p-4 md:p-6">
+              <Card className="group hover:shadow-lg hover:border-accent/30 transition-all duration-300 opacity-0 animate-fade-in cursor-pointer overflow-hidden" style={{ animationDelay: "200ms" }}>
+                <CardHeader className="pb-2 md:pb-3 p-3 sm:p-4 md:p-6">
                   <div className="flex items-center gap-2 text-muted-foreground">
-                    <Vote className="w-4 h-4" />
-                    <span className="text-xs font-medium uppercase tracking-wider">Knappste Abstimmung</span>
+                    <Vote className="w-4 h-4 flex-shrink-0" />
+                    <span className="text-[10px] sm:text-xs font-medium uppercase tracking-wider">Knappste Abstimmung</span>
                   </div>
-                  <CardTitle className="font-serif text-lg md:text-xl leading-snug">
+                  <CardTitle className="font-serif text-base sm:text-lg md:text-xl leading-snug line-clamp-2">
                     {closestVoting ? closestVoting.affair_title_de || closestVoting.title_de || "Abstimmung" : "Keine Abstimmung"}
                   </CardTitle>
-                  <CardDescription className="text-sm leading-relaxed">
+                  <CardDescription className="text-xs sm:text-sm leading-relaxed">
                     {closestVoting
                       ? `Entschied: ${isVotingAccepted(closestVoting) ? "Annahme" : "Ablehnung"} – Differenz von nur ${Math.abs(closestVoting.results_yes - closestVoting.results_no)} Stimmen.`
                       : "Keine Abstimmungen in dieser Woche erfasst."}
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="p-4 md:p-6 pt-0 space-y-4">
+                <CardContent className="p-3 sm:p-4 md:p-6 pt-0 space-y-4">
                   {closestVoting && (
                     <VoteBar
                       ja={closestVoting.results_yes}
@@ -281,27 +282,27 @@ const WeeklyOverview = () => {
               </Link>
 
               {/* Card 3: Alle Abstimmungen */}
-              <Card className="group hover:shadow-lg hover:border-accent/30 transition-all duration-300 opacity-0 animate-fade-in" style={{ animationDelay: "300ms" }}>
-                <CardHeader className="pb-2 md:pb-3 p-4 md:p-6">
+              <Card className="group hover:shadow-lg hover:border-accent/30 transition-all duration-300 opacity-0 animate-fade-in overflow-hidden" style={{ animationDelay: "300ms" }}>
+                <CardHeader className="pb-2 md:pb-3 p-3 sm:p-4 md:p-6">
                   <div className="flex items-center gap-2 text-muted-foreground">
-                    <BarChart3 className="w-4 h-4" />
-                    <span className="text-xs font-medium uppercase tracking-wider">Abstimmungen der Woche</span>
+                    <BarChart3 className="w-4 h-4 flex-shrink-0" />
+                    <span className="text-[10px] sm:text-xs font-medium uppercase tracking-wider">Abstimmungen der Woche</span>
                   </div>
-                  <CardTitle className="font-serif text-lg md:text-xl leading-snug">Abstimmungsergebnisse</CardTitle>
-                  <CardDescription className="text-xs md:text-sm leading-relaxed">
+                  <CardTitle className="font-serif text-base sm:text-lg md:text-xl leading-snug">Abstimmungsergebnisse</CardTitle>
+                  <CardDescription className="text-[10px] sm:text-xs md:text-sm leading-relaxed">
                     {data.votings.length > 0
                       ? `${data.votings.length} Abstimmungen – ${data.votings.filter(v => isVotingAccepted(v)).length} angenommen, ${data.votings.filter(v => !isVotingAccepted(v)).length} abgelehnt.`
                       : "Keine Abstimmungsdaten vorhanden."}
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="p-4 md:p-6 pt-0">
+                <CardContent className="p-3 sm:p-4 md:p-6 pt-0">
                   <div className="space-y-2 max-h-48 overflow-y-auto">
                     {data.votings.slice(0, 8).map((v) => (
-                      <Link key={v.id} to={`/detail/${v.id}?type=voting&body=${encodeURIComponent(bodyKey)}`} className="flex items-center justify-between py-1.5 border-b border-border/30 last:border-0 hover:bg-secondary/30 rounded px-1 -mx-1 transition-colors">
-                        <span className="text-sm text-foreground truncate mr-3 flex-1">
+                      <Link key={v.id} to={`/detail/${v.id}?type=voting&body=${encodeURIComponent(bodyKey)}`} className="flex items-center justify-between py-1.5 border-b border-border/30 last:border-0 hover:bg-secondary/30 rounded px-1 -mx-1 transition-colors gap-2">
+                        <span className="text-xs sm:text-sm text-foreground line-clamp-2 flex-1 min-w-0">
                           {v.affair_title_de || v.title_de || `Abstimmung #${v.id}`}
                         </span>
-                        <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${isVotingAccepted(v) ? "bg-success/10 text-success" : "bg-destructive/10 text-destructive"}`}>
+                        <span className={`text-[10px] sm:text-xs font-medium px-1.5 sm:px-2 py-0.5 rounded-full flex-shrink-0 ${isVotingAccepted(v) ? "bg-success/10 text-success" : "bg-destructive/10 text-destructive"}`}>
                           {v.results_yes}:{v.results_no}
                         </span>
                       </Link>
@@ -314,28 +315,28 @@ const WeeklyOverview = () => {
               </Card>
 
               {/* Card 4: Neueste Geschäfte with AI tags */}
-              <Card className="group hover:shadow-lg hover:border-accent/30 transition-all duration-300 opacity-0 animate-fade-in" style={{ animationDelay: "400ms" }}>
-                <CardHeader className="pb-2 md:pb-3 p-4 md:p-6">
+              <Card className="group hover:shadow-lg hover:border-accent/30 transition-all duration-300 opacity-0 animate-fade-in overflow-hidden" style={{ animationDelay: "400ms" }}>
+                <CardHeader className="pb-2 md:pb-3 p-3 sm:p-4 md:p-6">
                   <div className="flex items-center justify-between gap-2">
-                    <div className="flex items-center gap-2 text-muted-foreground">
-                      <FileText className="w-4 h-4" />
-                      <span className="text-xs font-medium uppercase tracking-wider">Geschäfte der Woche</span>
+                    <div className="flex items-center gap-2 text-muted-foreground min-w-0">
+                      <FileText className="w-4 h-4 flex-shrink-0" />
+                      <span className="text-[10px] sm:text-xs font-medium uppercase tracking-wider truncate">Geschäfte der Woche</span>
                     </div>
                     {taggingLoading && (
-                      <div className="flex items-center gap-1.5 text-accent">
+                      <div className="flex items-center gap-1.5 text-accent flex-shrink-0">
                         <Sparkles className="w-3.5 h-3.5 animate-pulse" />
-                        <span className="text-xs">AI taggt…</span>
+                        <span className="text-[10px] sm:text-xs">AI taggt…</span>
                       </div>
                     )}
                   </div>
-                  <CardTitle className="font-serif text-lg md:text-xl leading-snug">Parlamentarische Geschäfte</CardTitle>
-                  <CardDescription className="text-xs md:text-sm leading-relaxed">
+                  <CardTitle className="font-serif text-base sm:text-lg md:text-xl leading-snug">Parlamentarische Geschäfte</CardTitle>
+                  <CardDescription className="text-[10px] sm:text-xs md:text-sm leading-relaxed">
                     {data.recentAffairs.length > 0
                       ? `${data.totalAffairs} Geschäfte in dieser Woche.${allTags.length > 0 ? ` ${allTags.length} Themen erkannt.` : ""}`
                       : "Keine Geschäfte in dieser Woche erfasst."}
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="p-4 md:p-6 pt-0 space-y-3">
+                <CardContent className="p-3 sm:p-4 md:p-6 pt-0 space-y-3">
                   {/* Tag filter chips */}
                   {allTags.length > 0 && (
                     <div className="flex flex-wrap gap-1.5">
@@ -363,7 +364,7 @@ const WeeklyOverview = () => {
                   <div className="space-y-2 max-h-64 overflow-y-auto">
                     {filteredAffairs.map((a) => (
                       <Link key={a.id} to={`/detail/${a.id}?type=affair&body=${encodeURIComponent(bodyKey)}`} className="block py-1.5 border-b border-border/30 last:border-0 hover:bg-secondary/30 rounded px-1 -mx-1 transition-colors">
-                        <p className="text-sm text-foreground">{a.title_de || `Geschäft #${a.id}`}</p>
+                        <p className="text-xs sm:text-sm text-foreground line-clamp-2">{a.title_de || `Geschäft #${a.id}`}</p>
                         <div className="flex flex-wrap gap-1.5 mt-1">
                           {a.type_de && <span className="text-xs text-muted-foreground">{a.type_de}</span>}
                           {a.status_de && <span className="text-xs text-muted-foreground">· {a.status_de}</span>}
