@@ -29,6 +29,7 @@ interface StoryPreviewModalProps {
   slides: StorySlide[];
   loading?: boolean;
   affairId?: string | null;
+  votingId?: string | null;
 }
 
 function StoryContent({
