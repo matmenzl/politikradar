@@ -20,7 +20,7 @@ const StoriesCarousel = () => {
   useEffect(() => {
     supabase
       .from("story_posts")
-      .select("id, title, slides, published_at")
+      .select("id, title, body_key, slides, published_at")
       .eq("status", "published")
       .order("published_at", { ascending: false })
       .limit(10)
@@ -30,6 +30,7 @@ const StoriesCarousel = () => {
             data.map((d) => ({
               id: d.id,
               title: d.title,
+              body_key: d.body_key,
               slides: (d.slides as unknown as StorySlide[]) || [],
               published_at: d.published_at || "",
             }))
