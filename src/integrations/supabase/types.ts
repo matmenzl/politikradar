@@ -14,6 +14,27 @@ export type Database = {
   }
   public: {
     Tables: {
+      affair_summaries: {
+        Row: {
+          affair_id: string
+          created_at: string
+          id: string
+          summary: string
+        }
+        Insert: {
+          affair_id: string
+          created_at?: string
+          id?: string
+          summary: string
+        }
+        Update: {
+          affair_id?: string
+          created_at?: string
+          id?: string
+          summary?: string
+        }
+        Relationships: []
+      }
       weekly_digests: {
         Row: {
           closest_votings: Json
