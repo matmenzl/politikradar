@@ -254,7 +254,7 @@ const WeeklyOverview = () => {
               {/* Card 2: Knappste Abstimmung */}
               <Link to={closestVoting ? `/detail/${closestVoting.id}?type=voting&body=${encodeURIComponent(bodyKey)}` : "#"} className="block">
               <Card className="group hover:shadow-lg hover:border-accent/30 transition-all duration-300 opacity-0 animate-fade-in cursor-pointer" style={{ animationDelay: "200ms" }}>
-                <CardHeader className="pb-3">
+                <CardHeader className="pb-2 md:pb-3 p-4 md:p-6">
                   <div className="flex items-center gap-2 text-muted-foreground">
                     <Vote className="w-4 h-4" />
                     <span className="text-xs font-medium uppercase tracking-wider">Knappste Abstimmung</span>
