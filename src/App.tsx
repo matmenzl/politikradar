@@ -12,6 +12,7 @@ import ListAffairs from "./pages/ListAffairs";
 import ListMeetings from "./pages/ListMeetings";
 import ListBodies from "./pages/ListBodies";
 import NotFound from "./pages/NotFound";
+import PersonProfile from "./pages/PersonProfile";
 
 const queryClient = new QueryClient();
 
