@@ -29,6 +29,7 @@ interface StoryPreviewModalProps {
   slides: StorySlide[];
   loading?: boolean;
   affairId?: string | null;
+  votingId?: string | null;
 }
 
 function StoryContent({
@@ -155,9 +156,14 @@ function StoryContent({
   );
 }
 
-const StoryPreviewModal = ({ open, onOpenChange, slides, loading, affairId }: StoryPreviewModalProps) => {
+const StoryPreviewModal = ({ open, onOpenChange, slides, loading, affairId, votingId }: StoryPreviewModalProps) => {
   const isMobile = useIsMobile();
   const navigate = useNavigate();
+  const detailLink = affairId
+    ? `/detail/${affairId}?type=affair`
+    : votingId
+      ? `/detail/${votingId}?type=voting`
+      : null;
 
   // Full-page view on mobile
   if (isMobile && open) {
@@ -199,13 +205,13 @@ const StoryPreviewModal = ({ open, onOpenChange, slides, loading, affairId }: St
           )}
         </DialogHeader>
         <StoryContent slides={slides} loading={loading} />
-        {affairId && (
+        {detailLink && (
           <div className="px-6 pb-4">
             <Button
               variant="outline"
               size="sm"
               className="w-full gap-2 text-sm"
-              onClick={() => { onOpenChange(false); navigate(`/detail/${affairId}`); }}
+              onClick={() => { onOpenChange(false); navigate(detailLink); }}
             >
               <FileText className="w-4 h-4" />
               Zum Geschäft

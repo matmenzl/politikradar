@@ -13,6 +13,7 @@ interface StoryPost {
   title: string;
   body_key: string | null;
   affair_id: string | null;
+  voting_id: string | null;
   slides: StorySlide[];
   published_at: string;
 }
@@ -28,7 +29,7 @@ const StoriesCarousel = () => {
   useEffect(() => {
     supabase
       .from("story_posts")
-      .select("id, title, body_key, affair_id, slides, published_at")
+      .select("id, title, body_key, affair_id, voting_id, slides, published_at")
       .eq("status", "published")
       .order("published_at", { ascending: false })
       .limit(10)
@@ -39,6 +40,7 @@ const StoriesCarousel = () => {
             title: d.title,
             body_key: d.body_key,
             affair_id: d.affair_id,
+            voting_id: d.voting_id,
             slides: (d.slides as unknown as StorySlide[]) || [],
             published_at: d.published_at || "",
           }));
@@ -140,6 +142,7 @@ const StoriesCarousel = () => {
           onOpenChange={(open) => !open && setSelectedStory(null)}
           slides={selectedStory.slides}
           affairId={selectedStory.affair_id}
+          votingId={selectedStory.voting_id}
         />
       )}
     </>
