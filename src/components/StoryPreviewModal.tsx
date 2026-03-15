@@ -42,7 +42,29 @@ const slideTypeLabel: Record<StorySlide["slide_type"], string> = {
   result: "ERGEBNIS",
   insight: "EINORDNUNG",
   cta: "MEHR ERFAHREN",
+  party: "PARTEIVERHALTEN",
 };
+
+const PARTY_COLORS: Record<string, string> = {
+  "SP": "hsl(0, 72%, 51%)",
+  "GRÜNE": "hsl(142, 71%, 35%)",
+  "Grüne": "hsl(142, 71%, 35%)",
+  "GPS": "hsl(142, 71%, 35%)",
+  "GLP": "hsl(142, 50%, 50%)",
+  "Grünliberale": "hsl(142, 50%, 50%)",
+  "M-E": "hsl(30, 80%, 50%)",
+  "Mitte": "hsl(30, 80%, 50%)",
+  "FDP-Liberale": "hsl(210, 70%, 50%)",
+  "FDP": "hsl(210, 70%, 50%)",
+  "SVP": "hsl(142, 50%, 25%)",
+};
+
+function getPartyColor(party: string): string {
+  for (const [key, color] of Object.entries(PARTY_COLORS)) {
+    if (party.includes(key)) return color;
+  }
+  return "hsl(220, 20%, 60%)";
+}
 
 const StoryPreviewModal = ({ open, onOpenChange, slides, loading }: StoryPreviewModalProps) => {
   const slideRefs = useRef<(HTMLDivElement | null)[]>([]);
