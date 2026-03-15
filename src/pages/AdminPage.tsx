@@ -1,13 +1,26 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
+import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Search, Sparkles, Trash2, Eye, EyeOff, Lock } from "lucide-react";
+import { Loader2, Search, Sparkles, Trash2, Eye, EyeOff, Lock, Vote, BarChart3, Calendar } from "lucide-react";
 import { toast } from "sonner";
+import VoteBar from "@/components/VoteBar";
 import type { StorySlide } from "@/components/StoryPreviewModal";
 import StoryPreviewModal from "@/components/StoryPreviewModal";
+import {
+  getCurrentISOWeek,
+  getWeekDateRange,
+  formatDateRange,
+  fetchBodies,
+  fetchAffairsForWeek,
+  fetchVotingsForWeek,
+  isVotingAccepted,
+  type Affair,
+  type Voting,
+} from "@/lib/api/openparldata";
 
 interface StoryPost {
   id: string;
