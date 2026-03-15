@@ -1,7 +1,7 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { ArrowLeft, Loader2 } from "lucide-react";
+import { ArrowLeft, Loader2, FileText } from "lucide-react";
 import StorySlideCard from "@/components/story/StorySlideCard";
 import { Button } from "@/components/ui/button";
 import { Download } from "lucide-react";
