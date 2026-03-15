@@ -268,7 +268,7 @@ const WeeklyOverview = () => {
                       : "Keine Abstimmungen in dieser Woche erfasst."}
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-4">
+                <CardContent className="p-4 md:p-6 pt-0 space-y-4">
                   {closestVoting && (
                     <VoteBar
                       ja={closestVoting.results_yes}
