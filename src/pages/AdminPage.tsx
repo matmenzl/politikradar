@@ -660,7 +660,19 @@ function AdminDashboard() {
     const key = `${result.type}-${result.id}`;
     setGeneratingId(key);
     try {
-      const body: Record<string, unknown> = { title: result.title };
+      // Resolve parliament name from bodyKey if not already set
+      let parliamentName = result.bodyName;
+      if (!parliamentName && result.bodyKey) {
+        try {
+          const bodies = await fetchBodies();
+          const body = bodies.find((b) => b.key === result.bodyKey);
+          parliamentName = body ? (body.name_de || body.key) : result.bodyKey;
+        } catch {
+          parliamentName = result.bodyKey;
+        }
+      }
+
+      const body: Record<string, unknown> = { title: result.title, parliament: parliamentName };
       if (result.type === "voting" && result.results_yes != null) {
         body.votingResults = {
           yes: result.results_yes,
