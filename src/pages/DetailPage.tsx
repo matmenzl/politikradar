@@ -106,6 +106,19 @@ const DetailPage = () => {
     }
   }, [id, type]);
 
+  // Check cache on load when affair is available
+  useEffect(() => {
+    if (!affair?.id) return;
+    supabase
+      .from("affair_summaries")
+      .select("summary")
+      .eq("affair_id", String(affair.id))
+      .maybeSingle()
+      .then(({ data }) => {
+        if (data?.summary) setSummary(data.summary);
+      });
+  }, [affair?.id]);
+
   const generateSummary = async () => {
     if (!affair) return;
     setSummaryLoading(true);
@@ -130,7 +143,15 @@ const DetailPage = () => {
       }
       const { data, error } = await supabase.functions.invoke("summarize-affair", { body });
       if (error) throw error;
-      setSummary(data?.summary || "Keine Zusammenfassung verfügbar.");
+      const summaryText = data?.summary || "Keine Zusammenfassung verfügbar.";
+      setSummary(summaryText);
+      // Cache in database
+      if (summaryText && summaryText !== "Keine Zusammenfassung verfügbar.") {
+        supabase
+          .from("affair_summaries")
+          .upsert({ affair_id: String(affair.id), summary: summaryText }, { onConflict: "affair_id" })
+          .then(() => {});
+      }
     } catch (e) {
       console.error("Summary error:", e);
       setSummary("Zusammenfassung konnte nicht erstellt werden.");
