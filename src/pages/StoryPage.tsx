@@ -26,7 +26,7 @@ const StoryPage = () => {
     if (!id) return;
     supabase
       .from("story_posts")
-      .select("title, slides, affair_id")
+      .select("title, slides, affair_id, voting_id")
       .eq("id", id)
       .eq("status", "published")
       .single()
@@ -35,6 +35,7 @@ const StoryPage = () => {
           setTitle(data.title);
           setSlides((data.slides as unknown as StorySlide[]) || []);
           setAffairId(data.affair_id);
+          setVotingId(data.voting_id);
         }
         setLoading(false);
       });
