@@ -29,7 +29,7 @@ const StoriesCarousel = () => {
   useEffect(() => {
     supabase
       .from("story_posts")
-      .select("id, title, body_key, affair_id, slides, published_at")
+      .select("id, title, body_key, affair_id, voting_id, slides, published_at")
       .eq("status", "published")
       .order("published_at", { ascending: false })
       .limit(10)
