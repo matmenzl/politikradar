@@ -219,8 +219,8 @@ const WeeklyOverview = () => {
         )}
 
         {!loading && !error && data && (data.totalAffairs > 0 || data.totalVotings > 0 || data.totalMeetings > 0) && (
-          <div className="space-y-8">
-            <div className="grid gap-5 md:grid-cols-2">
+          <div className="space-y-5 md:space-y-8">
+            <div className="grid gap-4 md:gap-5 md:grid-cols-2">
               {/* Card 1: Gesamtaktivität */}
               <Card className="group hover:shadow-lg hover:border-accent/30 transition-all duration-300 opacity-0 animate-fade-in" style={{ animationDelay: "100ms" }}>
                 <CardHeader className="pb-3">
