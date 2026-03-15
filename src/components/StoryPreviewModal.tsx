@@ -71,6 +71,10 @@ function StoryContent({
   const downloadAll = useCallback(async () => {
     for (let i = 0; i < slides.length; i++) {
       await downloadSlide(i);
+      // Browser blocks rapid sequential downloads; add delay between each
+      if (i < slides.length - 1) {
+        await new Promise((r) => setTimeout(r, 800));
+      }
     }
   }, [slides.length, downloadSlide]);
 

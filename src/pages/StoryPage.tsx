@@ -69,6 +69,9 @@ const StoryPage = () => {
   const downloadAll = useCallback(async () => {
     for (let i = 0; i < slides.length; i++) {
       await downloadSlide(i);
+      if (i < slides.length - 1) {
+        await new Promise((r) => setTimeout(r, 800));
+      }
     }
   }, [slides.length, downloadSlide]);
 
