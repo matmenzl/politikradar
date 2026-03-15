@@ -282,7 +282,7 @@ const WeeklyOverview = () => {
 
               {/* Card 3: Alle Abstimmungen */}
               <Card className="group hover:shadow-lg hover:border-accent/30 transition-all duration-300 opacity-0 animate-fade-in" style={{ animationDelay: "300ms" }}>
-                <CardHeader className="pb-3">
+                <CardHeader className="pb-2 md:pb-3 p-4 md:p-6">
                   <div className="flex items-center gap-2 text-muted-foreground">
                     <BarChart3 className="w-4 h-4" />
                     <span className="text-xs font-medium uppercase tracking-wider">Abstimmungen der Woche</span>
