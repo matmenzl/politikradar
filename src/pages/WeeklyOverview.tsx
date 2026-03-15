@@ -259,7 +259,7 @@ const WeeklyOverview = () => {
                     <Vote className="w-4 h-4" />
                     <span className="text-xs font-medium uppercase tracking-wider">Knappste Abstimmung</span>
                   </div>
-                  <CardTitle className="font-serif text-xl leading-snug">
+                  <CardTitle className="font-serif text-lg md:text-xl leading-snug">
                     {closestVoting ? closestVoting.affair_title_de || closestVoting.title_de || "Abstimmung" : "Keine Abstimmung"}
                   </CardTitle>
                   <CardDescription className="text-sm leading-relaxed">
