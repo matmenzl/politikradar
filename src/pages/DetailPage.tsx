@@ -360,7 +360,7 @@ const DetailPage = () => {
               {type === "voting" ? "Abstimmung" : "Parlamentarisches Geschäft"}
             </p>
           </div>
-          <h1 className="font-serif text-3xl md:text-4xl font-bold text-foreground">
+          <h1 className="font-serif text-2xl md:text-4xl font-bold text-foreground">
             {voting
               ? voting.affair_title_de || voting.title_de || `Abstimmung #${voting.id}`
               : affair?.title_de || `Geschäft #${affair?.id}`}
