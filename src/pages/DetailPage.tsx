@@ -412,6 +412,15 @@ const DetailPage = () => {
                   </div>
                   <p className="text-sm text-foreground leading-relaxed">{summary}</p>
                   <p className="text-xs text-muted-foreground pt-1">Erstellt mit KI · Angaben ohne Gewähr</p>
+                  <Button
+                    variant="outline"
+                    className="w-full gap-2 mt-2"
+                    onClick={generateStory}
+                    disabled={storyLoading}
+                  >
+                    {storyLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Instagram className="w-4 h-4" />}
+                    Story erstellen &amp; veröffentlichen
+                  </Button>
                 </>
               )}
             </CardContent>
