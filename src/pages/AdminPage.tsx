@@ -38,6 +38,7 @@ interface SearchResult {
   id: number;
   title: string;
   bodyKey: string;
+  bodyName?: string;
   type: "affair" | "voting";
   date?: string;
   status?: string;
@@ -263,6 +264,7 @@ function BrowseSection({
                         id: a.id,
                         title: a.title_de || `Geschäft #${a.id}`,
                         bodyKey: a.body_key,
+                        bodyName: a.bodyName,
                         type: "affair",
                         date: a.begin_date,
                         status: a.status_de,
@@ -312,6 +314,7 @@ function BrowseSection({
                         id: v.id,
                         title: v.affair_title_de || v.title_de || `Abstimmung #${v.id}`,
                         bodyKey: v.body_key,
+                        bodyName: v.bodyName,
                         type: "voting",
                         date: v.date,
                         results_yes: v.results_yes,
@@ -516,6 +519,7 @@ function AISuggestionsSection({
                           id: item.id,
                           title: item.title,
                           bodyKey: item.bodyKey,
+                          bodyName: item.bodyName,
                           type: item.type,
                           date: item.date,
                           status: item.status,
@@ -659,7 +663,19 @@ function AdminDashboard() {
     const key = `${result.type}-${result.id}`;
     setGeneratingId(key);
     try {
-      const body: Record<string, unknown> = { title: result.title };
+      // Resolve parliament name from bodyKey if not already set
+      let parliamentName = result.bodyName;
+      if (!parliamentName && result.bodyKey) {
+        try {
+          const bodies = await fetchBodies();
+          const body = bodies.find((b) => b.key === result.bodyKey);
+          parliamentName = body ? (body.name_de || body.key) : result.bodyKey;
+        } catch {
+          parliamentName = result.bodyKey;
+        }
+      }
+
+      const body: Record<string, unknown> = { title: result.title, parliament: parliamentName };
       if (result.type === "voting" && result.results_yes != null) {
         body.votingResults = {
           yes: result.results_yes,
