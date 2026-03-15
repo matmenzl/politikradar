@@ -6,10 +6,10 @@ import { Button } from "@/components/ui/button";
 import VoteBar from "@/components/VoteBar";
 import VotingPartyBreakdown from "@/components/VotingPartyBreakdown";
 import EmbedCodeModal from "@/components/EmbedCodeModal";
-import StoryPreviewModal, { type StorySlide } from "@/components/StoryPreviewModal";
+import StoryPreviewModal, { type StorySlide, type PartyVoteData } from "@/components/StoryPreviewModal";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { type Voting, type Affair, isVotingAccepted } from "@/lib/api/openparldata";
+import { type Voting, type Affair, isVotingAccepted, fetchVotesForVoting } from "@/lib/api/openparldata";
 
 interface AffairDetail extends Affair {
   type_name_de?: string;
@@ -191,7 +191,44 @@ const DetailPage = () => {
       if (summary) body.summary = summary;
       const { data, error } = await supabase.functions.invoke("generate-story", { body });
       if (error) throw error;
-      setStorySlides(data?.slides || []);
+      let slides: StorySlide[] = data?.slides || [];
+
+      // Fetch party breakdown and insert as a data-driven slide
+      if (voting) {
+        try {
+          const votes = await fetchVotesForVoting(voting.id);
+          const partyMap = new Map<string, { yes: number; no: number; total: number }>();
+          for (const v of votes) {
+            const party = v.person_party_de || v.person_parliamentary_group_name_de || "Unbekannt";
+            if (!partyMap.has(party)) partyMap.set(party, { yes: 0, no: 0, total: 0 });
+            const entry = partyMap.get(party)!;
+            if (v.vote === "yes") { entry.yes++; entry.total++; }
+            else if (v.vote === "no") { entry.no++; entry.total++; }
+            else if (v.vote === "abstention") { entry.total++; }
+          }
+          const partyData: PartyVoteData[] = Array.from(partyMap.entries())
+            .map(([party, d]) => ({ party, ...d }))
+            .sort((a, b) => b.total - a.total);
+
+          if (partyData.length > 0) {
+            const partySlide: StorySlide = {
+              headline: "So haben die Parteien gestimmt",
+              body: "",
+              emoji: "🏛️",
+              slide_type: "party",
+              partyData,
+            };
+            // Insert after "result" slide, or before last slide
+            const resultIdx = slides.findIndex(s => s.slide_type === "result");
+            const insertIdx = resultIdx >= 0 ? resultIdx + 1 : Math.max(slides.length - 1, 0);
+            slides.splice(insertIdx, 0, partySlide);
+          }
+        } catch (e) {
+          console.error("Party data fetch error:", e);
+        }
+      }
+
+      setStorySlides(slides);
     } catch (e) {
       console.error("Story generation error:", e);
       setStorySlides([]);
