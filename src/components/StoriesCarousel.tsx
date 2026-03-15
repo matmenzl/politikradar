@@ -72,7 +72,24 @@ const StoriesCarousel = () => {
     });
   }, []);
 
-  if (stories.length === 0) return null;
+  if (stories.length === 0) {
+    return (
+      <div>
+        <div className="mb-4">
+          <div className="flex items-center gap-2 text-muted-foreground mb-1">
+            <Sparkles className="w-4 h-4" />
+            <span className="text-xs font-medium uppercase tracking-wider">Stories</span>
+          </div>
+          <h2 className="font-serif text-2xl md:text-3xl font-bold text-foreground">
+            Stories der Woche
+          </h2>
+        </div>
+        <p className="text-sm text-muted-foreground text-center py-8">
+          Noch keine Stories für diese Woche verfügbar.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <>
