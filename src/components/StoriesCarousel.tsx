@@ -8,6 +8,7 @@ import StorySlideCard from "@/components/story/StorySlideCard";
 interface StoryPost {
   id: string;
   title: string;
+  body_key: string | null;
   slides: StorySlide[];
   published_at: string;
 }
