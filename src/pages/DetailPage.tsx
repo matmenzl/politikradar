@@ -128,7 +128,12 @@ const DetailPage = () => {
   const resolveParliamentName = async (): Promise<string | undefined> => {
     const key = bodyParam || affair?.body_key || voting?.body_key;
     if (!key) return undefined;
-    if (key === "CHE") return "Bundesversammlung (Schweizer Parlament)";
+    if (key === "CHE") {
+      const groupId = voting?.group_external_id;
+      if (groupId === "Council_1") return "Nationalrat";
+      if (groupId === "Council_2") return "Ständerat";
+      return "Bundesversammlung (Schweizer Parlament)";
+    }
     try {
       const bodies = await fetchBodies();
       const body = bodies.find((b) => b.key.toLowerCase() === key.toLowerCase());
