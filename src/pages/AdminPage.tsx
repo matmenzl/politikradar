@@ -38,6 +38,7 @@ interface SearchResult {
   id: number;
   title: string;
   bodyKey: string;
+  bodyName?: string;
   type: "affair" | "voting";
   date?: string;
   status?: string;
