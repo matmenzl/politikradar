@@ -117,12 +117,25 @@ Antworte NUR mit dem tool call, nichts anderes.`,
     const data = await response.json();
     const toolCall = data.choices?.[0]?.message?.tool_calls?.[0];
 
-    if (!toolCall?.function?.arguments) {
-      throw new Error("No tool call response from AI");
-    }
+    let results: { id: number; tags: string[] }[] = [];
 
-    const parsed = JSON.parse(toolCall.function.arguments);
-    const results = parsed.results || [];
+    if (toolCall?.function?.arguments) {
+      const parsed = JSON.parse(toolCall.function.arguments);
+      results = parsed.results || [];
+    } else {
+      // Fallback: try to parse from message content
+      const content = data.choices?.[0]?.message?.content;
+      if (content) {
+        try {
+          const parsed = JSON.parse(content);
+          results = parsed.results || [];
+        } catch {
+          console.error("Could not parse AI content as JSON, returning empty tags. Content:", content);
+        }
+      } else {
+        console.error("No tool call and no content in AI response:", JSON.stringify(data));
+      }
+    }
 
     // Build a map of id -> tags
     const tagMap: Record<number, string[]> = {};
