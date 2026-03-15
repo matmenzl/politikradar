@@ -1,10 +1,11 @@
 import { Link, useParams, useSearchParams } from "react-router-dom";
-import { ArrowLeft, Loader2, ExternalLink, Calendar, FileText, Vote, Tag, Sparkles } from "lucide-react";
+import { ArrowLeft, Loader2, ExternalLink, Calendar, FileText, Vote, Tag, Sparkles, Code2 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import VoteBar from "@/components/VoteBar";
 import VotingPartyBreakdown from "@/components/VotingPartyBreakdown";
+import EmbedCodeModal from "@/components/EmbedCodeModal";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { type Voting, type Affair, isVotingAccepted } from "@/lib/api/openparldata";
@@ -44,6 +45,7 @@ const DetailPage = () => {
   const [tags, setTags] = useState<string[]>([]);
   const [summary, setSummary] = useState<string>("");
   const [summaryLoading, setSummaryLoading] = useState(false);
+  const [embedModalOpen, setEmbedModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -179,16 +181,24 @@ const DetailPage = () => {
     );
   }
 
+  const embedUrl = `${window.location.origin}/embed/${id}?type=${type}`;
+
   return (
     <div className="min-h-screen bg-background">
       <header className="sticky top-0 z-10 bg-background/80 backdrop-blur-md border-b border-border/50 px-6 py-4">
-        <div className="max-w-3xl mx-auto">
+        <div className="max-w-3xl mx-auto flex items-center justify-between">
           <Link to={backUrl} className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
             <ArrowLeft className="w-4 h-4" />
             <span className="text-sm">Zurück zur Übersicht</span>
           </Link>
+          <Button variant="ghost" size="sm" className="gap-1.5 text-xs h-8" onClick={() => setEmbedModalOpen(true)}>
+            <Code2 className="w-3.5 h-3.5" />
+            Einbetten
+          </Button>
         </div>
       </header>
+
+      <EmbedCodeModal open={embedModalOpen} onOpenChange={setEmbedModalOpen} embedUrl={embedUrl} />
 
       <main className="max-w-3xl mx-auto px-6 py-10 space-y-8">
         {/* Title section */}

@@ -13,6 +13,7 @@ import ListMeetings from "./pages/ListMeetings";
 import ListBodies from "./pages/ListBodies";
 import NotFound from "./pages/NotFound";
 import PersonProfile from "./pages/PersonProfile";
+import EmbedDetailPage from "./pages/EmbedDetailPage";
 
 const queryClient = new QueryClient();
 
@@ -30,6 +31,7 @@ const App = () => (
           <Route path="/list/meetings" element={<ListMeetings />} />
           <Route path="/list/bodies" element={<ListBodies />} />
           <Route path="/detail/:id" element={<DetailPage />} />
+          <Route path="/embed/:id" element={<EmbedDetailPage />} />
           <Route path="/person/:id" element={<PersonProfile />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
