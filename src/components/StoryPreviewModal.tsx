@@ -121,18 +121,49 @@ const StoryPreviewModal = ({ open, onOpenChange, slides, loading }: StoryPreview
                             {slideTypeLabel[slide.slide_type]}
                           </span>
 
-                          {/* Emoji */}
-                          <span className="text-5xl mb-4 drop-shadow-lg">{slide.emoji}</span>
+                          {slide.slide_type === "party" && slide.partyData ? (
+                            <>
+                              <span className="text-3xl mb-2 drop-shadow-lg">🏛️</span>
+                              <h3 className="text-white font-bold text-base leading-tight mb-4 px-2" style={{ fontFamily: "'Source Serif 4', Georgia, serif" }}>
+                                {slide.headline}
+                              </h3>
+                              <div className="w-full px-3 space-y-1.5">
+                                {slide.partyData.map((p) => {
+                                  const yesP = p.total > 0 ? Math.round((p.yes / p.total) * 100) : 0;
+                                  const noP = p.total > 0 ? Math.round((p.no / p.total) * 100) : 0;
+                                  return (
+                                    <div key={p.party} className="flex items-center gap-2">
+                                      <span className="text-white/90 text-[10px] font-semibold w-[72px] text-right truncate">{p.party}</span>
+                                      <div className="flex-1 flex h-3 rounded-full overflow-hidden" style={{ backgroundColor: "hsla(220,20%,30%,0.5)" }}>
+                                        <div className="rounded-l-full" style={{ width: `${yesP}%`, backgroundColor: "hsl(152, 60%, 50%)" }} />
+                                        <div className="rounded-r-full" style={{ width: `${noP}%`, backgroundColor: "hsl(0, 72%, 55%)" }} />
+                                      </div>
+                                      <span className="text-white/60 text-[9px] w-[32px]">{p.yes}/{p.no}</span>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                              <div className="flex items-center gap-4 mt-3 text-[9px] text-white/50">
+                                <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full" style={{ backgroundColor: "hsl(152, 60%, 50%)" }} /> Ja</span>
+                                <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full" style={{ backgroundColor: "hsl(0, 72%, 55%)" }} /> Nein</span>
+                              </div>
+                            </>
+                          ) : (
+                            <>
+                              {/* Emoji */}
+                              <span className="text-5xl mb-4 drop-shadow-lg">{slide.emoji}</span>
 
-                          {/* Headline */}
-                          <h3 className="text-white font-bold text-lg leading-tight mb-3 px-2" style={{ fontFamily: "'Source Serif 4', Georgia, serif" }}>
-                            {slide.headline}
-                          </h3>
+                              {/* Headline */}
+                              <h3 className="text-white font-bold text-lg leading-tight mb-3 px-2" style={{ fontFamily: "'Source Serif 4', Georgia, serif" }}>
+                                {slide.headline}
+                              </h3>
 
-                          {/* Body */}
-                          <p className="text-white/80 text-sm leading-relaxed px-2">
-                            {slide.body}
-                          </p>
+                              {/* Body */}
+                              <p className="text-white/80 text-sm leading-relaxed px-2">
+                                {slide.body}
+                              </p>
+                            </>
+                          )}
 
                           {/* Branding */}
                           <div className="absolute bottom-4 left-0 right-0 flex flex-col items-center gap-0.5">
