@@ -115,7 +115,7 @@ const WeeklyDigest = () => {
           <p className="text-base md:text-xl text-muted-foreground leading-relaxed max-w-lg mx-auto">
             Visuell und datenbasiert – die wichtigsten parlamentarischen Aktivitäten der Woche auf einen Blick.
           </p>
-          <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-muted-foreground">
+          <div className="flex flex-wrap items-center justify-center gap-3 md:gap-6 text-xs md:text-sm text-muted-foreground">
             <div className="flex items-center gap-2">
               <div className="w-1.5 h-1.5 rounded-full bg-success" />
               Datenbasierte Analyse
