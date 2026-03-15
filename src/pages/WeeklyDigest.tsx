@@ -15,6 +15,7 @@ import {
   formatDateRange } from
 "@/lib/api/openparldata";
 import VoteBar from "@/components/VoteBar";
+import StoriesCarousel from "@/components/StoriesCarousel";
 
 interface DigestData {
   year: number;
@@ -188,6 +189,11 @@ const WeeklyDigest = () => {
                   </Card>
                 </Link>
             )}
+            </div>
+
+            {/* Stories */}
+            <div className="opacity-0 animate-fade-in" style={{ animationDelay: "150ms" }}>
+              <StoriesCarousel />
             </div>
 
             {/* AI Summary */}

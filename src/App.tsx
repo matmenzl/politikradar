@@ -14,6 +14,7 @@ import ListBodies from "./pages/ListBodies";
 import NotFound from "./pages/NotFound";
 import PersonProfile from "./pages/PersonProfile";
 import EmbedDetailPage from "./pages/EmbedDetailPage";
+import AdminPage from "./pages/AdminPage";
 
 const queryClient = new QueryClient();
 
@@ -33,6 +34,7 @@ const App = () => (
           <Route path="/detail/:id" element={<DetailPage />} />
           <Route path="/embed/:id" element={<EmbedDetailPage />} />
           <Route path="/person/:id" element={<PersonProfile />} />
+          <Route path="/admin" element={<AdminPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
