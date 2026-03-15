@@ -62,14 +62,12 @@ const StoriesCarousel = () => {
                   onClick={() => setSelectedStory(story)}
                   className="flex-shrink-0 w-[200px] group focus:outline-none snap-start"
                 >
-                  <div className="w-[200px] h-[356px] rounded-xl overflow-hidden ring-2 ring-transparent group-hover:ring-accent/50 transition-all shadow-md relative">
-                    <div className="absolute top-0 left-0 w-[540px] h-[960px] origin-top-left scale-[0.3704] pointer-events-none">
-                      <StorySlideCard
-                        slide={firstSlide}
-                        index={0}
-                        total={story.slides.length}
-                      />
-                    </div>
+                  <div className="w-[200px] rounded-xl overflow-hidden ring-2 ring-transparent group-hover:ring-accent/50 transition-all shadow-md">
+                    <StorySlideCard
+                      slide={firstSlide}
+                      index={0}
+                      total={story.slides.length}
+                    />
                   </div>
                   <div className="mt-2 text-center">
                     <p className="text-xs font-medium text-foreground line-clamp-1 group-hover:text-accent transition-colors">
