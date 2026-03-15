@@ -347,7 +347,7 @@ const DetailPage = () => {
       <EmbedCodeModal open={embedModalOpen} onOpenChange={setEmbedModalOpen} embedUrl={embedUrl} />
       <StoryPreviewModal open={storyModalOpen} onOpenChange={setStoryModalOpen} slides={storySlides} loading={storyLoading} />
 
-      <main className="max-w-3xl mx-auto px-6 py-10 space-y-8">
+      <main className="max-w-3xl mx-auto px-4 md:px-6 py-6 md:py-10 space-y-6 md:space-y-8">
         {/* Title section */}
         <div className="space-y-3 opacity-0 animate-fade-in" style={{ animationDelay: "0ms" }}>
           <div className="flex items-center gap-2">
