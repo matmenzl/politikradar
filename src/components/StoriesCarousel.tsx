@@ -39,6 +39,14 @@ const StoriesCarousel = () => {
           );
         }
       });
+
+    fetchBodies().then((bodies) => {
+      const map: Record<string, string> = {};
+      for (const b of bodies) {
+        map[b.key] = getBodyLabel(b);
+      }
+      setBodyNames(map);
+    });
   }, []);
 
   if (stories.length === 0) return null;
