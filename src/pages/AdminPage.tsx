@@ -314,6 +314,7 @@ function BrowseSection({
                         id: v.id,
                         title: v.affair_title_de || v.title_de || `Abstimmung #${v.id}`,
                         bodyKey: v.body_key,
+                        bodyName: v.bodyName,
                         type: "voting",
                         date: v.date,
                         results_yes: v.results_yes,
