@@ -264,6 +264,7 @@ function BrowseSection({
                         id: a.id,
                         title: a.title_de || `Geschäft #${a.id}`,
                         bodyKey: a.body_key,
+                        bodyName: a.bodyName,
                         type: "affair",
                         date: a.begin_date,
                         status: a.status_de,
