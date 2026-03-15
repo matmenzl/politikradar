@@ -61,7 +61,7 @@ Kriterien für hohes Potenzial:
 4. **Emotionales Potenzial** (Themen die Empörung, Überraschung oder Freude auslösen)
 5. **Aktualität** (passt zu aktuellen gesellschaftlichen Debatten)
 
-Wähle die Top 5 aus und erkläre kurz warum. Antworte NUR mit dem tool call.`,
+Wähle die Top 10 aus und erkläre kurz warum. Antworte NUR mit dem tool call.`,
           },
           {
             role: "user",
