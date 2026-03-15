@@ -1,93 +1,63 @@
 
 
-# Instagram Story-Generator für parlamentarische Geschäfte
+## AI-Zusammenfassung fuer parlamentarische Geschaefte
 
-## Konzept
+### Uebersicht
 
-Auf der Detail-Seite wird ein neuer Button "Instagram Stories generieren" angeboten. Beim Klick werden:
+Auf der Detailseite eines Geschaefts wird ein neuer "Zusammenfassung"-Bereich eingefuegt, der per Knopfdruck eine verstaendliche AI-Zusammenfassung generiert. Die Zusammenfassung erklaert das Geschaeft in einfacher Sprache, basierend auf den vorhandenen Daten (Titel, Typ, Status, Abstimmungsergebnisse).
 
-1. **KI-Storytelling** generiert: Eine Edge Function erstellt einen 3–5-Slide-Storytelling-Vorschlag (Hook → Kontext → Ergebnis → Einordnung → Call-to-Action)
-2. **Story-Slides als HTML-Karten** gerendert: Visuell ansprechende, im Instagram-Story-Format (9:16, 1080×1920) gestaltete Karten, die der Nutzer als Screenshots exportieren kann
+### Funktionsweise
 
-## Architektur
+- Der Nutzer sieht einen Button "Zusammenfassung generieren" auf der Detailseite
+- Beim Klick wird eine Backend-Funktion aufgerufen, die alle verfuegbaren Informationen zum Geschaeft (Titel, Typ, Abstimmungsergebnisse, Datum, Status) an Lovable AI sendet
+- Die AI erstellt eine kurze, allgemeinverstaendliche Zusammenfassung auf Deutsch
+- Die Zusammenfassung wird direkt in einer Karte angezeigt
+- Waehrend des Ladens wird ein Skeleton/Spinner angezeigt
 
-```text
-┌─ DetailPage.tsx ──────────────────────────┐
-│  [📱 Instagram Stories generieren]        │
-│         ↓ Klick                           │
-│  Edge Function: generate-story            │
-│    → KI generiert Storytelling-Slides     │
-│         ↓ Response                        │
-│  StoryPreviewModal.tsx                    │
-│    → Rendert Slides im 9:16 Format       │
-│    → "Screenshot speichern" per Slide     │
-└───────────────────────────────────────────┘
-```
+### Technische Umsetzung
 
-## Neue Dateien
+#### 1. Neue Backend-Funktion: `supabase/functions/summarize-affair/index.ts`
 
-### 1. Edge Function `supabase/functions/generate-story/index.ts`
+- Empfaengt Geschaeftsdaten (Titel, Typ, Status, Abstimmungsergebnisse, Daten)
+- Ruft Lovable AI (google/gemini-3-flash-preview) auf mit einem System-Prompt, der die Rolle eines Schweizer Politik-Erklaerers einnimmt
+- Gibt eine kurze Zusammenfassung (3-5 Saetze) in einfacher Sprache zurueck
+- Behandelt 429/402 Fehler korrekt
 
-- Erhält: Titel, Typ, Status, Abstimmungsergebnisse, Zusammenfassung
-- Nutzt Lovable AI (Gemini) mit Tool Calling, um strukturierten Output zu liefern:
-  - Array von 3–5 Slides, jeweils mit `headline`, `body`, `emoji`, `slide_type` (hook/context/result/insight/cta)
-- Rückgabe: JSON-Array der Slides
+#### 2. Config: `supabase/config.toml`
 
-### 2. Komponente `src/components/StoryPreviewModal.tsx`
+- Neuer Eintrag fuer `summarize-affair` mit `verify_jwt = false`
 
-- Dialog/Modal mit horizontalem Karussell der Story-Slides
-- Jeder Slide wird als HTML-Karte im 9:16-Verhältnis gerendert (AspectRatio)
-- Design pro Slide-Typ:
-  - **Hook**: Grosser Emoji + Frage/Aussage, dunkler Hintergrund
-  - **Context**: Geschäftstyp + Erklärtext
-  - **Result**: VoteBar-Visualisierung + Ja/Nein-Zahlen
-  - **Insight**: KI-Einordnung
-  - **CTA**: "Mehr auf politikradar.ch" + QR-Code oder Link
-- Export: `html2canvas` oder nativer Browser-Screenshot-Hinweis ("Rechtsklick → Bild speichern")
-- Branding: "politikradar.ch" Wasserzeichen unten
+#### 3. Detailseite: `src/pages/DetailPage.tsx`
 
-### 3. Anpassung `src/pages/DetailPage.tsx`
+- Neuer State: `summary` (string), `summaryLoading` (boolean)
+- Neue Karte im Affair-Bereich mit:
+  - Button "Zusammenfassung generieren" (Sparkles-Icon)
+  - Nach dem Laden: Die Zusammenfassung als Fliesstext
+  - Hinweis "Erstellt mit KI" am unteren Rand
+- Die Zusammenfassung wird on-demand geladen (nicht automatisch), um API-Calls zu sparen
+- Verfuegbar fuer alle Geschaefte (nicht nur Nationalparlament), solange genuegend Kontextdaten vorhanden sind
 
-- Neuer Button neben "Einbetten" im Header oder im AI-Summary-Bereich
-- State für Story-Slides und Loading
-- Aufruf der Edge Function beim Klick
+#### Datenfluss
 
-## Beispiel-Output (5 Slides)
+Das Frontend sammelt alle verfuegbaren Daten und sendet sie an die Edge Function:
 
 ```text
-Slide 1 (Hook):
-  🏛️
-  "Soll die Schweiz mehr in
-   erneuerbare Energien investieren?"
-
-Slide 2 (Context):
-  PARLAMENTARISCHE INITIATIVE
-  Eingereicht am 12.03.2025
-  "Förderung erneuerbarer Energien
-   in Berggebieten"
-
-Slide 3 (Result):
-  ABSTIMMUNG
-  ████████░░  126 Ja
-  ░░████████   68 Nein
-  ANGENOMMEN ✅
-
-Slide 4 (Insight):
-  "Das Parlament setzt ein klares
-   Zeichen für die Energiewende.
-   Die Vorlage wurde mit breiter
-   Unterstützung angenommen."
-
-Slide 5 (CTA):
-  Mehr erfahren auf
-  politikradar.ch
-  📱 @politikradar
+DetailPage (Klick auf Button)
+  --> supabase.functions.invoke("summarize-affair", {
+        title, type, status, votingResults, date
+      })
+  --> Edge Function ruft Lovable AI auf
+  --> Zusammenfassung wird zurueckgegeben und angezeigt
 ```
 
-## Technische Details
+#### Prompt-Strategie (Backend)
 
-- **html2canvas** als Dependency für den Bild-Export (PNG-Download pro Slide)
-- **config.toml** erweitern um `[functions.generate-story]` mit `verify_jwt = false`
-- KI-Prompt auf der Edge Function, nicht client-seitig
-- Tool Calling für strukturierten Output (Array von Slide-Objekten)
+Der AI-Prompt erhaelt:
+- Geschaeftstitel
+- Geschaeftstyp (Motion, Interpellation, etc.)
+- Status (erledigt, haengig, etc.)
+- Abstimmungsergebnisse (falls vorhanden)
+- Datumsangaben
+
+Die AI wird angewiesen, eine allgemeinverstaendliche Erklaerung in 3-5 Saetzen zu liefern, ohne Fachjargon.
 

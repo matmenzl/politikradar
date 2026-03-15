@@ -1,11 +1,12 @@
 import { Link, useParams, useSearchParams } from "react-router-dom";
-import { ArrowLeft, Loader2, ExternalLink, Calendar, FileText, Vote, Tag, Sparkles, Code2 } from "lucide-react";
+import { ArrowLeft, Loader2, ExternalLink, Calendar, FileText, Vote, Tag, Sparkles, Code2, Instagram } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import VoteBar from "@/components/VoteBar";
 import VotingPartyBreakdown from "@/components/VotingPartyBreakdown";
 import EmbedCodeModal from "@/components/EmbedCodeModal";
+import StoryPreviewModal, { type StorySlide } from "@/components/StoryPreviewModal";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { type Voting, type Affair, isVotingAccepted } from "@/lib/api/openparldata";
@@ -46,6 +47,9 @@ const DetailPage = () => {
   const [summary, setSummary] = useState<string>("");
   const [summaryLoading, setSummaryLoading] = useState(false);
   const [embedModalOpen, setEmbedModalOpen] = useState(false);
+  const [storyModalOpen, setStoryModalOpen] = useState(false);
+  const [storySlides, setStorySlides] = useState<StorySlide[]>([]);
+  const [storyLoading, setStoryLoading] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -161,6 +165,41 @@ const DetailPage = () => {
       setSummaryLoading(false);
     }
   };
+  const generateStory = async () => {
+    if (!affair) return;
+    setStoryLoading(true);
+    setStoryModalOpen(true);
+    try {
+      const body: Record<string, unknown> = { title: affair.title_de };
+      if (affair.type_de || affair.type_name_de || affair.type_harmonized_de) {
+        body.type = affair.type_de || affair.type_name_de || affair.type_harmonized_de;
+      }
+      if (affair.status_de || affair.state_name_de) {
+        body.status = affair.status_de || affair.state_name_de;
+      }
+      if (affair.begin_date) body.beginDate = affair.begin_date;
+      if (affair.end_date) body.endDate = affair.end_date;
+      if (voting) {
+        body.votingResults = {
+          yes: voting.results_yes,
+          no: voting.results_no,
+          abstention: voting.results_abstention,
+          decision: voting.decision,
+        };
+        if (voting.date) body.date = voting.date;
+      }
+      if (summary) body.summary = summary;
+      const { data, error } = await supabase.functions.invoke("generate-story", { body });
+      if (error) throw error;
+      setStorySlides(data?.slides || []);
+    } catch (e) {
+      console.error("Story generation error:", e);
+      setStorySlides([]);
+    } finally {
+      setStoryLoading(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
@@ -191,14 +230,23 @@ const DetailPage = () => {
             <ArrowLeft className="w-4 h-4" />
             <span className="text-sm">Zurück zur Übersicht</span>
           </Link>
-          <Button variant="ghost" size="sm" className="gap-1.5 text-xs h-8" onClick={() => setEmbedModalOpen(true)}>
-            <Code2 className="w-3.5 h-3.5" />
-            Einbetten
-          </Button>
+          <div className="flex items-center gap-1">
+            {affair && (
+              <Button variant="ghost" size="sm" className="gap-1.5 text-xs h-8" onClick={generateStory}>
+                <Instagram className="w-3.5 h-3.5" />
+                Stories
+              </Button>
+            )}
+            <Button variant="ghost" size="sm" className="gap-1.5 text-xs h-8" onClick={() => setEmbedModalOpen(true)}>
+              <Code2 className="w-3.5 h-3.5" />
+              Einbetten
+            </Button>
+          </div>
         </div>
       </header>
 
       <EmbedCodeModal open={embedModalOpen} onOpenChange={setEmbedModalOpen} embedUrl={embedUrl} />
+      <StoryPreviewModal open={storyModalOpen} onOpenChange={setStoryModalOpen} slides={storySlides} loading={storyLoading} />
 
       <main className="max-w-3xl mx-auto px-6 py-10 space-y-8">
         {/* Title section */}
