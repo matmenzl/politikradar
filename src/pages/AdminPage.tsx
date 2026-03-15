@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Search, Sparkles, Trash2, Eye, EyeOff, Lock, Vote, BarChart3, Calendar } from "lucide-react";
+import { Loader2, Search, Sparkles, Trash2, Eye, EyeOff, Lock, Vote, BarChart3, Calendar, TrendingUp, Zap, Lightbulb } from "lucide-react";
 import { toast } from "sonner";
 import VoteBar from "@/components/VoteBar";
 import type { StorySlide } from "@/components/StoryPreviewModal";
@@ -129,9 +129,17 @@ const AdminPage = () => {
 function BrowseSection({
   onSelectItem,
   generatingId,
+  affairs,
+  votings,
+  loadingAffairs,
+  loadingVotings,
 }: {
   onSelectItem: (item: SearchResult) => void;
   generatingId: string | null;
+  affairs: AffairWithBody[];
+  votings: VotingWithBody[];
+  loadingAffairs: boolean;
+  loadingVotings: boolean;
 }) {
   const { year, week } = getCurrentISOWeek();
   const { from, to } = getWeekDateRange(year, week);
@@ -140,46 +148,6 @@ function BrowseSection({
   const [tab, setTab] = useState<TabKey>("affairs");
   const [search, setSearch] = useState("");
   const [filterBody, setFilterBody] = useState("");
-
-  const [affairs, setAffairs] = useState<AffairWithBody[]>([]);
-  const [votings, setVotings] = useState<VotingWithBody[]>([]);
-  const [loadingAffairs, setLoadingAffairs] = useState(true);
-  const [loadingVotings, setLoadingVotings] = useState(true);
-
-  useEffect(() => {
-    (async () => {
-      try {
-        const bodies = await fetchBodies();
-        const allA: AffairWithBody[] = [];
-        const allV: VotingWithBody[] = [];
-        const batchSize = 5;
-        for (let i = 0; i < bodies.length; i += batchSize) {
-          const batch = bodies.slice(i, i + batchSize);
-          const [aRes, vRes] = await Promise.all([
-            Promise.all(batch.map(async (b) => {
-              const res = await fetchAffairsForWeek(from, to, b.key);
-              return res.data.map((a) => ({ ...a, bodyName: b.name_de || b.key }));
-            })),
-            Promise.all(batch.map(async (b) => {
-              const res = await fetchVotingsForWeek(from, to, b.key);
-              return res.data.map((v) => ({ ...v, bodyName: b.name_de || b.key }));
-            })),
-          ]);
-          aRes.forEach((r) => allA.push(...r));
-          vRes.forEach((r) => allV.push(...r));
-        }
-        allA.sort((a, b) => new Date(b.begin_date || "").getTime() - new Date(a.begin_date || "").getTime());
-        allV.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-        setAffairs(allA);
-        setVotings(allV);
-      } catch (e) {
-        console.error(e);
-      } finally {
-        setLoadingAffairs(false);
-        setLoadingVotings(false);
-      }
-    })();
-  }, []);
 
   const bodyNames = useMemo(() => {
     const names = new Set<string>();
@@ -366,6 +334,213 @@ function BrowseSection({
   );
 }
 
+/* ─── AI Suggestions Section ─── */
+
+interface AISuggestion {
+  index: number;
+  score: number;
+  reason: string;
+  hook_idea: string;
+}
+
+interface SuggestableItem {
+  id: number;
+  title: string;
+  bodyKey: string;
+  bodyName: string;
+  type: "affair" | "voting";
+  date?: string;
+  status?: string;
+  results_yes?: number;
+  results_no?: number;
+}
+
+function AISuggestionsSection({
+  affairs,
+  votings,
+  loadingData,
+  onSelectItem,
+  generatingId,
+}: {
+  affairs: AffairWithBody[];
+  votings: VotingWithBody[];
+  loadingData: boolean;
+  onSelectItem: (item: SearchResult) => void;
+  generatingId: string | null;
+}) {
+  const [suggestions, setSuggestions] = useState<AISuggestion[]>([]);
+  const [items, setItems] = useState<SuggestableItem[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [hasLoaded, setHasLoaded] = useState(false);
+
+  const generateSuggestions = async () => {
+    setLoading(true);
+    setSuggestions([]);
+
+    // Combine affairs + votings into a flat list for AI analysis
+    const combined: SuggestableItem[] = [];
+    for (const v of votings) {
+      combined.push({
+        id: v.id,
+        title: v.affair_title_de || v.title_de || `#${v.id}`,
+        bodyKey: v.body_key,
+        bodyName: v.bodyName,
+        type: "voting",
+        date: v.date,
+        results_yes: v.results_yes,
+        results_no: v.results_no,
+      });
+    }
+    for (const a of affairs) {
+      combined.push({
+        id: a.id,
+        title: a.title_de || `#${a.id}`,
+        bodyKey: a.body_key,
+        bodyName: a.bodyName,
+        type: "affair",
+        date: a.begin_date,
+        status: a.status_de,
+      });
+    }
+
+    // Limit to max 50 items to keep prompt manageable
+    const subset = combined.slice(0, 50);
+    setItems(subset);
+
+    try {
+      const { data, error } = await supabase.functions.invoke("suggest-stories", {
+        body: { items: subset },
+      });
+      if (error) throw error;
+      if (data?.suggestions) {
+        const sorted = [...data.suggestions].sort((a: AISuggestion, b: AISuggestion) => b.score - a.score);
+        setSuggestions(sorted);
+      }
+    } catch (e: any) {
+      toast.error(e.message || "Fehler bei KI-Analyse");
+    } finally {
+      setLoading(false);
+      setHasLoaded(true);
+    }
+  };
+
+  const scoreColor = (score: number) => {
+    if (score >= 8) return "bg-success/15 text-success border-success/30";
+    if (score >= 6) return "bg-accent/15 text-accent border-accent/30";
+    return "bg-muted text-muted-foreground border-border";
+  };
+
+  return (
+    <Card>
+      <CardHeader className="pb-3">
+        <div className="flex items-center justify-between">
+          <div>
+            <div className="flex items-center gap-2 mb-1">
+              <TrendingUp className="w-4 h-4 text-accent" />
+              <CardTitle className="font-serif text-xl">KI-Vorschläge</CardTitle>
+            </div>
+            <CardDescription>
+              KI analysiert Geschäfte & Abstimmungen nach Social-Media-Potenzial
+            </CardDescription>
+          </div>
+          <Button
+            onClick={generateSuggestions}
+            disabled={loading || loadingData}
+            size="sm"
+            className="gap-2"
+          >
+            {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Zap className="w-4 h-4" />}
+            {hasLoaded ? "Neu analysieren" : "Analysieren"}
+          </Button>
+        </div>
+      </CardHeader>
+      <CardContent>
+        {loading ? (
+          <div className="flex flex-col items-center justify-center py-12 gap-3">
+            <Loader2 className="w-6 h-6 animate-spin text-accent" />
+            <span className="text-sm text-muted-foreground">KI analysiert {items.length} Geschäfte…</span>
+          </div>
+        ) : !hasLoaded ? (
+          <div className="text-center py-8">
+            <Lightbulb className="w-8 h-8 mx-auto mb-3 text-muted-foreground/50" />
+            <p className="text-sm text-muted-foreground">
+              Klicke «Analysieren», um die besten Geschäfte für Social Media zu finden.
+            </p>
+            <p className="text-xs text-muted-foreground/70 mt-1">
+              Kriterien: Knappe Abstimmungen, kontroverse Themen, Alltagsrelevanz
+            </p>
+          </div>
+        ) : suggestions.length === 0 ? (
+          <p className="text-sm text-muted-foreground text-center py-8">Keine Vorschläge generiert.</p>
+        ) : (
+          <div className="space-y-3">
+            {suggestions.map((s, idx) => {
+              const item = items[s.index - 1];
+              if (!item) return null;
+              const key = `${item.type}-${item.id}`;
+              return (
+                <div
+                  key={idx}
+                  className="p-3 rounded-lg border border-border/50 hover:bg-secondary/30 transition-colors"
+                >
+                  <div className="flex items-start gap-3">
+                    <div className={`shrink-0 flex items-center justify-center w-9 h-9 rounded-lg border text-sm font-bold ${scoreColor(s.score)}`}>
+                      {s.score}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-foreground line-clamp-2">{item.title}</p>
+                      <div className="flex items-center gap-2 mt-1 flex-wrap">
+                        <Badge variant="outline" className="text-[10px]">{item.bodyName}</Badge>
+                        <Badge variant="secondary" className="text-[10px]">
+                          {item.type === "voting" ? "Abstimmung" : "Geschäft"}
+                        </Badge>
+                        {item.results_yes != null && item.results_no != null && (
+                          <span className="text-[10px] font-medium text-muted-foreground">
+                            {item.results_yes}:{item.results_no}
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-2">{s.reason}</p>
+                      <div className="flex items-center gap-1.5 mt-1.5">
+                        <Lightbulb className="w-3 h-3 text-accent shrink-0" />
+                        <span className="text-xs text-accent font-medium italic">«{s.hook_idea}»</span>
+                      </div>
+                    </div>
+                    <Button
+                      size="sm"
+                      variant="secondary"
+                      className="shrink-0 h-8 gap-1"
+                      disabled={generatingId === key}
+                      onClick={() =>
+                        onSelectItem({
+                          id: item.id,
+                          title: item.title,
+                          bodyKey: item.bodyKey,
+                          type: item.type,
+                          date: item.date,
+                          status: item.status,
+                          results_yes: item.results_yes,
+                          results_no: item.results_no,
+                        })
+                      }
+                    >
+                      {generatingId === key ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Sparkles className="w-3.5 h-3.5" />}
+                      <span className="hidden sm:inline">Story</span>
+                    </Button>
+                  </div>
+                </div>
+              );
+            })}
+            <p className="text-[10px] text-muted-foreground text-center opacity-70 mt-2">
+              Erstellt mit KI · Vorschläge basieren auf Titel und Abstimmungsdaten
+            </p>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
 /* ─── Admin Dashboard ─── */
 
 function AdminDashboard() {
@@ -376,6 +551,49 @@ function AdminDashboard() {
   const [searching, setSearching] = useState(false);
   const [generatingId, setGeneratingId] = useState<string | null>(null);
   const [previewStory, setPreviewStory] = useState<StoryPost | null>(null);
+
+  // Shared data for Browse + AI suggestions
+  const [affairs, setAffairs] = useState<AffairWithBody[]>([]);
+  const [votings, setVotings] = useState<VotingWithBody[]>([]);
+  const [loadingAffairs, setLoadingAffairs] = useState(true);
+  const [loadingVotings, setLoadingVotings] = useState(true);
+
+  useEffect(() => {
+    const { year, week } = getCurrentISOWeek();
+    const { from, to } = getWeekDateRange(year, week);
+    (async () => {
+      try {
+        const bodies = await fetchBodies();
+        const allA: AffairWithBody[] = [];
+        const allV: VotingWithBody[] = [];
+        const batchSize = 5;
+        for (let i = 0; i < bodies.length; i += batchSize) {
+          const batch = bodies.slice(i, i + batchSize);
+          const [aRes, vRes] = await Promise.all([
+            Promise.all(batch.map(async (b) => {
+              const res = await fetchAffairsForWeek(from, to, b.key);
+              return res.data.map((a) => ({ ...a, bodyName: b.name_de || b.key }));
+            })),
+            Promise.all(batch.map(async (b) => {
+              const res = await fetchVotingsForWeek(from, to, b.key);
+              return res.data.map((v) => ({ ...v, bodyName: b.name_de || b.key }));
+            })),
+          ]);
+          aRes.forEach((r) => allA.push(...r));
+          vRes.forEach((r) => allV.push(...r));
+        }
+        allA.sort((a, b) => new Date(b.begin_date || "").getTime() - new Date(a.begin_date || "").getTime());
+        allV.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+        setAffairs(allA);
+        setVotings(allV);
+      } catch (e) {
+        console.error(e);
+      } finally {
+        setLoadingAffairs(false);
+        setLoadingVotings(false);
+      }
+    })();
+  }, []);
 
   const loadStories = useCallback(async () => {
     const { data } = await supabase
@@ -518,8 +736,24 @@ function AdminDashboard() {
       </header>
 
       <main className="max-w-4xl mx-auto px-4 md:px-6 py-6 md:py-8 space-y-8">
+        {/* AI suggestions */}
+        <AISuggestionsSection
+          affairs={affairs}
+          votings={votings}
+          loadingData={loadingAffairs || loadingVotings}
+          onSelectItem={generateStory}
+          generatingId={generatingId}
+        />
+
         {/* Browse affairs & votings */}
-        <BrowseSection onSelectItem={generateStory} generatingId={generatingId} />
+        <BrowseSection
+          onSelectItem={generateStory}
+          generatingId={generatingId}
+          affairs={affairs}
+          votings={votings}
+          loadingAffairs={loadingAffairs}
+          loadingVotings={loadingVotings}
+        />
 
         {/* Quick search (API-wide) */}
         <Card>
