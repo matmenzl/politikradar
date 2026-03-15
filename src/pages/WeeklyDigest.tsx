@@ -171,10 +171,6 @@ const WeeklyDigest = () => {
             )}
             </div>
 
-            {/* Stories */}
-            <div className="opacity-0 animate-fade-in" style={{ animationDelay: "150ms" }}>
-              <StoriesCarousel />
-            </div>
 
             {/* AI Summary */}
             {data.summary &&

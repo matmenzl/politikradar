@@ -77,64 +77,72 @@ const StoriesCarousel = () => {
 
   return (
     <>
-      <Card>
-        <CardHeader className="pb-3">
-          <div className="flex items-center gap-2 text-muted-foreground">
+      <div>
+        <div className="mb-4">
+          <div className="flex items-center gap-2 text-muted-foreground mb-1">
             <Sparkles className="w-4 h-4" />
             <span className="text-xs font-medium uppercase tracking-wider">Stories</span>
           </div>
-          <CardTitle className="font-serif text-xl">Stories der Woche</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex gap-3 md:gap-4 overflow-x-auto pb-2 -mx-2 px-2 snap-x snap-mandatory">
-            {stories.map((story) => {
-              const firstSlide = story.slides[0];
-              if (!firstSlide) return null;
-              const extUrl = story.affair_id ? affairLinks[story.affair_id] : null;
-              return (
-                <div key={story.id} className="flex-shrink-0 w-[160px] md:w-[200px] snap-start">
-                  <button
-                    onClick={() => isMobile ? navigate(`/story/${story.id}`) : setSelectedStory(story)}
-                    className="w-full group focus:outline-none"
-                  >
-                    <div className="w-full rounded-xl overflow-hidden ring-2 ring-transparent group-hover:ring-accent/50 transition-all shadow-md">
-                      <StorySlideCard
-                        slide={firstSlide}
-                        index={0}
-                        total={story.slides.length}
-                      />
-                    </div>
-                    <div className="mt-2 text-center">
-                      <p className="text-xs font-medium text-foreground line-clamp-3 text-center group-hover:text-accent transition-colors">
-                        {story.title}
+          <h2 className="font-serif text-2xl md:text-3xl font-bold text-foreground">
+            Stories der Woche
+          </h2>
+          <p className="text-sm text-muted-foreground mt-1">
+            Politische Entscheide, einfach erklärt
+          </p>
+        </div>
+        <div className="flex gap-4 md:gap-5 overflow-x-auto pb-3 -mx-1 px-1 snap-x snap-mandatory">
+          {stories.map((story) => {
+            const firstSlide = story.slides[0];
+            if (!firstSlide) return null;
+            const extUrl = story.affair_id ? affairLinks[story.affair_id] : null;
+            return (
+              <div key={story.id} className="flex-shrink-0 w-[220px] md:w-[280px] snap-start">
+                <button
+                  onClick={() => isMobile ? navigate(`/story/${story.id}`) : setSelectedStory(story)}
+                  className="w-full group focus:outline-none"
+                >
+                  <div className="w-full rounded-xl overflow-hidden ring-2 ring-transparent group-hover:ring-accent/50 transition-all shadow-lg">
+                    <StorySlideCard
+                      slide={firstSlide}
+                      index={0}
+                      total={story.slides.length}
+                    />
+                  </div>
+                  <div className="mt-2.5 text-center">
+                    <p className="text-sm font-medium text-foreground line-clamp-3 text-center group-hover:text-accent transition-colors">
+                      {story.title}
+                    </p>
+                    {story.body_key && (
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        {bodyNames[story.body_key] || story.body_key}
                       </p>
-                      {story.body_key && (
-                        <p className="text-[10px] text-muted-foreground mt-0.5">
-                          {bodyNames[story.body_key] || story.body_key}
-                        </p>
-                      )}
-                    </div>
-                  </button>
-                  {extUrl && (
-                    <a
-                      href={extUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="mt-1.5 flex items-center justify-center gap-1 text-[10px] text-muted-foreground hover:text-accent transition-colors"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      <ExternalLink className="w-3 h-3" />
-                      <span>
-                        {(() => { try { return new URL(extUrl).hostname.replace(/^www\./, ''); } catch { return 'Parlamentsseite'; } })()}
-                      </span>
-                    </a>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        </CardContent>
-      </Card>
+                    )}
+                  </div>
+                </button>
+                {extUrl && (
+                  <a
+                    href={extUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-1.5 flex items-center justify-center gap-1 text-[10px] text-muted-foreground hover:text-accent transition-colors"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <ExternalLink className="w-3 h-3" />
+                    <span>
+                      {(() => { try { return new URL(extUrl).hostname.replace(/^www\./, ''); } catch { return 'Parlamentsseite'; } })()}
+                    </span>
+                  </a>
+                )}
+              </div>
+            );
+          })}
+        </div>
+        {stories.length === 0 && (
+          <p className="text-sm text-muted-foreground text-center py-8">
+            Noch keine Stories für diese Woche verfügbar.
+          </p>
+        )}
+      </div>
 
       {selectedStory && (
         <StoryPreviewModal
