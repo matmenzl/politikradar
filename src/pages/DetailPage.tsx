@@ -282,7 +282,7 @@ const DetailPage = () => {
         body_key: bodyKey,
         affair_id: affair ? String(affair.id) : null,
         voting_id: voting ? String(voting.id) : null,
-        slides,
+        slides: slides as unknown as Record<string, unknown>[],
         status: "published",
         published_at: new Date().toISOString(),
       });
