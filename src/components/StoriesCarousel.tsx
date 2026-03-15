@@ -8,6 +8,7 @@ import StorySlideCard from "@/components/story/StorySlideCard";
 interface StoryPost {
   id: string;
   title: string;
+  body_key: string | null;
   slides: StorySlide[];
   published_at: string;
 }
@@ -19,7 +20,7 @@ const StoriesCarousel = () => {
   useEffect(() => {
     supabase
       .from("story_posts")
-      .select("id, title, slides, published_at")
+      .select("id, title, body_key, slides, published_at")
       .eq("status", "published")
       .order("published_at", { ascending: false })
       .limit(10)
@@ -29,6 +30,7 @@ const StoriesCarousel = () => {
             data.map((d) => ({
               id: d.id,
               title: d.title,
+              body_key: d.body_key,
               slides: (d.slides as unknown as StorySlide[]) || [],
               published_at: d.published_at || "",
             }))
@@ -69,9 +71,16 @@ const StoriesCarousel = () => {
                       />
                     </div>
                   </div>
-                  <p className="text-xs text-muted-foreground mt-2 line-clamp-2 text-center group-hover:text-foreground transition-colors">
-                    {story.title}
-                  </p>
+                  <div className="mt-2 text-center">
+                    <p className="text-xs font-medium text-foreground line-clamp-1 group-hover:text-accent transition-colors">
+                      {story.title}
+                    </p>
+                    {story.body_key && (
+                      <p className="text-[10px] text-muted-foreground mt-0.5">
+                        {story.body_key}
+                      </p>
+                    )}
+                  </div>
                 </button>
               );
             })}
