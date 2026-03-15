@@ -219,32 +219,32 @@ const WeeklyOverview = () => {
         )}
 
         {!loading && !error && data && (data.totalAffairs > 0 || data.totalVotings > 0 || data.totalMeetings > 0) && (
-          <div className="space-y-8">
-            <div className="grid gap-5 md:grid-cols-2">
+          <div className="space-y-5 md:space-y-8">
+            <div className="grid gap-4 md:gap-5 md:grid-cols-2">
               {/* Card 1: Gesamtaktivität */}
               <Card className="group hover:shadow-lg hover:border-accent/30 transition-all duration-300 opacity-0 animate-fade-in" style={{ animationDelay: "100ms" }}>
-                <CardHeader className="pb-3">
+                <CardHeader className="pb-2 md:pb-3 p-4 md:p-6">
                   <div className="flex items-center gap-2 text-muted-foreground">
                     <Activity className="w-4 h-4" />
                     <span className="text-xs font-medium uppercase tracking-wider">Wochenüberblick in Zahlen</span>
                   </div>
-                  <CardTitle className="font-serif text-xl leading-snug">Gesamtaktivität</CardTitle>
+                  <CardTitle className="font-serif text-lg md:text-xl leading-snug">Gesamtaktivität</CardTitle>
                   <CardDescription className="text-sm leading-relaxed">
                     {data.totalAffairs > 0 || data.totalVotings > 0
                       ? `${data.totalAffairs} Geschäfte, ${data.totalVotings} Abstimmungen und ${data.totalMeetings} Sitzungen in dieser Woche.`
                       : "Keine parlamentarische Aktivität in dieser Woche erfasst."}
                   </CardDescription>
                 </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-3 gap-3">
+                <CardContent className="p-4 md:p-6 pt-0">
+                  <div className="grid grid-cols-3 gap-2 md:gap-3">
                     {[
                       { label: "Geschäfte", value: data.totalAffairs, href: `/list/affairs?body=${encodeURIComponent(bodyKey)}` },
                       { label: "Abstimmungen", value: data.totalVotings, href: `/list/votings?body=${encodeURIComponent(bodyKey)}` },
                       { label: "Sitzungen", value: data.totalMeetings, href: `/list/meetings?body=${encodeURIComponent(bodyKey)}` },
                     ].map((stat) => (
-                      <Link key={stat.label} to={stat.href} className="bg-secondary/50 rounded-lg p-3 hover:bg-secondary/80 transition-colors">
-                        <p className="text-2xl font-semibold text-foreground">{stat.value}</p>
-                        <p className="text-xs text-muted-foreground">{stat.label}</p>
+                      <Link key={stat.label} to={stat.href} className="bg-secondary/50 rounded-lg p-2 md:p-3 hover:bg-secondary/80 transition-colors">
+                        <p className="text-xl md:text-2xl font-semibold text-foreground">{stat.value}</p>
+                        <p className="text-[10px] md:text-xs text-muted-foreground">{stat.label}</p>
                       </Link>
                     ))}
                   </div>
@@ -254,12 +254,12 @@ const WeeklyOverview = () => {
               {/* Card 2: Knappste Abstimmung */}
               <Link to={closestVoting ? `/detail/${closestVoting.id}?type=voting&body=${encodeURIComponent(bodyKey)}` : "#"} className="block">
               <Card className="group hover:shadow-lg hover:border-accent/30 transition-all duration-300 opacity-0 animate-fade-in cursor-pointer" style={{ animationDelay: "200ms" }}>
-                <CardHeader className="pb-3">
+                <CardHeader className="pb-2 md:pb-3 p-4 md:p-6">
                   <div className="flex items-center gap-2 text-muted-foreground">
                     <Vote className="w-4 h-4" />
                     <span className="text-xs font-medium uppercase tracking-wider">Knappste Abstimmung</span>
                   </div>
-                  <CardTitle className="font-serif text-xl leading-snug">
+                  <CardTitle className="font-serif text-lg md:text-xl leading-snug">
                     {closestVoting ? closestVoting.affair_title_de || closestVoting.title_de || "Abstimmung" : "Keine Abstimmung"}
                   </CardTitle>
                   <CardDescription className="text-sm leading-relaxed">
@@ -268,7 +268,7 @@ const WeeklyOverview = () => {
                       : "Keine Abstimmungen in dieser Woche erfasst."}
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-4">
+                <CardContent className="p-4 md:p-6 pt-0 space-y-4">
                   {closestVoting && (
                     <VoteBar
                       ja={closestVoting.results_yes}
@@ -282,19 +282,19 @@ const WeeklyOverview = () => {
 
               {/* Card 3: Alle Abstimmungen */}
               <Card className="group hover:shadow-lg hover:border-accent/30 transition-all duration-300 opacity-0 animate-fade-in" style={{ animationDelay: "300ms" }}>
-                <CardHeader className="pb-3">
+                <CardHeader className="pb-2 md:pb-3 p-4 md:p-6">
                   <div className="flex items-center gap-2 text-muted-foreground">
                     <BarChart3 className="w-4 h-4" />
                     <span className="text-xs font-medium uppercase tracking-wider">Abstimmungen der Woche</span>
                   </div>
-                  <CardTitle className="font-serif text-xl leading-snug">Abstimmungsergebnisse</CardTitle>
-                  <CardDescription className="text-sm leading-relaxed">
+                  <CardTitle className="font-serif text-lg md:text-xl leading-snug">Abstimmungsergebnisse</CardTitle>
+                  <CardDescription className="text-xs md:text-sm leading-relaxed">
                     {data.votings.length > 0
                       ? `${data.votings.length} Abstimmungen – ${data.votings.filter(v => isVotingAccepted(v)).length} angenommen, ${data.votings.filter(v => !isVotingAccepted(v)).length} abgelehnt.`
                       : "Keine Abstimmungsdaten vorhanden."}
                   </CardDescription>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="p-4 md:p-6 pt-0">
                   <div className="space-y-2 max-h-48 overflow-y-auto">
                     {data.votings.slice(0, 8).map((v) => (
                       <Link key={v.id} to={`/detail/${v.id}?type=voting&body=${encodeURIComponent(bodyKey)}`} className="flex items-center justify-between py-1.5 border-b border-border/30 last:border-0 hover:bg-secondary/30 rounded px-1 -mx-1 transition-colors">
@@ -315,8 +315,8 @@ const WeeklyOverview = () => {
 
               {/* Card 4: Neueste Geschäfte with AI tags */}
               <Card className="group hover:shadow-lg hover:border-accent/30 transition-all duration-300 opacity-0 animate-fade-in" style={{ animationDelay: "400ms" }}>
-                <CardHeader className="pb-3">
-                  <div className="flex items-center justify-between">
+                <CardHeader className="pb-2 md:pb-3 p-4 md:p-6">
+                  <div className="flex items-center justify-between gap-2">
                     <div className="flex items-center gap-2 text-muted-foreground">
                       <FileText className="w-4 h-4" />
                       <span className="text-xs font-medium uppercase tracking-wider">Geschäfte der Woche</span>
@@ -328,14 +328,14 @@ const WeeklyOverview = () => {
                       </div>
                     )}
                   </div>
-                  <CardTitle className="font-serif text-xl leading-snug">Parlamentarische Geschäfte</CardTitle>
-                  <CardDescription className="text-sm leading-relaxed">
+                  <CardTitle className="font-serif text-lg md:text-xl leading-snug">Parlamentarische Geschäfte</CardTitle>
+                  <CardDescription className="text-xs md:text-sm leading-relaxed">
                     {data.recentAffairs.length > 0
                       ? `${data.totalAffairs} Geschäfte in dieser Woche.${allTags.length > 0 ? ` ${allTags.length} Themen erkannt.` : ""}`
                       : "Keine Geschäfte in dieser Woche erfasst."}
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-3">
+                <CardContent className="p-4 md:p-6 pt-0 space-y-3">
                   {/* Tag filter chips */}
                   {allTags.length > 0 && (
                     <div className="flex flex-wrap gap-1.5">
