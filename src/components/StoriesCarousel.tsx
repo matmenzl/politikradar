@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Sparkles, ExternalLink } from "lucide-react";
 import StoryPreviewModal, { type StorySlide } from "@/components/StoryPreviewModal";
 import StorySlideCard from "@/components/story/StorySlideCard";
 import { fetchBodies, getBodyLabel, fetchAffairById } from "@/lib/api/openparldata";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface StoryPost {
   id: string;
@@ -20,6 +22,8 @@ const StoriesCarousel = () => {
   const [selectedStory, setSelectedStory] = useState<StoryPost | null>(null);
   const [bodyNames, setBodyNames] = useState<Record<string, string>>({});
   const [affairLinks, setAffairLinks] = useState<Record<string, string>>({});
+  const isMobile = useIsMobile();
+  const navigate = useNavigate();
 
   useEffect(() => {
     supabase
@@ -88,7 +92,7 @@ const StoriesCarousel = () => {
               return (
                 <div key={story.id} className="flex-shrink-0 w-[160px] md:w-[200px] snap-start">
                   <button
-                    onClick={() => setSelectedStory(story)}
+                    onClick={() => isMobile ? navigate(`/story/${story.id}`) : setSelectedStory(story)}
                     className="w-full group focus:outline-none"
                   >
                     <div className="w-full rounded-xl overflow-hidden ring-2 ring-transparent group-hover:ring-accent/50 transition-all shadow-md">
