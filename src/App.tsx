@@ -35,7 +35,6 @@ const App = () => (
           <Route path="/embed/:id" element={<EmbedDetailPage />} />
           <Route path="/person/:id" element={<PersonProfile />} />
           <Route path="/admin" element={<AdminPage />} />
-          <Route path="/mobile" element={<MobileSearch />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
