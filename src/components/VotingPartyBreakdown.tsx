@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { Users, AlertTriangle, Loader2, ChevronDown, ChevronUp } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -155,10 +156,14 @@ const VotingPartyBreakdown = ({ votingId }: Props) => {
                           const isDeviator = (v.vote === "yes" || v.vote === "no") && v.vote !== majorityVote;
                           return (
                             <div key={v.id} className={`flex items-center justify-between text-xs py-0.5 ${isDeviator ? "font-medium" : ""}`}>
-                              <span className="text-foreground truncate mr-2">
+                              <Link
+                                to={`/person/${v.person_id}`}
+                                className="text-foreground truncate mr-2 hover:text-accent transition-colors hover:underline"
+                                onClick={(e) => e.stopPropagation()}
+                              >
                                 {v.person_fullname}
                                 {isDeviator && <span className="text-warning ml-1">⚡</span>}
-                              </span>
+                              </Link>
                               <span className={
                                 v.vote === "yes" ? "text-success" :
                                 v.vote === "no" ? "text-destructive" :

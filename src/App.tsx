@@ -12,6 +12,7 @@ import ListAffairs from "./pages/ListAffairs";
 import ListMeetings from "./pages/ListMeetings";
 import ListBodies from "./pages/ListBodies";
 import NotFound from "./pages/NotFound";
+import PersonProfile from "./pages/PersonProfile";
 
 const queryClient = new QueryClient();
 
@@ -29,6 +30,7 @@ const App = () => (
           <Route path="/list/meetings" element={<ListMeetings />} />
           <Route path="/list/bodies" element={<ListBodies />} />
           <Route path="/detail/:id" element={<DetailPage />} />
+          <Route path="/person/:id" element={<PersonProfile />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
