@@ -40,6 +40,7 @@ const StoriesCarousel = () => {
             title: d.title,
             body_key: d.body_key,
             affair_id: d.affair_id,
+            voting_id: d.voting_id,
             slides: (d.slides as unknown as StorySlide[]) || [],
             published_at: d.published_at || "",
           }));
