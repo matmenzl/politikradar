@@ -1,63 +1,73 @@
 
 
-## AI-Zusammenfassung fuer parlamentarische Geschaefte
+## Stories auf der Startseite + Admin-Bereich
 
-### Uebersicht
+### Übersicht
 
-Auf der Detailseite eines Geschaefts wird ein neuer "Zusammenfassung"-Bereich eingefuegt, der per Knopfdruck eine verstaendliche AI-Zusammenfassung generiert. Die Zusammenfassung erklaert das Geschaeft in einfacher Sprache, basierend auf den vorhandenen Daten (Titel, Typ, Status, Abstimmungsergebnisse).
+1. **Neue DB-Tabelle `story_posts`** speichert kuratierte Stories (welche Affair/Voting, generierte Slides, Status)
+2. **Admin-Seite `/admin`** mit einfachem PIN-Schutz, wo Abstimmungen/Geschäfte ausgewählt und Stories generiert/veröffentlicht werden
+3. **Stories-Karussell auf der Startseite** zeigt veröffentlichte Stories im Instagram-Look
 
-### Funktionsweise
+### Datenbank
 
-- Der Nutzer sieht einen Button "Zusammenfassung generieren" auf der Detailseite
-- Beim Klick wird eine Backend-Funktion aufgerufen, die alle verfuegbaren Informationen zum Geschaeft (Titel, Typ, Abstimmungsergebnisse, Datum, Status) an Lovable AI sendet
-- Die AI erstellt eine kurze, allgemeinverstaendliche Zusammenfassung auf Deutsch
-- Die Zusammenfassung wird direkt in einer Karte angezeigt
-- Waehrend des Ladens wird ein Skeleton/Spinner angezeigt
+Neue Tabelle `story_posts`:
 
-### Technische Umsetzung
+```sql
+CREATE TABLE public.story_posts (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  created_at timestamptz NOT NULL DEFAULT now(),
+  affair_id text,
+  voting_id text,
+  title text NOT NULL,
+  body_key text,
+  slides jsonb NOT NULL DEFAULT '[]',
+  status text NOT NULL DEFAULT 'draft',  -- 'draft' | 'published'
+  published_at timestamptz
+);
 
-#### 1. Neue Backend-Funktion: `supabase/functions/summarize-affair/index.ts`
+ALTER TABLE public.story_posts ENABLE ROW LEVEL SECURITY;
 
-- Empfaengt Geschaeftsdaten (Titel, Typ, Status, Abstimmungsergebnisse, Daten)
-- Ruft Lovable AI (google/gemini-3-flash-preview) auf mit einem System-Prompt, der die Rolle eines Schweizer Politik-Erklaerers einnimmt
-- Gibt eine kurze Zusammenfassung (3-5 Saetze) in einfacher Sprache zurueck
-- Behandelt 429/402 Fehler korrekt
+-- Jeder kann veröffentlichte Stories lesen
+CREATE POLICY "Anyone can read published stories"
+  ON public.story_posts FOR SELECT TO public
+  USING (status = 'published');
 
-#### 2. Config: `supabase/config.toml`
-
-- Neuer Eintrag fuer `summarize-affair` mit `verify_jwt = false`
-
-#### 3. Detailseite: `src/pages/DetailPage.tsx`
-
-- Neuer State: `summary` (string), `summaryLoading` (boolean)
-- Neue Karte im Affair-Bereich mit:
-  - Button "Zusammenfassung generieren" (Sparkles-Icon)
-  - Nach dem Laden: Die Zusammenfassung als Fliesstext
-  - Hinweis "Erstellt mit KI" am unteren Rand
-- Die Zusammenfassung wird on-demand geladen (nicht automatisch), um API-Calls zu sparen
-- Verfuegbar fuer alle Geschaefte (nicht nur Nationalparlament), solange genuegend Kontextdaten vorhanden sind
-
-#### Datenfluss
-
-Das Frontend sammelt alle verfuegbaren Daten und sendet sie an die Edge Function:
-
-```text
-DetailPage (Klick auf Button)
-  --> supabase.functions.invoke("summarize-affair", {
-        title, type, status, votingResults, date
-      })
-  --> Edge Function ruft Lovable AI auf
-  --> Zusammenfassung wird zurueckgegeben und angezeigt
+-- Insert/Update/Delete ohne Auth (PIN-Schutz erfolgt client-seitig, kein User-Auth)
+-- Alternativ: Service-Key in Edge Function für Schreibzugriff
+CREATE POLICY "Anyone can manage stories"
+  ON public.story_posts FOR ALL TO public
+  USING (true) WITH CHECK (true);
 ```
 
-#### Prompt-Strategie (Backend)
+### Admin-Bereich (`/admin`)
 
-Der AI-Prompt erhaelt:
-- Geschaeftstitel
-- Geschaeftstyp (Motion, Interpellation, etc.)
-- Status (erledigt, haengig, etc.)
-- Abstimmungsergebnisse (falls vorhanden)
-- Datumsangaben
+- **PIN-Schutz**: Beim Aufrufen wird ein Passwort abgefragt (gespeichert als Secret `ADMIN_PIN`, geprüft via Edge Function). Session wird in `sessionStorage` gehalten.
+- **Edge Function `verify-admin-pin`**: Nimmt PIN entgegen, vergleicht mit dem Secret, gibt `{ valid: true/false }` zurück.
+- **Geschäfte/Abstimmungen suchen**: Suchfeld, das die OpenParlData API nach Geschäften/Abstimmungen durchsucht.
+- **Story generieren**: Klick auf ein Ergebnis ruft die bestehende `generate-story` Edge Function auf und speichert die Slides in `story_posts` mit Status `draft`.
+- **Veröffentlichen/Entfernen**: Draft-Stories können veröffentlicht oder gelöscht werden.
+- **Übersicht**: Liste aller story_posts mit Status-Badge.
 
-Die AI wird angewiesen, eine allgemeinverstaendliche Erklaerung in 3-5 Saetzen zu liefern, ohne Fachjargon.
+### Startseite (WeeklyDigest)
+
+- Neuer Abschnitt **"Stories der Woche"** nach den Stats-Cards
+- Horizontales Karussell mit veröffentlichten Stories (Mini-Vorschau der ersten Slide)
+- Klick öffnet den bestehenden `StoryPreviewModal` mit allen Slides
+- Daten werden via `supabase.from('story_posts').select().eq('status', 'published').order('published_at', { ascending: false }).limit(10)` geladen
+
+### Neue Dateien
+
+| Datei | Zweck |
+|---|---|
+| `src/pages/AdminPage.tsx` | Admin-Bereich mit PIN-Gate, Suche, Story-Verwaltung |
+| `src/components/StoriesCarousel.tsx` | Horizontales Stories-Karussell für die Startseite |
+| `supabase/functions/verify-admin-pin/index.ts` | PIN-Verifizierung via Secret |
+
+### Geänderte Dateien
+
+| Datei | Änderung |
+|---|---|
+| `src/App.tsx` | Route `/admin` hinzufügen |
+| `src/pages/WeeklyDigest.tsx` | StoriesCarousel-Komponente einbinden |
+| `supabase/config.toml` | `verify-admin-pin` Function registrieren |
 
