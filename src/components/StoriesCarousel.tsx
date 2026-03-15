@@ -153,11 +153,6 @@ const StoriesCarousel = () => {
             );
           })}
         </div>
-        {stories.length === 0 && (
-          <p className="text-sm text-muted-foreground text-center py-8">
-            Noch keine Stories für diese Woche verfügbar.
-          </p>
-        )}
       </div>
 
       {selectedStory && (
