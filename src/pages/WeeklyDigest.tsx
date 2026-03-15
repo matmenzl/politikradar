@@ -15,6 +15,7 @@ import {
   formatDateRange } from
 "@/lib/api/openparldata";
 import VoteBar from "@/components/VoteBar";
+import StoriesCarousel from "@/components/StoriesCarousel";
 
 interface DigestData {
   year: number;
