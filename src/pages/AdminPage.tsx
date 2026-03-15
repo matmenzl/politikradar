@@ -552,6 +552,49 @@ function AdminDashboard() {
   const [generatingId, setGeneratingId] = useState<string | null>(null);
   const [previewStory, setPreviewStory] = useState<StoryPost | null>(null);
 
+  // Shared data for Browse + AI suggestions
+  const [affairs, setAffairs] = useState<AffairWithBody[]>([]);
+  const [votings, setVotings] = useState<VotingWithBody[]>([]);
+  const [loadingAffairs, setLoadingAffairs] = useState(true);
+  const [loadingVotings, setLoadingVotings] = useState(true);
+
+  useEffect(() => {
+    const { year, week } = getCurrentISOWeek();
+    const { from, to } = getWeekDateRange(year, week);
+    (async () => {
+      try {
+        const bodies = await fetchBodies();
+        const allA: AffairWithBody[] = [];
+        const allV: VotingWithBody[] = [];
+        const batchSize = 5;
+        for (let i = 0; i < bodies.length; i += batchSize) {
+          const batch = bodies.slice(i, i + batchSize);
+          const [aRes, vRes] = await Promise.all([
+            Promise.all(batch.map(async (b) => {
+              const res = await fetchAffairsForWeek(from, to, b.key);
+              return res.data.map((a) => ({ ...a, bodyName: b.name_de || b.key }));
+            })),
+            Promise.all(batch.map(async (b) => {
+              const res = await fetchVotingsForWeek(from, to, b.key);
+              return res.data.map((v) => ({ ...v, bodyName: b.name_de || b.key }));
+            })),
+          ]);
+          aRes.forEach((r) => allA.push(...r));
+          vRes.forEach((r) => allV.push(...r));
+        }
+        allA.sort((a, b) => new Date(b.begin_date || "").getTime() - new Date(a.begin_date || "").getTime());
+        allV.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+        setAffairs(allA);
+        setVotings(allV);
+      } catch (e) {
+        console.error(e);
+      } finally {
+        setLoadingAffairs(false);
+        setLoadingVotings(false);
+      }
+    })();
+  }, []);
+
   const loadStories = useCallback(async () => {
     const { data } = await supabase
       .from("story_posts")
