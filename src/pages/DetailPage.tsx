@@ -431,7 +431,7 @@ const DetailPage = () => {
         {voting && (
           <>
             <Card className="opacity-0 animate-fade-in" style={{ animationDelay: "100ms" }}>
-              <CardContent className="p-6 space-y-4">
+              <CardContent className="p-4 md:p-6 space-y-4">
                 <h2 className="font-serif text-lg font-semibold">Ergebnis</h2>
                 {voting.meaning_of_yes_de && (
                   <p className="text-sm text-muted-foreground">

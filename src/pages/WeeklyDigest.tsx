@@ -375,7 +375,7 @@ const WeeklyDigest = () => {
         </div>
       </main>
 
-      <footer className="px-6 py-5 border-t border-border/50">
+      <footer className="px-4 md:px-6 py-5 border-t border-border/50">
         <div className="max-w-4xl mx-auto text-center text-xs text-muted-foreground">
           PolitikRadar · Daten via <a href="https://openparldata.ch" target="_blank" rel="noopener noreferrer" className="underline hover:text-foreground">OpenParlData.ch</a> · CC BY 4.0
         </div>
