@@ -5,11 +5,19 @@ import { Download, Loader2 } from "lucide-react";
 import { useRef, useCallback } from "react";
 import html2canvas from "html2canvas";
 
+export interface PartyVoteData {
+  party: string;
+  yes: number;
+  no: number;
+  total: number;
+}
+
 export interface StorySlide {
   headline: string;
   body: string;
   emoji: string;
-  slide_type: "hook" | "context" | "result" | "insight" | "cta";
+  slide_type: "hook" | "context" | "result" | "insight" | "cta" | "party";
+  partyData?: PartyVoteData[];
 }
 
 interface StoryPreviewModalProps {
