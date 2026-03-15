@@ -9,6 +9,7 @@ import EmbedCodeModal from "@/components/EmbedCodeModal";
 import StoryPreviewModal, { type StorySlide, type PartyVoteData } from "@/components/StoryPreviewModal";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 import { type Voting, type Affair, isVotingAccepted, fetchVotesForVoting, fetchBodies } from "@/lib/api/openparldata";
 
 interface AffairDetail extends Affair {
@@ -272,6 +273,24 @@ const DetailPage = () => {
       }
 
       setStorySlides(slides);
+
+      // Auto-save and publish to story_posts
+      const title = affair?.title_de || voting?.affair_title_de || voting?.title_de || `#${id}`;
+      const bodyKey = bodyParam || affair?.body_key || voting?.body_key || "";
+      const { error: insertErr } = await supabase.from("story_posts").insert([{
+        title,
+        body_key: bodyKey,
+        affair_id: affair ? String(affair.id) : null,
+        voting_id: voting ? String(voting.id) : null,
+        slides: JSON.parse(JSON.stringify(slides)),
+        status: "published" as const,
+        published_at: new Date().toISOString(),
+      }]);
+      if (insertErr) {
+        console.error("Story save error:", insertErr);
+      } else {
+        toast.success("Story erstellt und veröffentlicht!");
+      }
     } catch (e) {
       console.error("Story generation error:", e);
       setStorySlides([]);
@@ -393,6 +412,15 @@ const DetailPage = () => {
                   </div>
                   <p className="text-sm text-foreground leading-relaxed">{summary}</p>
                   <p className="text-xs text-muted-foreground pt-1">Erstellt mit KI · Angaben ohne Gewähr</p>
+                  <Button
+                    variant="outline"
+                    className="w-full gap-2 mt-2"
+                    onClick={generateStory}
+                    disabled={storyLoading}
+                  >
+                    {storyLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Instagram className="w-4 h-4" />}
+                    Story erstellen &amp; veröffentlichen
+                  </Button>
                 </>
               )}
             </CardContent>
