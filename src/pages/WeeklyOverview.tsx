@@ -315,8 +315,8 @@ const WeeklyOverview = () => {
 
               {/* Card 4: Neueste Geschäfte with AI tags */}
               <Card className="group hover:shadow-lg hover:border-accent/30 transition-all duration-300 opacity-0 animate-fade-in" style={{ animationDelay: "400ms" }}>
-                <CardHeader className="pb-3">
-                  <div className="flex items-center justify-between">
+                <CardHeader className="pb-2 md:pb-3 p-4 md:p-6">
+                  <div className="flex items-center justify-between gap-2">
                     <div className="flex items-center gap-2 text-muted-foreground">
                       <FileText className="w-4 h-4" />
                       <span className="text-xs font-medium uppercase tracking-wider">Geschäfte der Woche</span>
