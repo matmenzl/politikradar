@@ -242,9 +242,9 @@ const WeeklyOverview = () => {
                       { label: "Abstimmungen", value: data.totalVotings, href: `/list/votings?body=${encodeURIComponent(bodyKey)}` },
                       { label: "Sitzungen", value: data.totalMeetings, href: `/list/meetings?body=${encodeURIComponent(bodyKey)}` },
                     ].map((stat) => (
-                      <Link key={stat.label} to={stat.href} className="bg-secondary/50 rounded-lg p-3 hover:bg-secondary/80 transition-colors">
-                        <p className="text-2xl font-semibold text-foreground">{stat.value}</p>
-                        <p className="text-xs text-muted-foreground">{stat.label}</p>
+                      <Link key={stat.label} to={stat.href} className="bg-secondary/50 rounded-lg p-2 md:p-3 hover:bg-secondary/80 transition-colors">
+                        <p className="text-xl md:text-2xl font-semibold text-foreground">{stat.value}</p>
+                        <p className="text-[10px] md:text-xs text-muted-foreground">{stat.label}</p>
                       </Link>
                     ))}
                   </div>
