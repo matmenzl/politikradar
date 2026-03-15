@@ -33,6 +33,7 @@ const StoryPage = () => {
         if (data) {
           setTitle(data.title);
           setSlides((data.slides as unknown as StorySlide[]) || []);
+          setAffairId(data.affair_id);
         }
         setLoading(false);
       });
