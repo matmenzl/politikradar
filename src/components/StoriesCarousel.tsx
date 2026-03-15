@@ -71,9 +71,16 @@ const StoriesCarousel = () => {
                       />
                     </div>
                   </div>
-                  <p className="text-xs text-muted-foreground mt-2 line-clamp-2 text-center group-hover:text-foreground transition-colors">
-                    {story.title}
-                  </p>
+                  <div className="mt-2 text-center">
+                    <p className="text-xs font-medium text-foreground line-clamp-1 group-hover:text-accent transition-colors">
+                      {story.title}
+                    </p>
+                    {story.body_key && (
+                      <p className="text-[10px] text-muted-foreground mt-0.5">
+                        {story.body_key}
+                      </p>
+                    )}
+                  </div>
                 </button>
               );
             })}
