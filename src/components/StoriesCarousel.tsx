@@ -17,6 +17,7 @@ interface StoryPost {
 const StoriesCarousel = () => {
   const [stories, setStories] = useState<StoryPost[]>([]);
   const [selectedStory, setSelectedStory] = useState<StoryPost | null>(null);
+  const [bodyNames, setBodyNames] = useState<Record<string, string>>({});
 
   useEffect(() => {
     supabase
