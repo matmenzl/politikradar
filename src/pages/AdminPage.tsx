@@ -129,9 +129,17 @@ const AdminPage = () => {
 function BrowseSection({
   onSelectItem,
   generatingId,
+  affairs,
+  votings,
+  loadingAffairs,
+  loadingVotings,
 }: {
   onSelectItem: (item: SearchResult) => void;
   generatingId: string | null;
+  affairs: AffairWithBody[];
+  votings: VotingWithBody[];
+  loadingAffairs: boolean;
+  loadingVotings: boolean;
 }) {
   const { year, week } = getCurrentISOWeek();
   const { from, to } = getWeekDateRange(year, week);
@@ -140,46 +148,6 @@ function BrowseSection({
   const [tab, setTab] = useState<TabKey>("affairs");
   const [search, setSearch] = useState("");
   const [filterBody, setFilterBody] = useState("");
-
-  const [affairs, setAffairs] = useState<AffairWithBody[]>([]);
-  const [votings, setVotings] = useState<VotingWithBody[]>([]);
-  const [loadingAffairs, setLoadingAffairs] = useState(true);
-  const [loadingVotings, setLoadingVotings] = useState(true);
-
-  useEffect(() => {
-    (async () => {
-      try {
-        const bodies = await fetchBodies();
-        const allA: AffairWithBody[] = [];
-        const allV: VotingWithBody[] = [];
-        const batchSize = 5;
-        for (let i = 0; i < bodies.length; i += batchSize) {
-          const batch = bodies.slice(i, i + batchSize);
-          const [aRes, vRes] = await Promise.all([
-            Promise.all(batch.map(async (b) => {
-              const res = await fetchAffairsForWeek(from, to, b.key);
-              return res.data.map((a) => ({ ...a, bodyName: b.name_de || b.key }));
-            })),
-            Promise.all(batch.map(async (b) => {
-              const res = await fetchVotingsForWeek(from, to, b.key);
-              return res.data.map((v) => ({ ...v, bodyName: b.name_de || b.key }));
-            })),
-          ]);
-          aRes.forEach((r) => allA.push(...r));
-          vRes.forEach((r) => allV.push(...r));
-        }
-        allA.sort((a, b) => new Date(b.begin_date || "").getTime() - new Date(a.begin_date || "").getTime());
-        allV.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-        setAffairs(allA);
-        setVotings(allV);
-      } catch (e) {
-        console.error(e);
-      } finally {
-        setLoadingAffairs(false);
-        setLoadingVotings(false);
-      }
-    })();
-  }, []);
 
   const bodyNames = useMemo(() => {
     const names = new Set<string>();
