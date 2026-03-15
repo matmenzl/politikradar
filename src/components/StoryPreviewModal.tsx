@@ -155,8 +155,9 @@ function StoryContent({
   );
 }
 
-const StoryPreviewModal = ({ open, onOpenChange, slides, loading }: StoryPreviewModalProps) => {
+const StoryPreviewModal = ({ open, onOpenChange, slides, loading, affairId }: StoryPreviewModalProps) => {
   const isMobile = useIsMobile();
+  const navigate = useNavigate();
 
   // Full-page view on mobile
   if (isMobile && open) {
