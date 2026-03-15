@@ -223,7 +223,7 @@ const WeeklyOverview = () => {
             <div className="grid gap-4 md:gap-5 md:grid-cols-2">
               {/* Card 1: Gesamtaktivität */}
               <Card className="group hover:shadow-lg hover:border-accent/30 transition-all duration-300 opacity-0 animate-fade-in" style={{ animationDelay: "100ms" }}>
-                <CardHeader className="pb-3">
+                <CardHeader className="pb-2 md:pb-3 p-4 md:p-6">
                   <div className="flex items-center gap-2 text-muted-foreground">
                     <Activity className="w-4 h-4" />
                     <span className="text-xs font-medium uppercase tracking-wider">Wochenüberblick in Zahlen</span>
