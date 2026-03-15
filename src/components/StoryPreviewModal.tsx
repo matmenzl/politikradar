@@ -1,9 +1,10 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext } from "@/components/ui/carousel";
+import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext, type CarouselApi } from "@/components/ui/carousel";
 import { Download, Loader2 } from "lucide-react";
-import { useRef, useCallback } from "react";
+import { useRef, useCallback, useState, useEffect } from "react";
 import html2canvas from "html2canvas";
+import StorySlideCard from "./story/StorySlideCard";
 
 export interface PartyVoteData {
   party: string;
@@ -27,47 +28,16 @@ interface StoryPreviewModalProps {
   loading?: boolean;
 }
 
-const slideStyles: Record<StorySlide["slide_type"], { bg: string; accent: string }> = {
-  hook: { bg: "from-[hsl(220,20%,10%)] to-[hsl(200,80%,20%)]", accent: "text-[hsl(200,80%,70%)]" },
-  context: { bg: "from-[hsl(220,14%,16%)] to-[hsl(220,20%,10%)]", accent: "text-[hsl(200,80%,60%)]" },
-  result: { bg: "from-[hsl(152,60%,20%)] to-[hsl(220,20%,10%)]", accent: "text-[hsl(152,60%,60%)]" },
-  insight: { bg: "from-[hsl(38,92%,25%)] to-[hsl(220,20%,10%)]", accent: "text-[hsl(38,92%,70%)]" },
-  cta: { bg: "from-[hsl(200,80%,30%)] to-[hsl(220,20%,10%)]", accent: "text-[hsl(200,80%,80%)]" },
-  party: { bg: "from-[hsl(260,40%,15%)] to-[hsl(220,20%,10%)]", accent: "text-[hsl(260,60%,75%)]" },
-};
-
-const slideTypeLabel: Record<StorySlide["slide_type"], string> = {
-  hook: "AUFMACHER",
-  context: "HINTERGRUND",
-  result: "ERGEBNIS",
-  insight: "EINORDNUNG",
-  cta: "MEHR ERFAHREN",
-  party: "PARTEIVERHALTEN",
-};
-
-const PARTY_COLORS: Record<string, string> = {
-  "SP": "hsl(0, 72%, 51%)",
-  "GRÜNE": "hsl(142, 71%, 35%)",
-  "Grüne": "hsl(142, 71%, 35%)",
-  "GPS": "hsl(142, 71%, 35%)",
-  "GLP": "hsl(142, 50%, 50%)",
-  "Grünliberale": "hsl(142, 50%, 50%)",
-  "M-E": "hsl(30, 80%, 50%)",
-  "Mitte": "hsl(30, 80%, 50%)",
-  "FDP-Liberale": "hsl(210, 70%, 50%)",
-  "FDP": "hsl(210, 70%, 50%)",
-  "SVP": "hsl(142, 50%, 25%)",
-};
-
-function getPartyColor(party: string): string {
-  for (const [key, color] of Object.entries(PARTY_COLORS)) {
-    if (party.includes(key)) return color;
-  }
-  return "hsl(220, 20%, 60%)";
-}
-
 const StoryPreviewModal = ({ open, onOpenChange, slides, loading }: StoryPreviewModalProps) => {
   const slideRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const [api, setApi] = useState<CarouselApi>();
+  const [current, setCurrent] = useState(0);
+
+  useEffect(() => {
+    if (!api) return;
+    setCurrent(api.selectedScrollSnap());
+    api.on("select", () => setCurrent(api.selectedScrollSnap()));
+  }, [api]);
 
   const downloadSlide = useCallback(async (index: number) => {
     const el = slideRefs.current[index];
@@ -88,109 +58,93 @@ const StoryPreviewModal = ({ open, onOpenChange, slides, loading }: StoryPreview
     }
   }, []);
 
+  const downloadAll = useCallback(async () => {
+    for (let i = 0; i < slides.length; i++) {
+      await downloadSlide(i);
+    }
+  }, [slides.length, downloadSlide]);
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="font-serif">Instagram Stories</DialogTitle>
+          <DialogTitle className="font-serif text-lg">Instagram Stories</DialogTitle>
+          {!loading && slides.length > 0 && (
+            <p className="text-xs text-muted-foreground">
+              {slides.length} Slides · Slide {current + 1} von {slides.length}
+            </p>
+          )}
         </DialogHeader>
 
         {loading && (
-          <div className="flex items-center justify-center py-16 gap-3">
-            <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
-            <span className="text-sm text-muted-foreground">Stories werden generiert…</span>
+          <div className="flex flex-col items-center justify-center py-20 gap-3">
+            <div className="relative">
+              <div className="w-10 h-10 rounded-full border-2 border-muted animate-ping absolute inset-0" />
+              <Loader2 className="w-10 h-10 animate-spin text-accent" />
+            </div>
+            <span className="text-sm text-muted-foreground mt-2">Stories werden generiert…</span>
           </div>
         )}
 
         {!loading && slides.length > 0 && (
-          <div className="px-8">
-            <Carousel opts={{ align: "center" }}>
+          <div className="px-4 sm:px-8">
+            <Carousel opts={{ align: "center" }} setApi={setApi}>
               <CarouselContent>
-                {slides.map((slide, i) => {
-                  const style = slideStyles[slide.slide_type];
-                  return (
-                    <CarouselItem key={i} className="basis-full sm:basis-[280px]">
-                      <div className="space-y-2">
-                        {/* 9:16 slide card */}
-                        <div
-                          ref={(el) => { slideRefs.current[i] = el; }}
-                          className={`relative aspect-[9/16] rounded-2xl bg-gradient-to-b ${style.bg} flex flex-col items-center justify-center p-6 text-center overflow-hidden`}
-                        >
-                          {/* Type label */}
-                          <span className={`absolute top-5 left-0 right-0 text-[10px] font-bold tracking-[0.2em] uppercase ${style.accent} opacity-80`}>
-                            {slideTypeLabel[slide.slide_type]}
-                          </span>
-
-                          {slide.slide_type === "party" && slide.partyData ? (
-                            <>
-                              <span className="text-3xl mb-2 drop-shadow-lg">🏛️</span>
-                              <h3 className="text-white font-bold text-base leading-tight mb-4 px-2" style={{ fontFamily: "'Source Serif 4', Georgia, serif" }}>
-                                {slide.headline}
-                              </h3>
-                              <div className="w-full px-3 space-y-1.5">
-                                {slide.partyData.map((p) => {
-                                  const yesP = p.total > 0 ? Math.round((p.yes / p.total) * 100) : 0;
-                                  const noP = p.total > 0 ? Math.round((p.no / p.total) * 100) : 0;
-                                  return (
-                                    <div key={p.party} className="flex items-center gap-2">
-                                      <span className="text-white/90 text-[10px] font-semibold w-[72px] text-right truncate">{p.party}</span>
-                                      <div className="flex-1 flex h-3 rounded-full overflow-hidden" style={{ backgroundColor: "hsla(220,20%,30%,0.5)" }}>
-                                        <div className="rounded-l-full" style={{ width: `${yesP}%`, backgroundColor: "hsl(152, 60%, 50%)" }} />
-                                        <div className="rounded-r-full" style={{ width: `${noP}%`, backgroundColor: "hsl(0, 72%, 55%)" }} />
-                                      </div>
-                                      <span className="text-white/60 text-[9px] w-[32px]">{p.yes}/{p.no}</span>
-                                    </div>
-                                  );
-                                })}
-                              </div>
-                              <div className="flex items-center gap-4 mt-3 text-[9px] text-white/50">
-                                <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full" style={{ backgroundColor: "hsl(152, 60%, 50%)" }} /> Ja</span>
-                                <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full" style={{ backgroundColor: "hsl(0, 72%, 55%)" }} /> Nein</span>
-                              </div>
-                            </>
-                          ) : (
-                            <>
-                              {/* Emoji */}
-                              <span className="text-5xl mb-4 drop-shadow-lg">{slide.emoji}</span>
-
-                              {/* Headline */}
-                              <h3 className="text-white font-bold text-lg leading-tight mb-3 px-2" style={{ fontFamily: "'Source Serif 4', Georgia, serif" }}>
-                                {slide.headline}
-                              </h3>
-
-                              {/* Body */}
-                              <p className="text-white/80 text-sm leading-relaxed px-2">
-                                {slide.body}
-                              </p>
-                            </>
-                          )}
-
-                          {/* Branding */}
-                          <div className="absolute bottom-4 left-0 right-0 flex flex-col items-center gap-0.5">
-                            <span className="text-white/40 text-[9px] font-medium tracking-wider uppercase">politikradar.ch</span>
-                          </div>
-                        </div>
-
-                        {/* Download button */}
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="w-full gap-1.5 text-xs"
-                          onClick={() => downloadSlide(i)}
-                        >
-                          <Download className="w-3.5 h-3.5" />
-                          Slide {i + 1} speichern
-                        </Button>
-                      </div>
-                    </CarouselItem>
-                  );
-                })}
+                {slides.map((slide, i) => (
+                  <CarouselItem key={i} className="basis-full sm:basis-[280px]">
+                    <div className="space-y-2">
+                      <StorySlideCard
+                        slide={slide}
+                        index={i}
+                        total={slides.length}
+                        ref={(el) => { slideRefs.current[i] = el; }}
+                      />
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="w-full gap-1.5 text-xs"
+                        onClick={() => downloadSlide(i)}
+                      >
+                        <Download className="w-3.5 h-3.5" />
+                        Slide {i + 1} speichern
+                      </Button>
+                    </div>
+                  </CarouselItem>
+                ))}
               </CarouselContent>
               <CarouselPrevious />
               <CarouselNext />
             </Carousel>
 
-            <p className="text-xs text-muted-foreground text-center mt-4">
+            {/* Dot indicators */}
+            <div className="flex items-center justify-center gap-1.5 mt-4">
+              {slides.map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => api?.scrollTo(i)}
+                  className={`rounded-full transition-all duration-300 ${
+                    i === current
+                      ? "w-6 h-2 bg-accent"
+                      : "w-2 h-2 bg-muted-foreground/30 hover:bg-muted-foreground/50"
+                  }`}
+                />
+              ))}
+            </div>
+
+            {/* Batch download */}
+            {slides.length > 1 && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="w-full mt-3 gap-1.5 text-xs text-muted-foreground"
+                onClick={downloadAll}
+              >
+                <Download className="w-3.5 h-3.5" />
+                Alle {slides.length} Slides speichern
+              </Button>
+            )}
+
+            <p className="text-[10px] text-muted-foreground text-center mt-3 opacity-70">
               Erstellt mit KI · Inhalte prüfen vor Veröffentlichung
             </p>
           </div>
