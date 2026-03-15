@@ -112,7 +112,7 @@ const WeeklyDigest = () => {
           <h1 className="font-serif text-3xl md:text-5xl lg:text-6xl font-bold leading-tight text-foreground">
             Was diese Woche in Schweizer Parlamenten Wichtiges passiert ist.   
           </h1>
-          <p className="text-lg md:text-xl text-muted-foreground leading-relaxed max-w-lg mx-auto">
+          <p className="text-base md:text-xl text-muted-foreground leading-relaxed max-w-lg mx-auto">
             Visuell und datenbasiert – die wichtigsten parlamentarischen Aktivitäten der Woche auf einen Blick.
           </p>
           <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-muted-foreground">
