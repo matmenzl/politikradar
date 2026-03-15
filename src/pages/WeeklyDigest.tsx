@@ -109,7 +109,7 @@ const WeeklyDigest = () => {
           <div className="inline-block px-3 py-1 rounded-full border border-border text-xs font-medium text-muted-foreground tracking-wide uppercase">
             Nationale, kantonale &amp; kommunale Parlamente
           </div>
-          <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl font-bold leading-tight text-foreground">
+          <h1 className="font-serif text-3xl md:text-5xl lg:text-6xl font-bold leading-tight text-foreground">
             Was diese Woche in Schweizer Parlamenten Wichtiges passiert ist.   
           </h1>
           <p className="text-lg md:text-xl text-muted-foreground leading-relaxed max-w-lg mx-auto">
