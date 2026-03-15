@@ -44,6 +44,7 @@ const DetailPage = () => {
   const [tags, setTags] = useState<string[]>([]);
   const [summary, setSummary] = useState<string>("");
   const [summaryLoading, setSummaryLoading] = useState(false);
+  const [embedModalOpen, setEmbedModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
