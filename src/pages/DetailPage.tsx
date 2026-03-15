@@ -230,10 +230,18 @@ const DetailPage = () => {
             <ArrowLeft className="w-4 h-4" />
             <span className="text-sm">Zurück zur Übersicht</span>
           </Link>
-          <Button variant="ghost" size="sm" className="gap-1.5 text-xs h-8" onClick={() => setEmbedModalOpen(true)}>
-            <Code2 className="w-3.5 h-3.5" />
-            Einbetten
-          </Button>
+          <div className="flex items-center gap-1">
+            {affair && (
+              <Button variant="ghost" size="sm" className="gap-1.5 text-xs h-8" onClick={generateStory}>
+                <Instagram className="w-3.5 h-3.5" />
+                Stories
+              </Button>
+            )}
+            <Button variant="ghost" size="sm" className="gap-1.5 text-xs h-8" onClick={() => setEmbedModalOpen(true)}>
+              <Code2 className="w-3.5 h-3.5" />
+              Einbetten
+            </Button>
+          </div>
         </div>
       </header>
 
