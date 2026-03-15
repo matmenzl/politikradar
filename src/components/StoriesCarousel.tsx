@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Sparkles } from "lucide-react";
 import StoryPreviewModal, { type StorySlide } from "@/components/StoryPreviewModal";
 import StorySlideCard from "@/components/story/StorySlideCard";
+import { fetchBodies, getBodyLabel } from "@/lib/api/openparldata";
 
 interface StoryPost {
   id: string;
@@ -16,6 +17,7 @@ interface StoryPost {
 const StoriesCarousel = () => {
   const [stories, setStories] = useState<StoryPost[]>([]);
   const [selectedStory, setSelectedStory] = useState<StoryPost | null>(null);
+  const [bodyNames, setBodyNames] = useState<Record<string, string>>({});
 
   useEffect(() => {
     supabase
@@ -37,6 +39,14 @@ const StoriesCarousel = () => {
           );
         }
       });
+
+    fetchBodies().then((bodies) => {
+      const map: Record<string, string> = {};
+      for (const b of bodies) {
+        map[b.key] = getBodyLabel(b);
+      }
+      setBodyNames(map);
+    });
   }, []);
 
   if (stories.length === 0) return null;
@@ -75,7 +85,7 @@ const StoriesCarousel = () => {
                     </p>
                     {story.body_key && (
                       <p className="text-[10px] text-muted-foreground mt-0.5">
-                        {story.body_key}
+                        {bodyNames[story.body_key] || story.body_key}
                       </p>
                     )}
                   </div>
