@@ -33,6 +33,7 @@ const slideStyles: Record<StorySlide["slide_type"], { bg: string; accent: string
   result: { bg: "from-[hsl(152,60%,20%)] to-[hsl(220,20%,10%)]", accent: "text-[hsl(152,60%,60%)]" },
   insight: { bg: "from-[hsl(38,92%,25%)] to-[hsl(220,20%,10%)]", accent: "text-[hsl(38,92%,70%)]" },
   cta: { bg: "from-[hsl(200,80%,30%)] to-[hsl(220,20%,10%)]", accent: "text-[hsl(200,80%,80%)]" },
+  party: { bg: "from-[hsl(260,40%,15%)] to-[hsl(220,20%,10%)]", accent: "text-[hsl(260,60%,75%)]" },
 };
 
 const slideTypeLabel: Record<StorySlide["slide_type"], string> = {
