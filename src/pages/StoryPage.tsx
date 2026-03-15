@@ -25,7 +25,7 @@ const StoryPage = () => {
     if (!id) return;
     supabase
       .from("story_posts")
-      .select("title, slides")
+      .select("title, slides, affair_id")
       .eq("id", id)
       .eq("status", "published")
       .single()
