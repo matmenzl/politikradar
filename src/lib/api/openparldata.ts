@@ -237,6 +237,15 @@ export async function fetchVotingsForWeek(from: string, to: string, bodyKey: str
   return { data: filtered, total: filtered.length };
 }
 
+export async function fetchAffairById(id: number | string): Promise<Affair | null> {
+  try {
+    const res = await fetchApi<Affair>(`/affairs/${id}`);
+    return res.data?.[0] ?? null;
+  } catch {
+    return null;
+  }
+}
+
 export async function fetchAffairsForWeek(from: string, to: string, bodyKey: string = "CHE") {
   const res = await fetchApi<Affair>("/affairs", {
     body_key: bodyKey,

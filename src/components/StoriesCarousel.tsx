@@ -1,15 +1,16 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Sparkles } from "lucide-react";
+import { Sparkles, ExternalLink } from "lucide-react";
 import StoryPreviewModal, { type StorySlide } from "@/components/StoryPreviewModal";
 import StorySlideCard from "@/components/story/StorySlideCard";
-import { fetchBodies, getBodyLabel } from "@/lib/api/openparldata";
+import { fetchBodies, getBodyLabel, fetchAffairById } from "@/lib/api/openparldata";
 
 interface StoryPost {
   id: string;
   title: string;
   body_key: string | null;
+  affair_id: string | null;
   slides: StorySlide[];
   published_at: string;
 }
@@ -18,25 +19,42 @@ const StoriesCarousel = () => {
   const [stories, setStories] = useState<StoryPost[]>([]);
   const [selectedStory, setSelectedStory] = useState<StoryPost | null>(null);
   const [bodyNames, setBodyNames] = useState<Record<string, string>>({});
+  const [affairLinks, setAffairLinks] = useState<Record<string, string>>({});
 
   useEffect(() => {
     supabase
       .from("story_posts")
-      .select("id, title, body_key, slides, published_at")
+      .select("id, title, body_key, affair_id, slides, published_at")
       .eq("status", "published")
       .order("published_at", { ascending: false })
       .limit(10)
       .then(({ data }) => {
         if (data) {
-          setStories(
-            data.map((d) => ({
-              id: d.id,
-              title: d.title,
-              body_key: d.body_key,
-              slides: (d.slides as unknown as StorySlide[]) || [],
-              published_at: d.published_at || "",
-            }))
-          );
+          const mapped = data.map((d) => ({
+            id: d.id,
+            title: d.title,
+            body_key: d.body_key,
+            affair_id: d.affair_id,
+            slides: (d.slides as unknown as StorySlide[]) || [],
+            published_at: d.published_at || "",
+          }));
+          setStories(mapped);
+
+          // Fetch external URLs for affairs
+          const affairIds = [...new Set(mapped.map((s) => s.affair_id).filter(Boolean))] as string[];
+          Promise.all(
+            affairIds.map(async (aid) => {
+              const affair = await fetchAffairById(aid);
+              if (affair?.url_external_de) return [aid, affair.url_external_de] as const;
+              return null;
+            })
+          ).then((results) => {
+            const links: Record<string, string> = {};
+            for (const r of results) {
+              if (r) links[r[0]] = r[1];
+            }
+            setAffairLinks(links);
+          });
         }
       });
 
@@ -66,30 +84,46 @@ const StoriesCarousel = () => {
             {stories.map((story) => {
               const firstSlide = story.slides[0];
               if (!firstSlide) return null;
+              const extUrl = story.affair_id ? affairLinks[story.affair_id] : null;
               return (
-                <button
-                  key={story.id}
-                  onClick={() => setSelectedStory(story)}
-                  className="flex-shrink-0 w-[200px] group focus:outline-none snap-start"
-                >
-                  <div className="w-[200px] rounded-xl overflow-hidden ring-2 ring-transparent group-hover:ring-accent/50 transition-all shadow-md">
-                    <StorySlideCard
-                      slide={firstSlide}
-                      index={0}
-                      total={story.slides.length}
-                    />
-                  </div>
-                  <div className="mt-2 text-center">
-                    <p className="text-xs font-medium text-foreground line-clamp-3 text-center group-hover:text-accent transition-colors">
-                      {story.title}
-                    </p>
-                    {story.body_key && (
-                      <p className="text-[10px] text-muted-foreground mt-0.5">
-                        {bodyNames[story.body_key] || story.body_key}
+                <div key={story.id} className="flex-shrink-0 w-[200px] snap-start">
+                  <button
+                    onClick={() => setSelectedStory(story)}
+                    className="w-full group focus:outline-none"
+                  >
+                    <div className="w-[200px] rounded-xl overflow-hidden ring-2 ring-transparent group-hover:ring-accent/50 transition-all shadow-md">
+                      <StorySlideCard
+                        slide={firstSlide}
+                        index={0}
+                        total={story.slides.length}
+                      />
+                    </div>
+                    <div className="mt-2 text-center">
+                      <p className="text-xs font-medium text-foreground line-clamp-3 text-center group-hover:text-accent transition-colors">
+                        {story.title}
                       </p>
-                    )}
-                  </div>
-                </button>
+                      {story.body_key && (
+                        <p className="text-[10px] text-muted-foreground mt-0.5">
+                          {bodyNames[story.body_key] || story.body_key}
+                        </p>
+                      )}
+                    </div>
+                  </button>
+                  {extUrl && (
+                    <a
+                      href={extUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mt-1.5 flex items-center justify-center gap-1 text-[10px] text-muted-foreground hover:text-accent transition-colors"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <ExternalLink className="w-3 h-3" />
+                      <span>
+                        {(() => { try { return new URL(extUrl).hostname.replace(/^www\./, ''); } catch { return 'Parlamentsseite'; } })()}
+                      </span>
+                    </a>
+                  )}
+                </div>
               );
             })}
           </div>
