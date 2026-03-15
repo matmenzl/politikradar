@@ -142,6 +142,7 @@ const StoriesCarousel = () => {
           onOpenChange={(open) => !open && setSelectedStory(null)}
           slides={selectedStory.slides}
           affairId={selectedStory.affair_id}
+          votingId={selectedStory.voting_id}
         />
       )}
     </>
