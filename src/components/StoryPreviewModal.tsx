@@ -1,7 +1,8 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext, type CarouselApi } from "@/components/ui/carousel";
-import { Download, Loader2, ArrowLeft } from "lucide-react";
+import { Download, Loader2, ArrowLeft, FileText } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { useRef, useCallback, useState, useEffect } from "react";
 import html2canvas from "html2canvas";
 import StorySlideCard from "./story/StorySlideCard";
@@ -27,6 +28,7 @@ interface StoryPreviewModalProps {
   onOpenChange: (open: boolean) => void;
   slides: StorySlide[];
   loading?: boolean;
+  affairId?: string | null;
 }
 
 function StoryContent({
@@ -153,8 +155,9 @@ function StoryContent({
   );
 }
 
-const StoryPreviewModal = ({ open, onOpenChange, slides, loading }: StoryPreviewModalProps) => {
+const StoryPreviewModal = ({ open, onOpenChange, slides, loading, affairId }: StoryPreviewModalProps) => {
   const isMobile = useIsMobile();
+  const navigate = useNavigate();
 
   // Full-page view on mobile
   if (isMobile && open) {
@@ -196,6 +199,19 @@ const StoryPreviewModal = ({ open, onOpenChange, slides, loading }: StoryPreview
           )}
         </DialogHeader>
         <StoryContent slides={slides} loading={loading} />
+        {affairId && (
+          <div className="px-6 pb-4">
+            <Button
+              variant="outline"
+              size="sm"
+              className="w-full gap-2 text-sm"
+              onClick={() => { onOpenChange(false); navigate(`/detail/${affairId}`); }}
+            >
+              <FileText className="w-4 h-4" />
+              Zum Geschäft
+            </Button>
+          </div>
+        )}
       </DialogContent>
     </Dialog>
   );

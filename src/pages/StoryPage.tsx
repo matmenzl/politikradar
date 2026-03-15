@@ -1,7 +1,7 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { ArrowLeft, Loader2 } from "lucide-react";
+import { ArrowLeft, Loader2, FileText } from "lucide-react";
 import StorySlideCard from "@/components/story/StorySlideCard";
 import { Button } from "@/components/ui/button";
 import { Download } from "lucide-react";
@@ -15,6 +15,7 @@ const StoryPage = () => {
   const navigate = useNavigate();
   const [slides, setSlides] = useState<StorySlide[]>([]);
   const [title, setTitle] = useState("");
+  const [affairId, setAffairId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [api, setApi] = useState<CarouselApi>();
   const [current, setCurrent] = useState(0);
@@ -24,7 +25,7 @@ const StoryPage = () => {
     if (!id) return;
     supabase
       .from("story_posts")
-      .select("title, slides")
+      .select("title, slides, affair_id")
       .eq("id", id)
       .eq("status", "published")
       .single()
@@ -32,6 +33,7 @@ const StoryPage = () => {
         if (data) {
           setTitle(data.title);
           setSlides((data.slides as unknown as StorySlide[]) || []);
+          setAffairId(data.affair_id);
         }
         setLoading(false);
       });
@@ -153,6 +155,18 @@ const StoryPage = () => {
             <p className="text-[10px] text-muted-foreground text-center mt-3 opacity-70">
               Erstellt mit KI · Inhalte prüfen vor Veröffentlichung
             </p>
+
+            {affairId && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="w-full mt-4 gap-2 text-sm"
+                onClick={() => navigate(`/detail/${affairId}`)}
+              >
+                <FileText className="w-4 h-4" />
+                Zum Geschäft
+              </Button>
+            )}
           </div>
         )}
       </div>
