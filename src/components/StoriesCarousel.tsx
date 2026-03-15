@@ -70,7 +70,7 @@ const StoriesCarousel = () => {
                     />
                   </div>
                   <div className="mt-2 text-center">
-                    <p className="text-xs font-medium text-foreground line-clamp-1 group-hover:text-accent transition-colors">
+                    <p className="text-xs font-medium text-foreground line-clamp-3 text-center group-hover:text-accent transition-colors">
                       {story.title}
                     </p>
                     {story.body_key && (
