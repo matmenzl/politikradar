@@ -62,7 +62,7 @@ export interface Voting {
 export function isVotingAccepted(v: Pick<Voting, 'decision' | 'results_yes' | 'results_no'>): boolean {
   if (v.decision) {
     const d = v.decision.toLowerCase();
-    return d === "ja" || d === "accepted" || d === "angenommen";
+    return d === "ja" || d === "accepted" || d === "angenommen" || d === "yes";
   }
   return v.results_yes > v.results_no;
 }
