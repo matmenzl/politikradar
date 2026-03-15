@@ -165,6 +165,41 @@ const DetailPage = () => {
       setSummaryLoading(false);
     }
   };
+  const generateStory = async () => {
+    if (!affair) return;
+    setStoryLoading(true);
+    setStoryModalOpen(true);
+    try {
+      const body: Record<string, unknown> = { title: affair.title_de };
+      if (affair.type_de || affair.type_name_de || affair.type_harmonized_de) {
+        body.type = affair.type_de || affair.type_name_de || affair.type_harmonized_de;
+      }
+      if (affair.status_de || affair.state_name_de) {
+        body.status = affair.status_de || affair.state_name_de;
+      }
+      if (affair.begin_date) body.beginDate = affair.begin_date;
+      if (affair.end_date) body.endDate = affair.end_date;
+      if (voting) {
+        body.votingResults = {
+          yes: voting.results_yes,
+          no: voting.results_no,
+          abstention: voting.results_abstention,
+          decision: voting.decision,
+        };
+        if (voting.date) body.date = voting.date;
+      }
+      if (summary) body.summary = summary;
+      const { data, error } = await supabase.functions.invoke("generate-story", { body });
+      if (error) throw error;
+      setStorySlides(data?.slides || []);
+    } catch (e) {
+      console.error("Story generation error:", e);
+      setStorySlides([]);
+    } finally {
+      setStoryLoading(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
