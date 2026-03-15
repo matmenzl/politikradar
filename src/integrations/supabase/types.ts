@@ -35,6 +35,42 @@ export type Database = {
         }
         Relationships: []
       }
+      story_posts: {
+        Row: {
+          affair_id: string | null
+          body_key: string | null
+          created_at: string
+          id: string
+          published_at: string | null
+          slides: Json
+          status: string
+          title: string
+          voting_id: string | null
+        }
+        Insert: {
+          affair_id?: string | null
+          body_key?: string | null
+          created_at?: string
+          id?: string
+          published_at?: string | null
+          slides?: Json
+          status?: string
+          title: string
+          voting_id?: string | null
+        }
+        Update: {
+          affair_id?: string | null
+          body_key?: string | null
+          created_at?: string
+          id?: string
+          published_at?: string | null
+          slides?: Json
+          status?: string
+          title?: string
+          voting_id?: string | null
+        }
+        Relationships: []
+      }
       weekly_digests: {
         Row: {
           closest_votings: Json
