@@ -85,7 +85,7 @@ const StoriesCarousel = () => {
                     </p>
                     {story.body_key && (
                       <p className="text-[10px] text-muted-foreground mt-0.5">
-                        {story.body_key}
+                        {bodyNames[story.body_key] || story.body_key}
                       </p>
                     )}
                   </div>
