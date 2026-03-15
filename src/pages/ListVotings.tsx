@@ -64,7 +64,7 @@ const ListVotings = () => {
       const matchesSearch =
         !search ||
         (v.affair_title_de || v.title_de || "").toLowerCase().includes(search.toLowerCase());
-      const matchesBody = !filterBody || v.bodyName === filterBody;
+      const matchesBody = !filterBody || v.bodyName === filterBody || v.body_key === filterBody;
       return matchesSearch && matchesBody;
     });
   }, [votings, search, filterBody]);

@@ -59,7 +59,7 @@ const ListAffairs = () => {
   const filtered = useMemo(() => {
     return affairs.filter((a) => {
       const matchesSearch = !search || (a.title_de || "").toLowerCase().includes(search.toLowerCase());
-      const matchesBody = !filterBody || a.bodyName === filterBody;
+      const matchesBody = !filterBody || a.bodyName === filterBody || a.body_key === filterBody;
       return matchesSearch && matchesBody;
     });
   }, [affairs, search, filterBody]);

@@ -59,7 +59,7 @@ const ListMeetings = () => {
   const filtered = useMemo(() => {
     return meetings.filter((m) => {
       const matchesSearch = !search || (m.name_de || "").toLowerCase().includes(search.toLowerCase());
-      const matchesBody = !filterBody || m.bodyName === filterBody;
+      const matchesBody = !filterBody || m.bodyName === filterBody || m.body_key === filterBody;
       return matchesSearch && matchesBody;
     });
   }, [meetings, search, filterBody]);
