@@ -736,8 +736,24 @@ function AdminDashboard() {
       </header>
 
       <main className="max-w-4xl mx-auto px-4 md:px-6 py-6 md:py-8 space-y-8">
+        {/* AI suggestions */}
+        <AISuggestionsSection
+          affairs={affairs}
+          votings={votings}
+          loadingData={loadingAffairs || loadingVotings}
+          onSelectItem={generateStory}
+          generatingId={generatingId}
+        />
+
         {/* Browse affairs & votings */}
-        <BrowseSection onSelectItem={generateStory} generatingId={generatingId} />
+        <BrowseSection
+          onSelectItem={generateStory}
+          generatingId={generatingId}
+          affairs={affairs}
+          votings={votings}
+          loadingAffairs={loadingAffairs}
+          loadingVotings={loadingVotings}
+        />
 
         {/* Quick search (API-wide) */}
         <Card>
