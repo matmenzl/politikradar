@@ -519,6 +519,7 @@ function AISuggestionsSection({
                           id: item.id,
                           title: item.title,
                           bodyKey: item.bodyKey,
+                          bodyName: item.bodyName,
                           type: item.type,
                           date: item.date,
                           status: item.status,
