@@ -287,8 +287,8 @@ const WeeklyOverview = () => {
                     <BarChart3 className="w-4 h-4" />
                     <span className="text-xs font-medium uppercase tracking-wider">Abstimmungen der Woche</span>
                   </div>
-                  <CardTitle className="font-serif text-xl leading-snug">Abstimmungsergebnisse</CardTitle>
-                  <CardDescription className="text-sm leading-relaxed">
+                  <CardTitle className="font-serif text-lg md:text-xl leading-snug">Abstimmungsergebnisse</CardTitle>
+                  <CardDescription className="text-xs md:text-sm leading-relaxed">
                     {data.votings.length > 0
                       ? `${data.votings.length} Abstimmungen – ${data.votings.filter(v => isVotingAccepted(v)).length} angenommen, ${data.votings.filter(v => !isVotingAccepted(v)).length} abgelehnt.`
                       : "Keine Abstimmungsdaten vorhanden."}
