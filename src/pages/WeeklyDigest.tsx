@@ -17,6 +17,7 @@ import {
 import VoteBar from "@/components/VoteBar";
 import StoriesCarousel from "@/components/StoriesCarousel";
 import logoImg from "@/assets/politikradar_logo.png";
+// Logo imported above
 
 interface DigestData {
   year: number;
