@@ -15,6 +15,7 @@ import NotFound from "./pages/NotFound";
 import PersonProfile from "./pages/PersonProfile";
 import EmbedDetailPage from "./pages/EmbedDetailPage";
 import AdminPage from "./pages/AdminPage";
+import StoryPage from "./pages/StoryPage";
 
 const queryClient = new QueryClient();
 
