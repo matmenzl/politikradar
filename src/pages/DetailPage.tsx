@@ -220,7 +220,7 @@ const DetailPage = () => {
           const votes = await fetchVotesForVoting(voting.id);
           const partyMap = new Map<string, { yes: number; no: number; total: number }>();
           for (const v of votes) {
-            const party = v.person_party_de || v.person_parliamentary_group_name_de || "Unbekannt";
+            const party = shortenPartyName(v.person_party_de || v.person_parliamentary_group_name_de || "Unbekannt");
             if (!partyMap.has(party)) partyMap.set(party, { yes: 0, no: 0, total: 0 });
             const entry = partyMap.get(party)!;
             if (v.vote === "yes") { entry.yes++; entry.total++; }
