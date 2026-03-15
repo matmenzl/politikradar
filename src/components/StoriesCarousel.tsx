@@ -80,18 +80,18 @@ const StoriesCarousel = () => {
           <CardTitle className="font-serif text-xl">Stories der Woche</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex gap-4 overflow-x-auto pb-2 -mx-2 px-2 snap-x snap-mandatory">
+          <div className="flex gap-3 md:gap-4 overflow-x-auto pb-2 -mx-2 px-2 snap-x snap-mandatory">
             {stories.map((story) => {
               const firstSlide = story.slides[0];
               if (!firstSlide) return null;
               const extUrl = story.affair_id ? affairLinks[story.affair_id] : null;
               return (
-                <div key={story.id} className="flex-shrink-0 w-[200px] snap-start">
+                <div key={story.id} className="flex-shrink-0 w-[160px] md:w-[200px] snap-start">
                   <button
                     onClick={() => setSelectedStory(story)}
                     className="w-full group focus:outline-none"
                   >
-                    <div className="w-[200px] rounded-xl overflow-hidden ring-2 ring-transparent group-hover:ring-accent/50 transition-all shadow-md">
+                    <div className="w-full rounded-xl overflow-hidden ring-2 ring-transparent group-hover:ring-accent/50 transition-all shadow-md">
                       <StorySlideCard
                         slide={firstSlide}
                         index={0}

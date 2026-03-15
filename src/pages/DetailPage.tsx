@@ -323,7 +323,7 @@ const DetailPage = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="sticky top-0 z-10 bg-background/80 backdrop-blur-md border-b border-border/50 px-6 py-4">
+      <header className="sticky top-0 z-10 bg-background/80 backdrop-blur-md border-b border-border/50 px-4 md:px-6 py-3 md:py-4">
         <div className="max-w-3xl mx-auto flex items-center justify-between">
           <Link to={backUrl} className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
             <ArrowLeft className="w-4 h-4" />
@@ -347,7 +347,7 @@ const DetailPage = () => {
       <EmbedCodeModal open={embedModalOpen} onOpenChange={setEmbedModalOpen} embedUrl={embedUrl} />
       <StoryPreviewModal open={storyModalOpen} onOpenChange={setStoryModalOpen} slides={storySlides} loading={storyLoading} />
 
-      <main className="max-w-3xl mx-auto px-6 py-10 space-y-8">
+      <main className="max-w-3xl mx-auto px-4 md:px-6 py-6 md:py-10 space-y-6 md:space-y-8">
         {/* Title section */}
         <div className="space-y-3 opacity-0 animate-fade-in" style={{ animationDelay: "0ms" }}>
           <div className="flex items-center gap-2">
@@ -360,7 +360,7 @@ const DetailPage = () => {
               {type === "voting" ? "Abstimmung" : "Parlamentarisches Geschäft"}
             </p>
           </div>
-          <h1 className="font-serif text-3xl md:text-4xl font-bold text-foreground">
+          <h1 className="font-serif text-2xl md:text-4xl font-bold text-foreground">
             {voting
               ? voting.affair_title_de || voting.title_de || `Abstimmung #${voting.id}`
               : affair?.title_de || `Geschäft #${affair?.id}`}
@@ -382,7 +382,7 @@ const DetailPage = () => {
         {/* AI Summary */}
         {affair && (
           <Card className="opacity-0 animate-fade-in" style={{ animationDelay: "50ms" }}>
-            <CardContent className="p-6 space-y-3">
+            <CardContent className="p-4 md:p-6 space-y-3">
               {!summary && !summaryLoading && (
                 <div className="space-y-2">
                   <Button
@@ -431,7 +431,7 @@ const DetailPage = () => {
         {voting && (
           <>
             <Card className="opacity-0 animate-fade-in" style={{ animationDelay: "100ms" }}>
-              <CardContent className="p-6 space-y-4">
+              <CardContent className="p-4 md:p-6 space-y-4">
                 <h2 className="font-serif text-lg font-semibold">Ergebnis</h2>
                 {voting.meaning_of_yes_de && (
                   <p className="text-sm text-muted-foreground">

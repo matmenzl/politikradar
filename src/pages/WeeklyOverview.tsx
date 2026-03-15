@@ -138,7 +138,7 @@ const WeeklyOverview = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="sticky top-0 z-10 bg-background/80 backdrop-blur-md border-b border-border/50 px-6 py-4">
+      <header className="sticky top-0 z-10 bg-background/80 backdrop-blur-md border-b border-border/50 px-4 md:px-6 py-3 md:py-4">
         <div className="max-w-4xl mx-auto flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
             <ArrowLeft className="w-4 h-4" />
@@ -151,7 +151,7 @@ const WeeklyOverview = () => {
         </div>
       </header>
 
-      <main className="max-w-4xl mx-auto px-6 py-10 space-y-8">
+      <main className="max-w-4xl mx-auto px-4 md:px-6 py-6 md:py-10 space-y-6 md:space-y-8">
         {/* Parliament selector */}
         <div className="opacity-0 animate-fade-in" style={{ animationDelay: "0ms" }}>
           <div className="flex items-center gap-3 flex-wrap">
@@ -178,7 +178,7 @@ const WeeklyOverview = () => {
               <ChevronRight className="w-4 h-4" />
             </Button>
           </div>
-          <h1 className="font-serif text-3xl md:text-4xl font-bold text-foreground">{dateRangeLabel}</h1>
+          <h1 className="font-serif text-2xl md:text-4xl font-bold text-foreground">{dateRangeLabel}</h1>
           <p className="text-lg font-medium text-foreground/80">
             {bodies.length === 0 ? "Lade Parlament…" : (selectedBody ? getBodyLabel(selectedBody) : bodyKey)}
           </p>

@@ -93,7 +93,7 @@ const WeeklyDigest = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="sticky top-0 z-10 bg-background/80 backdrop-blur-md border-b border-border/50 px-6 py-4">
+      <header className="sticky top-0 z-10 bg-background/80 backdrop-blur-md border-b border-border/50 px-4 md:px-6 py-3 md:py-4">
         <div className="max-w-4xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-2">
             <img src={logoImg} alt="PolitikRadar Logo" className="h-8 w-8 object-contain" />
@@ -103,19 +103,19 @@ const WeeklyDigest = () => {
         </div>
       </header>
 
-      <main className="max-w-4xl mx-auto px-6 py-10 space-y-12">
+      <main className="max-w-4xl mx-auto px-4 md:px-6 py-6 md:py-10 space-y-8 md:space-y-12">
         {/* Hero */}
-        <div className="text-center space-y-6 py-10 opacity-0 animate-fade-in" style={{ animationDelay: "0ms" }}>
+        <div className="text-center space-y-4 md:space-y-6 py-6 md:py-10 opacity-0 animate-fade-in" style={{ animationDelay: "0ms" }}>
           <div className="inline-block px-3 py-1 rounded-full border border-border text-xs font-medium text-muted-foreground tracking-wide uppercase">
             Nationale, kantonale &amp; kommunale Parlamente
           </div>
-          <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl font-bold leading-tight text-foreground">
+          <h1 className="font-serif text-3xl md:text-5xl lg:text-6xl font-bold leading-tight text-foreground">
             Was diese Woche in Schweizer Parlamenten Wichtiges passiert ist.   
           </h1>
-          <p className="text-lg md:text-xl text-muted-foreground leading-relaxed max-w-lg mx-auto">
+          <p className="text-base md:text-xl text-muted-foreground leading-relaxed max-w-lg mx-auto">
             Visuell und datenbasiert – die wichtigsten parlamentarischen Aktivitäten der Woche auf einen Blick.
           </p>
-          <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-muted-foreground">
+          <div className="flex flex-wrap items-center justify-center gap-3 md:gap-6 text-xs md:text-sm text-muted-foreground">
             <div className="flex items-center gap-2">
               <div className="w-1.5 h-1.5 rounded-full bg-success" />
               Datenbasierte Analyse
@@ -375,7 +375,7 @@ const WeeklyDigest = () => {
         </div>
       </main>
 
-      <footer className="px-6 py-5 border-t border-border/50">
+      <footer className="px-4 md:px-6 py-5 border-t border-border/50">
         <div className="max-w-4xl mx-auto text-center text-xs text-muted-foreground">
           PolitikRadar · Daten via <a href="https://openparldata.ch" target="_blank" rel="noopener noreferrer" className="underline hover:text-foreground">OpenParlData.ch</a> · CC BY 4.0
         </div>
