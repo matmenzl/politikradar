@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import VoteBar from "@/components/VoteBar";
 import VotingPartyBreakdown from "@/components/VotingPartyBreakdown";
 import EmbedCodeModal from "@/components/EmbedCodeModal";
-import StoryPreviewModal, { type StorySlide } from "@/components/StoryPreviewModal";
+import StoryPreviewModal, { type StorySlide, type PartyVoteData } from "@/components/StoryPreviewModal";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { type Voting, type Affair, isVotingAccepted } from "@/lib/api/openparldata";
