@@ -315,28 +315,28 @@ const WeeklyOverview = () => {
               </Card>
 
               {/* Card 4: Neueste Geschäfte with AI tags */}
-              <Card className="group hover:shadow-lg hover:border-accent/30 transition-all duration-300 opacity-0 animate-fade-in" style={{ animationDelay: "400ms" }}>
-                <CardHeader className="pb-2 md:pb-3 p-4 md:p-6">
+              <Card className="group hover:shadow-lg hover:border-accent/30 transition-all duration-300 opacity-0 animate-fade-in overflow-hidden" style={{ animationDelay: "400ms" }}>
+                <CardHeader className="pb-2 md:pb-3 p-3 sm:p-4 md:p-6">
                   <div className="flex items-center justify-between gap-2">
-                    <div className="flex items-center gap-2 text-muted-foreground">
-                      <FileText className="w-4 h-4" />
-                      <span className="text-xs font-medium uppercase tracking-wider">Geschäfte der Woche</span>
+                    <div className="flex items-center gap-2 text-muted-foreground min-w-0">
+                      <FileText className="w-4 h-4 flex-shrink-0" />
+                      <span className="text-[10px] sm:text-xs font-medium uppercase tracking-wider truncate">Geschäfte der Woche</span>
                     </div>
                     {taggingLoading && (
-                      <div className="flex items-center gap-1.5 text-accent">
+                      <div className="flex items-center gap-1.5 text-accent flex-shrink-0">
                         <Sparkles className="w-3.5 h-3.5 animate-pulse" />
-                        <span className="text-xs">AI taggt…</span>
+                        <span className="text-[10px] sm:text-xs">AI taggt…</span>
                       </div>
                     )}
                   </div>
-                  <CardTitle className="font-serif text-lg md:text-xl leading-snug">Parlamentarische Geschäfte</CardTitle>
-                  <CardDescription className="text-xs md:text-sm leading-relaxed">
+                  <CardTitle className="font-serif text-base sm:text-lg md:text-xl leading-snug">Parlamentarische Geschäfte</CardTitle>
+                  <CardDescription className="text-[10px] sm:text-xs md:text-sm leading-relaxed">
                     {data.recentAffairs.length > 0
                       ? `${data.totalAffairs} Geschäfte in dieser Woche.${allTags.length > 0 ? ` ${allTags.length} Themen erkannt.` : ""}`
                       : "Keine Geschäfte in dieser Woche erfasst."}
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="p-4 md:p-6 pt-0 space-y-3">
+                <CardContent className="p-3 sm:p-4 md:p-6 pt-0 space-y-3">
                   {/* Tag filter chips */}
                   {allTags.length > 0 && (
                     <div className="flex flex-wrap gap-1.5">
