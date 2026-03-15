@@ -184,7 +184,7 @@ const DetailPage = () => {
           yes: voting.results_yes,
           no: voting.results_no,
           abstention: voting.results_abstention,
-          decision: voting.decision,
+          accepted: isVotingAccepted(voting),
         };
         if (voting.date) body.date = voting.date;
       }

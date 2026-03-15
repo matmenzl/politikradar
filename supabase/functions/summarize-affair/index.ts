@@ -34,8 +34,9 @@ serve(async (req) => {
     if (endDate) parts.push(`Abgeschlossen: ${endDate}`);
     if (date) parts.push(`Datum: ${date}`);
     if (votingResults) {
+      const accepted = votingResults.accepted ?? (votingResults.yes > votingResults.no);
       parts.push(
-        `Abstimmungsergebnisse: Ja ${votingResults.yes}, Nein ${votingResults.no}, Enthaltungen ${votingResults.abstention}, Entscheid: ${votingResults.decision === "ja" ? "Angenommen" : "Abgelehnt"}`
+        `Abstimmungsergebnisse: Ja ${votingResults.yes}, Nein ${votingResults.no}, Enthaltungen ${votingResults.abstention}, Entscheid: ${accepted ? "Angenommen" : "Abgelehnt"}`
       );
     }
 
