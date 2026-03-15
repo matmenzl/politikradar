@@ -206,14 +206,19 @@ const DetailPage = () => {
           <Card className="opacity-0 animate-fade-in" style={{ animationDelay: "50ms" }}>
             <CardContent className="p-6 space-y-3">
               {!summary && !summaryLoading && (
-                <Button
-                  variant="outline"
-                  className="w-full gap-2"
-                  onClick={generateSummary}
-                >
-                  <Sparkles className="w-4 h-4" />
-                  Zusammenfassung generieren
-                </Button>
+                <div className="space-y-2">
+                  <Button
+                    variant="outline"
+                    className="w-full gap-2"
+                    onClick={generateSummary}
+                  >
+                    <Sparkles className="w-4 h-4" />
+                    Zusammenfassung generieren
+                  </Button>
+                  <p className="text-xs text-muted-foreground leading-relaxed">
+                    Diese Funktion erstellt mithilfe von Künstlicher Intelligenz eine kurze, allgemeinverständliche Zusammenfassung des parlamentarischen Geschäfts. Die Zusammenfassung basiert auf den verfügbaren Daten wie Titel, Geschäftstyp, Status und Abstimmungsergebnissen. Angaben ohne Gewähr.
+                  </p>
+                </div>
               )}
               {summaryLoading && (
                 <div className="flex items-center gap-3 py-2">
