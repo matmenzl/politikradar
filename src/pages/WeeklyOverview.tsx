@@ -364,7 +364,7 @@ const WeeklyOverview = () => {
                   <div className="space-y-2 max-h-64 overflow-y-auto">
                     {filteredAffairs.map((a) => (
                       <Link key={a.id} to={`/detail/${a.id}?type=affair&body=${encodeURIComponent(bodyKey)}`} className="block py-1.5 border-b border-border/30 last:border-0 hover:bg-secondary/30 rounded px-1 -mx-1 transition-colors">
-                        <p className="text-sm text-foreground">{a.title_de || `Geschäft #${a.id}`}</p>
+                        <p className="text-xs sm:text-sm text-foreground line-clamp-2">{a.title_de || `Geschäft #${a.id}`}</p>
                         <div className="flex flex-wrap gap-1.5 mt-1">
                           {a.type_de && <span className="text-xs text-muted-foreground">{a.type_de}</span>}
                           {a.status_de && <span className="text-xs text-muted-foreground">· {a.status_de}</span>}
