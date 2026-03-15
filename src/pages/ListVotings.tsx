@@ -27,8 +27,9 @@ const ListVotings = () => {
 
   const [votings, setVotings] = useState<VotingWithBody[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchParams] = useSearchParams();
   const [search, setSearch] = useState("");
-  const [filterBody, setFilterBody] = useState("");
+  const [filterBody, setFilterBody] = useState(searchParams.get("body") || "");
 
   useEffect(() => {
     (async () => {

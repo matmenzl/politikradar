@@ -24,8 +24,9 @@ const ListAffairs = () => {
 
   const [affairs, setAffairs] = useState<AffairWithBody[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchParams] = useSearchParams();
   const [search, setSearch] = useState("");
-  const [filterBody, setFilterBody] = useState("");
+  const [filterBody, setFilterBody] = useState(searchParams.get("body") || "");
 
   useEffect(() => {
     (async () => {
