@@ -1,0 +1,1 @@
+DELETE FROM affair_summaries WHERE affair_id = '285929';
