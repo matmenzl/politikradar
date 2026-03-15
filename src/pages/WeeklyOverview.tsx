@@ -294,7 +294,7 @@ const WeeklyOverview = () => {
                       : "Keine Abstimmungsdaten vorhanden."}
                   </CardDescription>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="p-4 md:p-6 pt-0">
                   <div className="space-y-2 max-h-48 overflow-y-auto">
                     {data.votings.slice(0, 8).map((v) => (
                       <Link key={v.id} to={`/detail/${v.id}?type=voting&body=${encodeURIComponent(bodyKey)}`} className="flex items-center justify-between py-1.5 border-b border-border/30 last:border-0 hover:bg-secondary/30 rounded px-1 -mx-1 transition-colors">
