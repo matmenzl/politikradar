@@ -1,7 +1,8 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext, type CarouselApi } from "@/components/ui/carousel";
-import { Download, Loader2, ArrowLeft } from "lucide-react";
+import { Download, Loader2, ArrowLeft, FileText } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { useRef, useCallback, useState, useEffect } from "react";
 import html2canvas from "html2canvas";
 import StorySlideCard from "./story/StorySlideCard";
