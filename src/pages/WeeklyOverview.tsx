@@ -235,8 +235,8 @@ const WeeklyOverview = () => {
                       : "Keine parlamentarische Aktivität in dieser Woche erfasst."}
                   </CardDescription>
                 </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-3 gap-3">
+                <CardContent className="p-4 md:p-6 pt-0">
+                  <div className="grid grid-cols-3 gap-2 md:gap-3">
                     {[
                       { label: "Geschäfte", value: data.totalAffairs, href: `/list/affairs?body=${encodeURIComponent(bodyKey)}` },
                       { label: "Abstimmungen", value: data.totalVotings, href: `/list/votings?body=${encodeURIComponent(bodyKey)}` },
