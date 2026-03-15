@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { ArrowLeft, Loader2, BarChart3, Search, Calendar } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -24,8 +24,9 @@ const ListAffairs = () => {
 
   const [affairs, setAffairs] = useState<AffairWithBody[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchParams] = useSearchParams();
   const [search, setSearch] = useState("");
-  const [filterBody, setFilterBody] = useState("");
+  const [filterBody, setFilterBody] = useState(searchParams.get("body") || "");
 
   useEffect(() => {
     (async () => {
@@ -58,7 +59,7 @@ const ListAffairs = () => {
   const filtered = useMemo(() => {
     return affairs.filter((a) => {
       const matchesSearch = !search || (a.title_de || "").toLowerCase().includes(search.toLowerCase());
-      const matchesBody = !filterBody || a.bodyName === filterBody;
+      const matchesBody = !filterBody || a.bodyName === filterBody || a.body_key === filterBody;
       return matchesSearch && matchesBody;
     });
   }, [affairs, search, filterBody]);

@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { ArrowLeft, Loader2, Vote, Search, ExternalLink } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -27,8 +27,9 @@ const ListVotings = () => {
 
   const [votings, setVotings] = useState<VotingWithBody[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchParams] = useSearchParams();
   const [search, setSearch] = useState("");
-  const [filterBody, setFilterBody] = useState("");
+  const [filterBody, setFilterBody] = useState(searchParams.get("body") || "");
 
   useEffect(() => {
     (async () => {
@@ -63,7 +64,7 @@ const ListVotings = () => {
       const matchesSearch =
         !search ||
         (v.affair_title_de || v.title_de || "").toLowerCase().includes(search.toLowerCase());
-      const matchesBody = !filterBody || v.bodyName === filterBody;
+      const matchesBody = !filterBody || v.bodyName === filterBody || v.body_key === filterBody;
       return matchesSearch && matchesBody;
     });
   }, [votings, search, filterBody]);
