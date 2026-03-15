@@ -27,10 +27,11 @@ const StoriesCarousel = () => {
         if (data) {
           setStories(
             data.map((d) => ({
-              ...d,
+              id: d.id,
+              title: d.title,
               slides: (d.slides as unknown as StorySlide[]) || [],
-              published_at: d.published_at || d.created_at,
-            })) as StoryPost[]
+              published_at: d.published_at || "",
+            }))
           );
         }
       });
