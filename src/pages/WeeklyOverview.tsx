@@ -328,8 +328,8 @@ const WeeklyOverview = () => {
                       </div>
                     )}
                   </div>
-                  <CardTitle className="font-serif text-xl leading-snug">Parlamentarische Geschäfte</CardTitle>
-                  <CardDescription className="text-sm leading-relaxed">
+                  <CardTitle className="font-serif text-lg md:text-xl leading-snug">Parlamentarische Geschäfte</CardTitle>
+                  <CardDescription className="text-xs md:text-sm leading-relaxed">
                     {data.recentAffairs.length > 0
                       ? `${data.totalAffairs} Geschäfte in dieser Woche.${allTags.length > 0 ? ` ${allTags.length} Themen erkannt.` : ""}`
                       : "Keine Geschäfte in dieser Woche erfasst."}
