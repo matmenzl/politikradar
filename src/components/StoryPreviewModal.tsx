@@ -28,6 +28,7 @@ interface StoryPreviewModalProps {
   onOpenChange: (open: boolean) => void;
   slides: StorySlide[];
   loading?: boolean;
+  affairId?: string | null;
 }
 
 function StoryContent({
