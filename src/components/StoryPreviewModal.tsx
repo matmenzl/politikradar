@@ -199,6 +199,19 @@ const StoryPreviewModal = ({ open, onOpenChange, slides, loading, affairId }: St
           )}
         </DialogHeader>
         <StoryContent slides={slides} loading={loading} />
+        {affairId && (
+          <div className="px-6 pb-4">
+            <Button
+              variant="outline"
+              size="sm"
+              className="w-full gap-2 text-sm"
+              onClick={() => { onOpenChange(false); navigate(`/detail/${affairId}`); }}
+            >
+              <FileText className="w-4 h-4" />
+              Zum Geschäft
+            </Button>
+          </div>
+        )}
       </DialogContent>
     </Dialog>
   );
