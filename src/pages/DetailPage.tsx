@@ -1,10 +1,11 @@
 import { Link, useParams, useSearchParams } from "react-router-dom";
-import { ArrowLeft, Loader2, ExternalLink, Calendar, FileText, Vote, Tag, Sparkles } from "lucide-react";
+import { ArrowLeft, Loader2, ExternalLink, Calendar, FileText, Vote, Tag, Sparkles, Code2 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import VoteBar from "@/components/VoteBar";
 import VotingPartyBreakdown from "@/components/VotingPartyBreakdown";
+import EmbedCodeModal from "@/components/EmbedCodeModal";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { type Voting, type Affair, isVotingAccepted } from "@/lib/api/openparldata";
