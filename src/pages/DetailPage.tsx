@@ -9,6 +9,7 @@ import EmbedCodeModal from "@/components/EmbedCodeModal";
 import StoryPreviewModal, { type StorySlide, type PartyVoteData } from "@/components/StoryPreviewModal";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 import { type Voting, type Affair, isVotingAccepted, fetchVotesForVoting, fetchBodies } from "@/lib/api/openparldata";
 
 interface AffairDetail extends Affair {
