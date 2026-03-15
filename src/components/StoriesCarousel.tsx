@@ -60,10 +60,10 @@ const StoriesCarousel = () => {
                 <button
                   key={story.id}
                   onClick={() => setSelectedStory(story)}
-                  className="flex-shrink-0 w-[120px] group focus:outline-none"
+                  className="flex-shrink-0 w-[180px] group focus:outline-none"
                 >
-                  <div className="w-[120px] h-[213px] rounded-xl overflow-hidden ring-2 ring-transparent group-hover:ring-accent/50 transition-all shadow-md relative">
-                    <div className="absolute top-0 left-0 w-[540px] h-[960px] origin-top-left scale-[0.222] pointer-events-none">
+                  <div className="w-[180px] h-[320px] rounded-xl overflow-hidden ring-2 ring-transparent group-hover:ring-accent/50 transition-all shadow-md relative">
+                    <div className="absolute top-0 left-0 w-[540px] h-[960px] origin-top-left scale-[0.333] pointer-events-none">
                       <StorySlideCard
                         slide={firstSlide}
                         index={0}
