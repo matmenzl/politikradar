@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Sparkles, ExternalLink } from "lucide-react";
 import StoryPreviewModal, { type StorySlide } from "@/components/StoryPreviewModal";
 import StorySlideCard from "@/components/story/StorySlideCard";
