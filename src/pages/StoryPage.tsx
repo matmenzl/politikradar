@@ -15,6 +15,7 @@ const StoryPage = () => {
   const navigate = useNavigate();
   const [slides, setSlides] = useState<StorySlide[]>([]);
   const [title, setTitle] = useState("");
+  const [affairId, setAffairId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [api, setApi] = useState<CarouselApi>();
   const [current, setCurrent] = useState(0);
