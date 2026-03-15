@@ -12,7 +12,7 @@ serve(async (req) => {
   }
 
   try {
-    const { title, type, status, votingResults, date, beginDate, endDate, summary } = await req.json();
+    const { title, type, status, votingResults, date, beginDate, endDate, summary, parliament } = await req.json();
 
     if (!title) {
       return new Response(JSON.stringify({ error: "title is required" }), {
@@ -28,6 +28,7 @@ serve(async (req) => {
 
     // Build context
     const parts: string[] = [`Titel: ${title}`];
+    if (parliament) parts.push(`Parlament: ${parliament}`);
     if (type) parts.push(`Geschäftstyp: ${type}`);
     if (status) parts.push(`Status: ${status}`);
     if (beginDate) parts.push(`Eingereicht: ${beginDate}`);
@@ -55,7 +56,7 @@ serve(async (req) => {
           {
             role: "system",
             content:
-              "Du erstellst Instagram-Story-Inhalte über Schweizer Parlamentsgeschäfte. Erstelle 4–5 Story-Slides, die das Geschäft als Storytelling aufbereiten. Jeder Slide soll einen klaren Zweck haben. Verwende einfache Sprache, kurze Sätze, und passende Emojis. Die Slides sollen für ein breites Publikum verständlich sein.",
+              "Du erstellst Instagram-Story-Inhalte über Schweizer Parlamentsgeschäfte. Erstelle 4–5 Story-Slides, die das Geschäft als Storytelling aufbereiten. Jeder Slide soll einen klaren Zweck haben. Erwähne immer, in welchem Parlament (z.B. Nationalrat, Kantonsrat Zürich) das Geschäft behandelt wurde – schreibe nicht einfach 'Parlament'. Verwende einfache Sprache, kurze Sätze, und passende Emojis. Die Slides sollen für ein breites Publikum verständlich sein.",
           },
           {
             role: "user",

@@ -12,7 +12,7 @@ serve(async (req) => {
   }
 
   try {
-    const { title, type, status, votingResults, date, beginDate, endDate } = await req.json();
+    const { title, type, status, votingResults, date, beginDate, endDate, parliament } = await req.json();
 
     if (!title) {
       return new Response(JSON.stringify({ error: "title is required" }), {
@@ -28,6 +28,7 @@ serve(async (req) => {
 
     // Build context string from available data
     const parts: string[] = [`Titel: ${title}`];
+    if (parliament) parts.push(`Parlament: ${parliament}`);
     if (type) parts.push(`Geschäftstyp: ${type}`);
     if (status) parts.push(`Status: ${status}`);
     if (beginDate) parts.push(`Eingereicht: ${beginDate}`);
@@ -54,7 +55,7 @@ serve(async (req) => {
           {
             role: "system",
             content:
-              "Du bist ein Experte für Schweizer Politik und erklärst parlamentarische Geschäfte in einfacher, allgemeinverständlicher Sprache. Schreibe eine Zusammenfassung in 3–5 Sätzen auf Deutsch. Vermeide Fachjargon. Erkläre, worum es bei dem Geschäft geht, was der aktuelle Stand ist, und was das Ergebnis bedeutet (falls Abstimmungsergebnisse vorhanden). Antworte nur mit der Zusammenfassung, ohne Überschrift oder Einleitung.",
+              "Du bist ein Experte für Schweizer Politik und erklärst parlamentarische Geschäfte in einfacher, allgemeinverständlicher Sprache. Schreibe eine Zusammenfassung in 3–5 Sätzen auf Deutsch. Vermeide Fachjargon. Erwähne immer, in welchem Parlament (z.B. Nationalrat, Kantonsrat Zürich, Grosser Rat Bern) das Geschäft behandelt wurde. Erkläre, worum es bei dem Geschäft geht, was der aktuelle Stand ist, und was das Ergebnis bedeutet (falls Abstimmungsergebnisse vorhanden). Antworte nur mit der Zusammenfassung, ohne Überschrift oder Einleitung.",
           },
           {
             role: "user",
