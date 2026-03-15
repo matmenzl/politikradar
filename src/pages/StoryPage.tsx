@@ -158,12 +158,16 @@ const StoryPage = () => {
               Erstellt mit KI · Inhalte prüfen vor Veröffentlichung
             </p>
 
-            {affairId && (
+            {(affairId || votingId) && (
               <Button
                 variant="outline"
                 size="sm"
                 className="w-full mt-4 gap-2 text-sm"
-                onClick={() => navigate(`/detail/${affairId}`)}
+                onClick={() => navigate(
+                  affairId
+                    ? `/detail/${affairId}?type=affair`
+                    : `/detail/${votingId}?type=voting`
+                )}
               >
                 <FileText className="w-4 h-4" />
                 Zum Geschäft
