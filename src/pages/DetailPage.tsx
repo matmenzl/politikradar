@@ -19,6 +19,28 @@ interface AffairDetail extends Affair {
   url_external_de?: string;
 }
 
+const PARTY_SHORT_NAMES: [string, string][] = [
+  ["Schweizerische Volkspartei", "SVP"],
+  ["Sozialdemokratische", "SP"],
+  ["FDP-Liberale", "FDP"],
+  ["FDP.Die Liberalen", "FDP"],
+  ["Grüne", "Grüne"],
+  ["Grünliberale", "GLP"],
+  ["Mitte-Fraktion", "Mitte"],
+  ["Die Mitte", "Mitte"],
+  ["M-E", "Mitte"],
+  ["Evangelische", "EVP"],
+  ["EDU", "EDU"],
+  ["Lega", "Lega"],
+];
+
+function shortenPartyName(name: string): string {
+  for (const [substring, short] of PARTY_SHORT_NAMES) {
+    if (name.includes(substring)) return short;
+  }
+  return name;
+}
+
 const BASE_URL = "https://api.openparldata.ch/v1";
 
 async function fetchDetail<T>(endpoint: string, id: string): Promise<T | null> {
@@ -220,7 +242,7 @@ const DetailPage = () => {
           const votes = await fetchVotesForVoting(voting.id);
           const partyMap = new Map<string, { yes: number; no: number; total: number }>();
           for (const v of votes) {
-            const party = v.person_party_de || v.person_parliamentary_group_name_de || "Unbekannt";
+            const party = shortenPartyName(v.person_party_de || v.person_parliamentary_group_name_de || "Unbekannt");
             if (!partyMap.has(party)) partyMap.set(party, { yes: 0, no: 0, total: 0 });
             const entry = partyMap.get(party)!;
             if (v.vote === "yes") { entry.yes++; entry.total++; }
