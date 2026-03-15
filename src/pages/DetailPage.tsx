@@ -456,7 +456,7 @@ const DetailPage = () => {
               <a href={affair.url_external_de} target="_blank" rel="noopener noreferrer">
                 <Button variant="outline" className="w-full gap-2">
                   <ExternalLink className="w-4 h-4" />
-                  Auf parlament.ch ansehen
+                  Auf {(() => { try { return new URL(affair.url_external_de!).hostname.replace(/^www\./, ''); } catch { return 'Website'; } })()} ansehen
                 </Button>
               </a>
             )}
