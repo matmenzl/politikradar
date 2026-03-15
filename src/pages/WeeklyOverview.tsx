@@ -282,27 +282,27 @@ const WeeklyOverview = () => {
               </Link>
 
               {/* Card 3: Alle Abstimmungen */}
-              <Card className="group hover:shadow-lg hover:border-accent/30 transition-all duration-300 opacity-0 animate-fade-in" style={{ animationDelay: "300ms" }}>
-                <CardHeader className="pb-2 md:pb-3 p-4 md:p-6">
+              <Card className="group hover:shadow-lg hover:border-accent/30 transition-all duration-300 opacity-0 animate-fade-in overflow-hidden" style={{ animationDelay: "300ms" }}>
+                <CardHeader className="pb-2 md:pb-3 p-3 sm:p-4 md:p-6">
                   <div className="flex items-center gap-2 text-muted-foreground">
-                    <BarChart3 className="w-4 h-4" />
-                    <span className="text-xs font-medium uppercase tracking-wider">Abstimmungen der Woche</span>
+                    <BarChart3 className="w-4 h-4 flex-shrink-0" />
+                    <span className="text-[10px] sm:text-xs font-medium uppercase tracking-wider">Abstimmungen der Woche</span>
                   </div>
-                  <CardTitle className="font-serif text-lg md:text-xl leading-snug">Abstimmungsergebnisse</CardTitle>
-                  <CardDescription className="text-xs md:text-sm leading-relaxed">
+                  <CardTitle className="font-serif text-base sm:text-lg md:text-xl leading-snug">Abstimmungsergebnisse</CardTitle>
+                  <CardDescription className="text-[10px] sm:text-xs md:text-sm leading-relaxed">
                     {data.votings.length > 0
                       ? `${data.votings.length} Abstimmungen – ${data.votings.filter(v => isVotingAccepted(v)).length} angenommen, ${data.votings.filter(v => !isVotingAccepted(v)).length} abgelehnt.`
                       : "Keine Abstimmungsdaten vorhanden."}
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="p-4 md:p-6 pt-0">
+                <CardContent className="p-3 sm:p-4 md:p-6 pt-0">
                   <div className="space-y-2 max-h-48 overflow-y-auto">
                     {data.votings.slice(0, 8).map((v) => (
-                      <Link key={v.id} to={`/detail/${v.id}?type=voting&body=${encodeURIComponent(bodyKey)}`} className="flex items-center justify-between py-1.5 border-b border-border/30 last:border-0 hover:bg-secondary/30 rounded px-1 -mx-1 transition-colors">
-                        <span className="text-sm text-foreground truncate mr-3 flex-1">
+                      <Link key={v.id} to={`/detail/${v.id}?type=voting&body=${encodeURIComponent(bodyKey)}`} className="flex items-center justify-between py-1.5 border-b border-border/30 last:border-0 hover:bg-secondary/30 rounded px-1 -mx-1 transition-colors gap-2">
+                        <span className="text-xs sm:text-sm text-foreground line-clamp-2 flex-1 min-w-0">
                           {v.affair_title_de || v.title_de || `Abstimmung #${v.id}`}
                         </span>
-                        <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${isVotingAccepted(v) ? "bg-success/10 text-success" : "bg-destructive/10 text-destructive"}`}>
+                        <span className={`text-[10px] sm:text-xs font-medium px-1.5 sm:px-2 py-0.5 rounded-full flex-shrink-0 ${isVotingAccepted(v) ? "bg-success/10 text-success" : "bg-destructive/10 text-destructive"}`}>
                           {v.results_yes}:{v.results_no}
                         </span>
                       </Link>
