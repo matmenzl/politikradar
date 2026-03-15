@@ -125,6 +125,18 @@ const DetailPage = () => {
       });
   }, [affair?.id]);
 
+  const resolveParliamentName = async (): Promise<string | undefined> => {
+    const key = bodyParam || affair?.body_key || voting?.body_key;
+    if (!key) return undefined;
+    if (key === "CHE") return "Bundesversammlung (Schweizer Parlament)";
+    try {
+      const bodies = await fetchBodies();
+      const body = bodies.find((b) => b.key.toLowerCase() === key.toLowerCase());
+      if (body?.name_de) return `Kantons-/Stadtparlament ${body.name_de}`;
+    } catch {}
+    return key;
+  };
+
   const generateSummary = async () => {
     if (!affair) return;
     setSummaryLoading(true);
@@ -138,6 +150,8 @@ const DetailPage = () => {
       }
       if (affair.begin_date) body.beginDate = affair.begin_date;
       if (affair.end_date) body.endDate = affair.end_date;
+      const parliamentName = await resolveParliamentName();
+      if (parliamentName) body.parliament = parliamentName;
       if (voting) {
         body.votingResults = {
           yes: voting.results_yes,
