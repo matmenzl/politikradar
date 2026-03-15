@@ -13,6 +13,7 @@ import ListMeetings from "./pages/ListMeetings";
 import ListBodies from "./pages/ListBodies";
 import NotFound from "./pages/NotFound";
 import PersonProfile from "./pages/PersonProfile";
+import EmbedDetailPage from "./pages/EmbedDetailPage";
 
 const queryClient = new QueryClient();
 
