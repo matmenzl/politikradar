@@ -277,15 +277,15 @@ const DetailPage = () => {
       // Auto-save and publish to story_posts
       const title = affair?.title_de || voting?.affair_title_de || voting?.title_de || `#${id}`;
       const bodyKey = bodyParam || affair?.body_key || voting?.body_key || "";
-      const { error: insertErr } = await supabase.from("story_posts").insert({
+      const { error: insertErr } = await supabase.from("story_posts").insert([{
         title,
         body_key: bodyKey,
         affair_id: affair ? String(affair.id) : null,
         voting_id: voting ? String(voting.id) : null,
-        slides: slides as unknown as Record<string, unknown>[],
-        status: "published",
+        slides: JSON.parse(JSON.stringify(slides)),
+        status: "published" as const,
         published_at: new Date().toISOString(),
-      });
+      }]);
       if (insertErr) {
         console.error("Story save error:", insertErr);
       } else {
