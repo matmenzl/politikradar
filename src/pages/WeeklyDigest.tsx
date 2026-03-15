@@ -105,7 +105,7 @@ const WeeklyDigest = () => {
 
       <main className="max-w-4xl mx-auto px-4 md:px-6 py-6 md:py-10 space-y-8 md:space-y-12">
         {/* Hero */}
-        <div className="text-center space-y-6 py-10 opacity-0 animate-fade-in" style={{ animationDelay: "0ms" }}>
+        <div className="text-center space-y-4 md:space-y-6 py-6 md:py-10 opacity-0 animate-fade-in" style={{ animationDelay: "0ms" }}>
           <div className="inline-block px-3 py-1 rounded-full border border-border text-xs font-medium text-muted-foreground tracking-wide uppercase">
             Nationale, kantonale &amp; kommunale Parlamente
           </div>
