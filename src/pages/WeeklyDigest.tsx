@@ -104,33 +104,6 @@ const WeeklyDigest = () => {
       </header>
 
       <main className="max-w-4xl mx-auto px-4 md:px-6 py-6 md:py-10 space-y-8 md:space-y-12">
-        {/* Hero */}
-        <div className="text-center space-y-4 md:space-y-6 py-6 md:py-10 opacity-0 animate-fade-in" style={{ animationDelay: "0ms" }}>
-          <div className="inline-block px-3 py-1 rounded-full border border-border text-xs font-medium text-muted-foreground tracking-wide uppercase">
-            Nationale, kantonale &amp; kommunale Parlamente
-          </div>
-          <h1 className="font-serif text-3xl md:text-5xl lg:text-6xl font-bold leading-tight text-foreground">
-            Was diese Woche in Schweizer Parlamenten Wichtiges passiert ist.   
-          </h1>
-          <p className="text-base md:text-xl text-muted-foreground leading-relaxed max-w-lg mx-auto">
-            Visuell und datenbasiert – die wichtigsten parlamentarischen Aktivitäten der Woche auf einen Blick.
-          </p>
-          <div className="flex flex-wrap items-center justify-center gap-3 md:gap-6 text-xs md:text-sm text-muted-foreground">
-            <div className="flex items-center gap-2">
-              <div className="w-1.5 h-1.5 rounded-full bg-success" />
-              Datenbasierte Analyse
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-1.5 h-1.5 rounded-full bg-accent" />
-              Wöchentlich aktualisiert
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-1.5 h-1.5 rounded-full bg-warning" />
-              Neutral &amp; überparteilich
-            </div>
-          </div>
-        </div>
-
         {/* Week header */}
         <div className="space-y-2 opacity-0 animate-fade-in" style={{ animationDelay: "0ms" }}>
           <div className="flex items-center gap-3">
@@ -148,9 +121,11 @@ const WeeklyDigest = () => {
             🇨🇭 Politikwoche
           </h1>
           <p className="text-lg text-foreground/80">{dateRangeLabel}</p>
-          <p className="text-xs text-muted-foreground">
-            Aggregierte Übersicht über alle indexierten Schweizer Parlamente
-          </p>
+        </div>
+
+        {/* Stories – central hero element */}
+        <div className="opacity-0 animate-fade-in" style={{ animationDelay: "50ms" }}>
+          <StoriesCarousel />
         </div>
 
         {loading &&
@@ -196,10 +171,6 @@ const WeeklyDigest = () => {
             )}
             </div>
 
-            {/* Stories */}
-            <div className="opacity-0 animate-fade-in" style={{ animationDelay: "150ms" }}>
-              <StoriesCarousel />
-            </div>
 
             {/* AI Summary */}
             {data.summary &&

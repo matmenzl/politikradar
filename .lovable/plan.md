@@ -1,54 +1,63 @@
 
 
-# Stories der Woche als zentrales Element
+## AI-Zusammenfassung fuer parlamentarische Geschaefte
 
-## Analyse
+### Uebersicht
 
-Aktuell ist die Landing Page (`WeeklyDigest`) datengetrieben aufgebaut: Statistik-Cards oben, Stories als eine von vielen Sektionen dazwischen. Die Stories erscheinen erst nach den Zahlen — obwohl sie das eigentliche Kernprodukt sind.
+Auf der Detailseite eines Geschaefts wird ein neuer "Zusammenfassung"-Bereich eingefuegt, der per Knopfdruck eine verstaendliche AI-Zusammenfassung generiert. Die Zusammenfassung erklaert das Geschaeft in einfacher Sprache, basierend auf den vorhandenen Daten (Titel, Typ, Status, Abstimmungsergebnisse).
 
-## Konzept
+### Funktionsweise
 
-Die Stories werden zum Hero-Element der Startseite. Statt einer kleinen horizontalen Scroll-Leiste bekommen sie eine prominente, visuell dominante Darstellung direkt nach dem Titel.
+- Der Nutzer sieht einen Button "Zusammenfassung generieren" auf der Detailseite
+- Beim Klick wird eine Backend-Funktion aufgerufen, die alle verfuegbaren Informationen zum Geschaeft (Titel, Typ, Abstimmungsergebnisse, Datum, Status) an Lovable AI sendet
+- Die AI erstellt eine kurze, allgemeinverstaendliche Zusammenfassung auf Deutsch
+- Die Zusammenfassung wird direkt in einer Karte angezeigt
+- Waehrend des Ladens wird ein Skeleton/Spinner angezeigt
 
-## Geplante Änderungen
+### Technische Umsetzung
 
-### 1. Neues Layout der Landing Page (`WeeklyDigest.tsx`)
+#### 1. Neue Backend-Funktion: `supabase/functions/summarize-affair/index.ts`
 
-Neue Reihenfolge der Sektionen:
+- Empfaengt Geschaeftsdaten (Titel, Typ, Status, Abstimmungsergebnisse, Daten)
+- Ruft Lovable AI (google/gemini-3-flash-preview) auf mit einem System-Prompt, der die Rolle eines Schweizer Politik-Erklaerers einnimmt
+- Gibt eine kurze Zusammenfassung (3-5 Saetze) in einfacher Sprache zurueck
+- Behandelt 429/402 Fehler korrekt
 
-1. **Header** (bleibt)
-2. **Kompakter Wochen-Header** — Titel, KW-Navigation, Datumsbereich (Hero-Text wird gekürzt, der grosse Marketingblock oben wird entfernt oder stark reduziert)
-3. **Stories der Woche** (NEU: prominent, gross, zentrales Element)
-4. KI-Zusammenfassung
-5. Statistik-Cards (kompakt, eine Zeile)
-6. Knappste Abstimmungen
-7. Themen-Radar
-8. Aktive Parlamente
-9. Parliament Browser
+#### 2. Config: `supabase/config.toml`
 
-### 2. Neues `StoriesCarousel`-Design
+- Neuer Eintrag fuer `summarize-affair` mit `verify_jwt = false`
 
-- Grössere Story-Karten (statt 160px/200px → 220px/280px)
-- Kein Card-Wrapper mehr — die Stories stehen frei und visuell dominant
-- Überschrift wird prominenter: "Stories der Woche" als grosse Serif-Headline
-- Kurzer Einleitungstext: "Politische Entscheide, einfach erklärt"
-- Bei 0 Stories: Hinweis statt komplett ausblenden
+#### 3. Detailseite: `src/pages/DetailPage.tsx`
 
-### 3. Hero-Bereich vereinfachen
+- Neuer State: `summary` (string), `summaryLoading` (boolean)
+- Neue Karte im Affair-Bereich mit:
+  - Button "Zusammenfassung generieren" (Sparkles-Icon)
+  - Nach dem Laden: Die Zusammenfassung als Fliesstext
+  - Hinweis "Erstellt mit KI" am unteren Rand
+- Die Zusammenfassung wird on-demand geladen (nicht automatisch), um API-Calls zu sparen
+- Verfuegbar fuer alle Geschaefte (nicht nur Nationalparlament), solange genuegend Kontextdaten vorhanden sind
 
-- Den grossen Hero-Text ("Was diese Woche in Schweizer Parlamenten...") entfernen oder auf einen Einzeiler reduzieren
-- Die drei Bullet-Punkte (Datenbasiert, Wöchentlich, Neutral) entfernen
-- Der Wochen-Header wird zum primären Einstieg
+#### Datenfluss
 
-## Betroffene Dateien
+Das Frontend sammelt alle verfuegbaren Daten und sendet sie an die Edge Function:
 
-| Datei | Änderung |
-|---|---|
-| `src/pages/WeeklyDigest.tsx` | Hero entfernen, Sektions-Reihenfolge ändern, Stories nach oben |
-| `src/components/StoriesCarousel.tsx` | Grösseres, prominenteres Design ohne Card-Wrapper |
+```text
+DetailPage (Klick auf Button)
+  --> supabase.functions.invoke("summarize-affair", {
+        title, type, status, votingResults, date
+      })
+  --> Edge Function ruft Lovable AI auf
+  --> Zusammenfassung wird zurueckgegeben und angezeigt
+```
 
-## Nicht betroffen
+#### Prompt-Strategie (Backend)
 
-- Story-Generierung, Admin-Seite, StorySlideCard, StoryPreviewModal — bleiben unverändert
-- Datenbank/Backend — keine Änderungen nötig
+Der AI-Prompt erhaelt:
+- Geschaeftstitel
+- Geschaeftstyp (Motion, Interpellation, etc.)
+- Status (erledigt, haengig, etc.)
+- Abstimmungsergebnisse (falls vorhanden)
+- Datumsangaben
+
+Die AI wird angewiesen, eine allgemeinverstaendliche Erklaerung in 3-5 Saetzen zu liefern, ohne Fachjargon.
 
