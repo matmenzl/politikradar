@@ -335,7 +335,7 @@ const WeeklyOverview = () => {
                       : "Keine Geschäfte in dieser Woche erfasst."}
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-3">
+                <CardContent className="p-4 md:p-6 pt-0 space-y-3">
                   {/* Tag filter chips */}
                   {allTags.length > 0 && (
                     <div className="flex flex-wrap gap-1.5">
