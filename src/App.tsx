@@ -14,6 +14,7 @@ import ListBodies from "./pages/ListBodies";
 import NotFound from "./pages/NotFound";
 import PersonProfile from "./pages/PersonProfile";
 import EmbedDetailPage from "./pages/EmbedDetailPage";
+import AdminPage from "./pages/AdminPage";
 
 const queryClient = new QueryClient();
 
