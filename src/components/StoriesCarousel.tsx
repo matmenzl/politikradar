@@ -13,6 +13,7 @@ interface StoryPost {
   title: string;
   body_key: string | null;
   affair_id: string | null;
+  voting_id: string | null;
   slides: StorySlide[];
   published_at: string;
 }
