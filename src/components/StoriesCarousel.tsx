@@ -22,6 +22,8 @@ const StoriesCarousel = () => {
   const [selectedStory, setSelectedStory] = useState<StoryPost | null>(null);
   const [bodyNames, setBodyNames] = useState<Record<string, string>>({});
   const [affairLinks, setAffairLinks] = useState<Record<string, string>>({});
+  const isMobile = useIsMobile();
+  const navigate = useNavigate();
 
   useEffect(() => {
     supabase
