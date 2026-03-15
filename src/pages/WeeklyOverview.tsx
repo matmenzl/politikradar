@@ -254,22 +254,22 @@ const WeeklyOverview = () => {
 
               {/* Card 2: Knappste Abstimmung */}
               <Link to={closestVoting ? `/detail/${closestVoting.id}?type=voting&body=${encodeURIComponent(bodyKey)}` : "#"} className="block">
-              <Card className="group hover:shadow-lg hover:border-accent/30 transition-all duration-300 opacity-0 animate-fade-in cursor-pointer" style={{ animationDelay: "200ms" }}>
-                <CardHeader className="pb-2 md:pb-3 p-4 md:p-6">
+              <Card className="group hover:shadow-lg hover:border-accent/30 transition-all duration-300 opacity-0 animate-fade-in cursor-pointer overflow-hidden" style={{ animationDelay: "200ms" }}>
+                <CardHeader className="pb-2 md:pb-3 p-3 sm:p-4 md:p-6">
                   <div className="flex items-center gap-2 text-muted-foreground">
-                    <Vote className="w-4 h-4" />
-                    <span className="text-xs font-medium uppercase tracking-wider">Knappste Abstimmung</span>
+                    <Vote className="w-4 h-4 flex-shrink-0" />
+                    <span className="text-[10px] sm:text-xs font-medium uppercase tracking-wider">Knappste Abstimmung</span>
                   </div>
-                  <CardTitle className="font-serif text-lg md:text-xl leading-snug">
+                  <CardTitle className="font-serif text-base sm:text-lg md:text-xl leading-snug line-clamp-2">
                     {closestVoting ? closestVoting.affair_title_de || closestVoting.title_de || "Abstimmung" : "Keine Abstimmung"}
                   </CardTitle>
-                  <CardDescription className="text-sm leading-relaxed">
+                  <CardDescription className="text-xs sm:text-sm leading-relaxed">
                     {closestVoting
                       ? `Entschied: ${isVotingAccepted(closestVoting) ? "Annahme" : "Ablehnung"} – Differenz von nur ${Math.abs(closestVoting.results_yes - closestVoting.results_no)} Stimmen.`
                       : "Keine Abstimmungen in dieser Woche erfasst."}
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="p-4 md:p-6 pt-0 space-y-4">
+                <CardContent className="p-3 sm:p-4 md:p-6 pt-0 space-y-4">
                   {closestVoting && (
                     <VoteBar
                       ja={closestVoting.results_yes}
