@@ -16,6 +16,7 @@ import {
 "@/lib/api/openparldata";
 import VoteBar from "@/components/VoteBar";
 import StoriesCarousel from "@/components/StoriesCarousel";
+import logoImg from "@/assets/politikradar_logo.png";
 
 interface DigestData {
   year: number;
