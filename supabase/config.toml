@@ -14,3 +14,6 @@ verify_jwt = false
 
 [functions.verify-admin-pin]
 verify_jwt = false
+
+[functions.suggest-stories]
+verify_jwt = false
