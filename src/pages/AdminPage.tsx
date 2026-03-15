@@ -1,13 +1,26 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
+import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Search, Sparkles, Trash2, Eye, EyeOff, Lock } from "lucide-react";
+import { Loader2, Search, Sparkles, Trash2, Eye, EyeOff, Lock, Vote, BarChart3, Calendar } from "lucide-react";
 import { toast } from "sonner";
+import VoteBar from "@/components/VoteBar";
 import type { StorySlide } from "@/components/StoryPreviewModal";
 import StoryPreviewModal from "@/components/StoryPreviewModal";
+import {
+  getCurrentISOWeek,
+  getWeekDateRange,
+  formatDateRange,
+  fetchBodies,
+  fetchAffairsForWeek,
+  fetchVotingsForWeek,
+  isVotingAccepted,
+  type Affair,
+  type Voting,
+} from "@/lib/api/openparldata";
 
 interface StoryPost {
   id: string;
@@ -32,6 +45,13 @@ interface SearchResult {
   results_no?: number;
 }
 
+interface AffairWithBody extends Affair {
+  bodyName: string;
+}
+interface VotingWithBody extends Voting {
+  bodyName: string;
+}
+
 const BASE_URL = "https://api.openparldata.ch/v1";
 
 const AdminPage = () => {
@@ -39,7 +59,6 @@ const AdminPage = () => {
   const [pin, setPin] = useState("");
   const [pinLoading, setPinLoading] = useState(false);
 
-  // Check session
   useEffect(() => {
     if (sessionStorage.getItem("admin_auth") === "true") {
       setAuthenticated(true);
@@ -104,6 +123,250 @@ const AdminPage = () => {
 
   return <AdminDashboard />;
 };
+
+/* ─── Browse Section: affairs & votings with tabs ─── */
+
+function BrowseSection({
+  onSelectItem,
+  generatingId,
+}: {
+  onSelectItem: (item: SearchResult) => void;
+  generatingId: string | null;
+}) {
+  const { year, week } = getCurrentISOWeek();
+  const { from, to } = getWeekDateRange(year, week);
+
+  type TabKey = "affairs" | "votings";
+  const [tab, setTab] = useState<TabKey>("affairs");
+  const [search, setSearch] = useState("");
+  const [filterBody, setFilterBody] = useState("");
+
+  const [affairs, setAffairs] = useState<AffairWithBody[]>([]);
+  const [votings, setVotings] = useState<VotingWithBody[]>([]);
+  const [loadingAffairs, setLoadingAffairs] = useState(true);
+  const [loadingVotings, setLoadingVotings] = useState(true);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const bodies = await fetchBodies();
+        const allA: AffairWithBody[] = [];
+        const allV: VotingWithBody[] = [];
+        const batchSize = 5;
+        for (let i = 0; i < bodies.length; i += batchSize) {
+          const batch = bodies.slice(i, i + batchSize);
+          const [aRes, vRes] = await Promise.all([
+            Promise.all(batch.map(async (b) => {
+              const res = await fetchAffairsForWeek(from, to, b.key);
+              return res.data.map((a) => ({ ...a, bodyName: b.name_de || b.key }));
+            })),
+            Promise.all(batch.map(async (b) => {
+              const res = await fetchVotingsForWeek(from, to, b.key);
+              return res.data.map((v) => ({ ...v, bodyName: b.name_de || b.key }));
+            })),
+          ]);
+          aRes.forEach((r) => allA.push(...r));
+          vRes.forEach((r) => allV.push(...r));
+        }
+        allA.sort((a, b) => new Date(b.begin_date || "").getTime() - new Date(a.begin_date || "").getTime());
+        allV.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+        setAffairs(allA);
+        setVotings(allV);
+      } catch (e) {
+        console.error(e);
+      } finally {
+        setLoadingAffairs(false);
+        setLoadingVotings(false);
+      }
+    })();
+  }, []);
+
+  const bodyNames = useMemo(() => {
+    const names = new Set<string>();
+    affairs.forEach((a) => names.add(a.bodyName));
+    votings.forEach((v) => names.add(v.bodyName));
+    return [...names].sort();
+  }, [affairs, votings]);
+
+  const filteredAffairs = useMemo(() => {
+    return affairs.filter((a) => {
+      const ms = !search || (a.title_de || "").toLowerCase().includes(search.toLowerCase());
+      const mb = !filterBody || a.bodyName === filterBody;
+      return ms && mb;
+    });
+  }, [affairs, search, filterBody]);
+
+  const filteredVotings = useMemo(() => {
+    return votings.filter((v) => {
+      const ms = !search || (v.affair_title_de || v.title_de || "").toLowerCase().includes(search.toLowerCase());
+      const mb = !filterBody || v.bodyName === filterBody;
+      return ms && mb;
+    });
+  }, [votings, search, filterBody]);
+
+  const loading = tab === "affairs" ? loadingAffairs : loadingVotings;
+
+  return (
+    <Card>
+      <CardHeader className="pb-3">
+        <CardTitle className="font-serif text-xl">Geschäfte & Abstimmungen durchsuchen</CardTitle>
+        <CardDescription>
+          Aktuelle Woche – wähle ein Element, um eine Story zu generieren oder Details anzusehen
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        {/* Tabs */}
+        <div className="flex rounded-lg bg-secondary/50 p-1 gap-1">
+          <button
+            onClick={() => setTab("affairs")}
+            className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-md text-sm font-medium transition-colors ${
+              tab === "affairs" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            <BarChart3 className="w-3.5 h-3.5" />
+            Geschäfte
+            {!loadingAffairs && <span className="text-[10px] text-muted-foreground">({filteredAffairs.length})</span>}
+          </button>
+          <button
+            onClick={() => setTab("votings")}
+            className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-md text-sm font-medium transition-colors ${
+              tab === "votings" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            <Vote className="w-3.5 h-3.5" />
+            Abstimmungen
+            {!loadingVotings && <span className="text-[10px] text-muted-foreground">({filteredVotings.length})</span>}
+          </button>
+        </div>
+
+        {/* Search + filter */}
+        <div className="flex flex-col sm:flex-row gap-2">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Input
+              placeholder={tab === "affairs" ? "Geschäft suchen…" : "Abstimmung suchen…"}
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="pl-9 h-9"
+            />
+          </div>
+          <select
+            value={filterBody}
+            onChange={(e) => setFilterBody(e.target.value)}
+            className="h-9 rounded-md border border-input bg-background px-3 text-sm text-foreground"
+          >
+            <option value="">Alle Parlamente</option>
+            {bodyNames.map((b) => <option key={b} value={b}>{b}</option>)}
+          </select>
+        </div>
+
+        {/* Results */}
+        {loading ? (
+          <div className="flex items-center justify-center py-12">
+            <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
+            <span className="ml-2 text-sm text-muted-foreground">Laden…</span>
+          </div>
+        ) : tab === "affairs" ? (
+          <div className="space-y-1.5 max-h-[50vh] overflow-y-auto">
+            {filteredAffairs.map((a) => {
+              const key = `affair-${a.id}`;
+              return (
+                <div key={a.id} className="flex items-center gap-2 p-2.5 rounded-lg border border-border/50 hover:bg-secondary/30 transition-colors">
+                  <Link to={`/detail/${a.id}?type=affair&body=${encodeURIComponent(a.body_key)}`} className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-foreground line-clamp-2">{a.title_de || `#${a.id}`}</p>
+                    <div className="flex items-center gap-2 mt-1 flex-wrap">
+                      <Badge variant="outline" className="text-[10px]">{a.bodyName}</Badge>
+                      {a.type_de && <Badge variant="secondary" className="text-[10px]">{a.type_de}</Badge>}
+                      {a.begin_date && (
+                        <span className="text-[10px] text-muted-foreground flex items-center gap-1">
+                          <Calendar className="w-2.5 h-2.5" />
+                          {new Date(a.begin_date).toLocaleDateString("de-CH")}
+                        </span>
+                      )}
+                    </div>
+                  </Link>
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    className="shrink-0 h-8"
+                    disabled={generatingId === key}
+                    onClick={() =>
+                      onSelectItem({
+                        id: a.id,
+                        title: a.title_de || `Geschäft #${a.id}`,
+                        bodyKey: a.body_key,
+                        type: "affair",
+                        date: a.begin_date,
+                        status: a.status_de,
+                      })
+                    }
+                  >
+                    {generatingId === key ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Sparkles className="w-3.5 h-3.5" />}
+                  </Button>
+                </div>
+              );
+            })}
+            {filteredAffairs.length === 0 && (
+              <p className="text-center text-sm text-muted-foreground py-6">Keine Geschäfte gefunden.</p>
+            )}
+          </div>
+        ) : (
+          <div className="space-y-1.5 max-h-[50vh] overflow-y-auto">
+            {filteredVotings.map((v) => {
+              const accepted = isVotingAccepted(v);
+              const key = `voting-${v.id}`;
+              return (
+                <div key={v.id} className="flex items-center gap-2 p-2.5 rounded-lg border border-border/50 hover:bg-secondary/30 transition-colors">
+                  <Link to={`/detail/${v.id}?type=voting&body=${encodeURIComponent(v.body_key)}`} className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-foreground line-clamp-2">
+                      {v.affair_title_de || v.title_de || `#${v.id}`}
+                    </p>
+                    <div className="flex items-center gap-2 mt-1 flex-wrap">
+                      <Badge variant="outline" className="text-[10px]">{v.bodyName}</Badge>
+                      <span className="text-[10px] text-muted-foreground">
+                        {new Date(v.date).toLocaleDateString("de-CH")}
+                      </span>
+                      <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded-full ${accepted ? "bg-success/10 text-success" : "bg-destructive/10 text-destructive"}`}>
+                        {v.results_yes}:{v.results_no}
+                      </span>
+                    </div>
+                    <div className="mt-1.5">
+                      <VoteBar ja={v.results_yes} nein={v.results_no} enthaltungen={v.results_abstention} compact />
+                    </div>
+                  </Link>
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    className="shrink-0 h-8"
+                    disabled={generatingId === key}
+                    onClick={() =>
+                      onSelectItem({
+                        id: v.id,
+                        title: v.affair_title_de || v.title_de || `Abstimmung #${v.id}`,
+                        bodyKey: v.body_key,
+                        type: "voting",
+                        date: v.date,
+                        results_yes: v.results_yes,
+                        results_no: v.results_no,
+                      })
+                    }
+                  >
+                    {generatingId === key ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Sparkles className="w-3.5 h-3.5" />}
+                  </Button>
+                </div>
+              );
+            })}
+            {filteredVotings.length === 0 && (
+              <p className="text-center text-sm text-muted-foreground py-6">Keine Abstimmungen gefunden.</p>
+            )}
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+/* ─── Admin Dashboard ─── */
 
 function AdminDashboard() {
   const [stories, setStories] = useState<StoryPost[]>([]);
@@ -190,7 +453,6 @@ function AdminDashboard() {
       if (error) throw error;
       if (!data?.slides) throw new Error("Keine Slides generiert");
 
-      // Save to DB
       const { error: insertErr } = await supabase.from("story_posts").insert({
         title: result.title,
         body_key: result.bodyKey,
@@ -239,7 +501,7 @@ function AdminDashboard() {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="sticky top-0 z-10 bg-background/80 backdrop-blur-md border-b border-border/50 px-6 py-4">
+      <header className="sticky top-0 z-10 bg-background/80 backdrop-blur-md border-b border-border/50 px-4 md:px-6 py-3 md:py-4">
         <div className="max-w-4xl mx-auto flex items-center justify-between">
           <span className="font-serif text-lg font-semibold text-foreground">PolitikRadar Admin</span>
           <Button
@@ -255,13 +517,16 @@ function AdminDashboard() {
         </div>
       </header>
 
-      <main className="max-w-4xl mx-auto px-6 py-8 space-y-8">
-        {/* Search */}
+      <main className="max-w-4xl mx-auto px-4 md:px-6 py-6 md:py-8 space-y-8">
+        {/* Browse affairs & votings */}
+        <BrowseSection onSelectItem={generateStory} generatingId={generatingId} />
+
+        {/* Quick search (API-wide) */}
         <Card>
           <CardHeader>
-            <CardTitle className="font-serif text-xl">Story erstellen</CardTitle>
+            <CardTitle className="font-serif text-xl">API-Suche</CardTitle>
             <CardDescription>
-              Suche nach Geschäften oder Abstimmungen, um eine Story zu generieren
+              Suche über alle Zeiträume nach Geschäften oder Abstimmungen
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">

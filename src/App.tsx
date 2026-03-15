@@ -15,7 +15,6 @@ import NotFound from "./pages/NotFound";
 import PersonProfile from "./pages/PersonProfile";
 import EmbedDetailPage from "./pages/EmbedDetailPage";
 import AdminPage from "./pages/AdminPage";
-import MobileSearch from "./pages/MobileSearch";
 
 const queryClient = new QueryClient();
 
@@ -36,7 +35,6 @@ const App = () => (
           <Route path="/embed/:id" element={<EmbedDetailPage />} />
           <Route path="/person/:id" element={<PersonProfile />} />
           <Route path="/admin" element={<AdminPage />} />
-          <Route path="/mobile" element={<MobileSearch />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
