@@ -382,7 +382,7 @@ const DetailPage = () => {
         {/* AI Summary */}
         {affair && (
           <Card className="opacity-0 animate-fade-in" style={{ animationDelay: "50ms" }}>
-            <CardContent className="p-6 space-y-3">
+            <CardContent className="p-4 md:p-6 space-y-3">
               {!summary && !summaryLoading && (
                 <div className="space-y-2">
                   <Button
