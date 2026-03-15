@@ -12,7 +12,7 @@ serve(async (req) => {
   }
 
   try {
-    const { title, type, status, votingResults, date, beginDate, endDate, summary } = await req.json();
+    const { title, type, status, votingResults, date, beginDate, endDate, summary, parliament } = await req.json();
 
     if (!title) {
       return new Response(JSON.stringify({ error: "title is required" }), {
@@ -28,6 +28,7 @@ serve(async (req) => {
 
     // Build context
     const parts: string[] = [`Titel: ${title}`];
+    if (parliament) parts.push(`Parlament: ${parliament}`);
     if (type) parts.push(`Geschäftstyp: ${type}`);
     if (status) parts.push(`Status: ${status}`);
     if (beginDate) parts.push(`Eingereicht: ${beginDate}`);
