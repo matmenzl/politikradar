@@ -193,6 +193,8 @@ const DetailPage = () => {
       }
       if (affair.begin_date) body.beginDate = affair.begin_date;
       if (affair.end_date) body.endDate = affair.end_date;
+      const parliamentName = await resolveParliamentName();
+      if (parliamentName) body.parliament = parliamentName;
       if (voting) {
         body.votingResults = {
           yes: voting.results_yes,
