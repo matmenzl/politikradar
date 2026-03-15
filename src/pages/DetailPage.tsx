@@ -246,6 +246,7 @@ const DetailPage = () => {
       </header>
 
       <EmbedCodeModal open={embedModalOpen} onOpenChange={setEmbedModalOpen} embedUrl={embedUrl} />
+      <StoryPreviewModal open={storyModalOpen} onOpenChange={setStoryModalOpen} slides={storySlides} loading={storyLoading} />
 
       <main className="max-w-3xl mx-auto px-6 py-10 space-y-8">
         {/* Title section */}
