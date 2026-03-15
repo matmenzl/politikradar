@@ -16,6 +16,7 @@ import {
 "@/lib/api/openparldata";
 import VoteBar from "@/components/VoteBar";
 import StoriesCarousel from "@/components/StoriesCarousel";
+import logoImg from "@/assets/politikradar_logo.png";
 
 interface DigestData {
   year: number;
@@ -93,7 +94,10 @@ const WeeklyDigest = () => {
     <div className="min-h-screen bg-background">
       <header className="sticky top-0 z-10 bg-background/80 backdrop-blur-md border-b border-border/50 px-6 py-4">
         <div className="max-w-4xl mx-auto flex items-center justify-between">
-          <span className="font-serif text-lg font-semibold text-foreground">PolitikRadar</span>
+          <div className="flex items-center gap-2">
+            <img src={logoImg} alt="PolitikRadar Logo" className="h-8 w-8 object-contain" />
+            <span className="font-serif text-lg font-semibold text-foreground">PolitikRadar</span>
+          </div>
           <Badge variant="secondary" className="text-xs">Alle Parlamente</Badge>
         </div>
       </header>
