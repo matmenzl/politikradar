@@ -228,7 +228,7 @@ const WeeklyOverview = () => {
                     <Activity className="w-4 h-4" />
                     <span className="text-xs font-medium uppercase tracking-wider">Wochenüberblick in Zahlen</span>
                   </div>
-                  <CardTitle className="font-serif text-xl leading-snug">Gesamtaktivität</CardTitle>
+                  <CardTitle className="font-serif text-lg md:text-xl leading-snug">Gesamtaktivität</CardTitle>
                   <CardDescription className="text-sm leading-relaxed">
                     {data.totalAffairs > 0 || data.totalVotings > 0
                       ? `${data.totalAffairs} Geschäfte, ${data.totalVotings} Abstimmungen und ${data.totalMeetings} Sitzungen in dieser Woche.`
