@@ -134,7 +134,7 @@ const StoryPage = () => {
                 onClick={downloadAll}
               >
                 <Download className="w-3.5 h-3.5" />
-                Alle {slides.length} Slides speichern
+                Alle {slides.length} Slides als ZIP speichern
               </Button>
             )}
 
