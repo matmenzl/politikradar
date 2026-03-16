@@ -1,14 +1,13 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { ArrowLeft, Loader2, FileText } from "lucide-react";
+import { ArrowLeft, Loader2, FileText, Download } from "lucide-react";
 import StorySlideCard from "@/components/story/StorySlideCard";
 import { Button } from "@/components/ui/button";
-import { Download } from "lucide-react";
 import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext, type CarouselApi } from "@/components/ui/carousel";
 import { useRef, useCallback } from "react";
-import html2canvas from "html2canvas";
 import type { StorySlide } from "@/components/StoryPreviewModal";
+import { downloadSingleSlide, downloadAllSlidesAsZip } from "@/lib/exportSlides";
 
 const StoryPage = () => {
   const { id } = useParams<{ id: string }>();
