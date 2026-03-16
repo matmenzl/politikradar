@@ -4,9 +4,9 @@ import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext
 import { Download, Loader2, ArrowLeft, FileText } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useRef, useCallback, useState, useEffect } from "react";
-import html2canvas from "html2canvas";
 import StorySlideCard from "./story/StorySlideCard";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { downloadSingleSlide, downloadAllSlidesAsZip } from "@/lib/exportSlides";
 
 export interface PartyVoteData {
   party: string;
