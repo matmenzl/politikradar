@@ -10,47 +10,29 @@ const EXPORT_HEIGHT = 1920;
  * captures the full Instagram-story resolution without artifacts.
  */
 async function renderSlideToBlob(el: HTMLElement): Promise<Blob> {
-  // Get the element's current rendered size
   const rect = el.getBoundingClientRect();
   const origW = rect.width;
   const origH = rect.height;
 
-  // Calculate scale factor to fill 1080×1920
-  const scaleX = EXPORT_WIDTH / origW;
-  const scaleY = EXPORT_HEIGHT / origH;
-  const scale = Math.min(scaleX, scaleY);
+  // Use html2canvas scale to produce a 1080×1920 canvas from the small element
+  const canvasScale = EXPORT_WIDTH / origW;
 
-  // Clone element at its original size, then CSS-scale it up
-  const clone = el.cloneNode(true) as HTMLElement;
-  clone.style.width = `${origW}px`;
-  clone.style.height = `${origH}px`;
-  clone.style.borderRadius = "0";
-  clone.style.position = "fixed";
-  clone.style.left = "-9999px";
-  clone.style.top = "0";
-  clone.style.zIndex = "-1";
-  clone.style.transform = `scale(${scale})`;
-  clone.style.transformOrigin = "top left";
-  document.body.appendChild(clone);
+  const canvas = await html2canvas(el, {
+    scale: canvasScale,
+    backgroundColor: null,
+    width: origW,
+    height: origH,
+    useCORS: true,
+    // Ignore interactive buttons that shouldn't be in the export
+    ignoreElements: (element) => element.tagName === "BUTTON",
+  });
 
-  try {
-    const canvas = await html2canvas(clone, {
-      scale: 1,
-      backgroundColor: null,
-      width: EXPORT_WIDTH,
-      height: EXPORT_HEIGHT,
-      useCORS: true,
-    });
-
-    return new Promise<Blob>((resolve, reject) => {
-      canvas.toBlob((blob) => {
-        if (blob) resolve(blob);
-        else reject(new Error("Canvas toBlob failed"));
-      }, "image/png");
-    });
-  } finally {
-    document.body.removeChild(clone);
-  }
+  return new Promise<Blob>((resolve, reject) => {
+    canvas.toBlob((blob) => {
+      if (blob) resolve(blob);
+      else reject(new Error("Canvas toBlob failed"));
+    }, "image/png");
+  });
 }
 
 export async function downloadSingleSlide(el: HTMLElement, index: number) {
