@@ -10,15 +10,27 @@ const EXPORT_HEIGHT = 1920;
  * captures the full Instagram-story resolution without artifacts.
  */
 async function renderSlideToBlob(el: HTMLElement): Promise<Blob> {
-  // Clone element and set it to exact export dimensions
+  // Get the element's current rendered size
+  const rect = el.getBoundingClientRect();
+  const origW = rect.width;
+  const origH = rect.height;
+
+  // Calculate scale factor to fill 1080×1920
+  const scaleX = EXPORT_WIDTH / origW;
+  const scaleY = EXPORT_HEIGHT / origH;
+  const scale = Math.min(scaleX, scaleY);
+
+  // Clone element at its original size, then CSS-scale it up
   const clone = el.cloneNode(true) as HTMLElement;
-  clone.style.width = `${EXPORT_WIDTH}px`;
-  clone.style.height = `${EXPORT_HEIGHT}px`;
+  clone.style.width = `${origW}px`;
+  clone.style.height = `${origH}px`;
   clone.style.borderRadius = "0";
   clone.style.position = "fixed";
   clone.style.left = "-9999px";
   clone.style.top = "0";
   clone.style.zIndex = "-1";
+  clone.style.transform = `scale(${scale})`;
+  clone.style.transformOrigin = "top left";
   document.body.appendChild(clone);
 
   try {
