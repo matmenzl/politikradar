@@ -4,9 +4,9 @@ import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext
 import { Download, Loader2, ArrowLeft, FileText } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useRef, useCallback, useState, useEffect } from "react";
-import html2canvas from "html2canvas";
 import StorySlideCard from "./story/StorySlideCard";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { downloadSingleSlide, downloadAllSlidesAsZip } from "@/lib/exportSlides";
 
 export interface PartyVoteData {
   party: string;
@@ -52,31 +52,12 @@ function StoryContent({
   const downloadSlide = useCallback(async (index: number) => {
     const el = slideRefs.current[index];
     if (!el) return;
-    try {
-      const canvas = await html2canvas(el, {
-        scale: 2,
-        backgroundColor: null,
-        width: 1080 / 2,
-        height: 1920 / 2,
-      });
-      const link = document.createElement("a");
-      link.download = `story-slide-${index + 1}.png`;
-      link.href = canvas.toDataURL("image/png");
-      link.click();
-    } catch (e) {
-      console.error("Export error:", e);
-    }
+    await downloadSingleSlide(el, index);
   }, []);
 
   const downloadAll = useCallback(async () => {
-    for (let i = 0; i < slides.length; i++) {
-      await downloadSlide(i);
-      // Browser blocks rapid sequential downloads; add delay between each
-      if (i < slides.length - 1) {
-        await new Promise((r) => setTimeout(r, 800));
-      }
-    }
-  }, [slides.length, downloadSlide]);
+    await downloadAllSlidesAsZip(slideRefs.current.filter(Boolean) as HTMLElement[]);
+  }, []);
 
   if (loading) {
     return (
@@ -149,7 +130,7 @@ function StoryContent({
           onClick={downloadAll}
         >
           <Download className="w-3.5 h-3.5" />
-          Alle {slides.length} Slides speichern
+          Alle {slides.length} Slides als ZIP speichern
         </Button>
       )}
 

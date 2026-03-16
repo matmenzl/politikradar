@@ -1,14 +1,13 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { ArrowLeft, Loader2, FileText } from "lucide-react";
+import { ArrowLeft, Loader2, FileText, Download } from "lucide-react";
 import StorySlideCard from "@/components/story/StorySlideCard";
 import { Button } from "@/components/ui/button";
-import { Download } from "lucide-react";
 import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext, type CarouselApi } from "@/components/ui/carousel";
 import { useRef, useCallback } from "react";
-import html2canvas from "html2canvas";
 import type { StorySlide } from "@/components/StoryPreviewModal";
+import { downloadSingleSlide, downloadAllSlidesAsZip } from "@/lib/exportSlides";
 
 const StoryPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -50,30 +49,12 @@ const StoryPage = () => {
   const downloadSlide = useCallback(async (index: number) => {
     const el = slideRefs.current[index];
     if (!el) return;
-    try {
-      const canvas = await html2canvas(el, {
-        scale: 2,
-        backgroundColor: null,
-        width: 1080 / 2,
-        height: 1920 / 2,
-      });
-      const link = document.createElement("a");
-      link.download = `story-slide-${index + 1}.png`;
-      link.href = canvas.toDataURL("image/png");
-      link.click();
-    } catch (e) {
-      console.error("Export error:", e);
-    }
+    await downloadSingleSlide(el, index);
   }, []);
 
   const downloadAll = useCallback(async () => {
-    for (let i = 0; i < slides.length; i++) {
-      await downloadSlide(i);
-      if (i < slides.length - 1) {
-        await new Promise((r) => setTimeout(r, 800));
-      }
-    }
-  }, [slides.length, downloadSlide]);
+    await downloadAllSlidesAsZip(slideRefs.current.filter(Boolean) as HTMLElement[]);
+  }, []);
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -153,7 +134,7 @@ const StoryPage = () => {
                 onClick={downloadAll}
               >
                 <Download className="w-3.5 h-3.5" />
-                Alle {slides.length} Slides speichern
+                Alle {slides.length} Slides als ZIP speichern
               </Button>
             )}
 
