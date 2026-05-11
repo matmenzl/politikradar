@@ -564,7 +564,13 @@ function AdminDashboard() {
 
   useEffect(() => {
     const { year, week } = getCurrentISOWeek();
-    const { from, to } = getWeekDateRange(year, week);
+    const current = getWeekDateRange(year, week);
+    // Extend window: include previous week so Monday/early-week views still have data
+    const prevWeekNum = week > 1 ? week - 1 : 52;
+    const prevYear = week > 1 ? year : year - 1;
+    const prev = getWeekDateRange(prevYear, prevWeekNum);
+    const from = prev.from;
+    const to = current.to;
     (async () => {
       try {
         const bodies = await fetchBodies();
