@@ -377,9 +377,6 @@ function AISuggestionsSection({
   const [hasLoaded, setHasLoaded] = useState(false);
 
   const generateSuggestions = async () => {
-    setLoading(true);
-    setSuggestions([]);
-
     // Combine affairs + votings into a flat list for AI analysis
     const combined: SuggestableItem[] = [];
     for (const v of votings) {
@@ -405,6 +402,14 @@ function AISuggestionsSection({
         status: a.status_de,
       });
     }
+
+    if (combined.length === 0) {
+      toast.error("Keine Geschäfte oder Abstimmungen in dieser Woche geladen. Bitte warte, bis die Daten geladen sind, oder wechsle die Woche.");
+      return;
+    }
+
+    setLoading(true);
+    setSuggestions([]);
 
     // Limit to max 50 items to keep prompt manageable
     const subset = combined.slice(0, 50);
