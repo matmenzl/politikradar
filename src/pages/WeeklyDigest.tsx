@@ -53,10 +53,9 @@ interface DigestData {
 }
 
 const WeeklyDigest = () => {
-  const initial = getCurrentISOWeek();
-  const [year, setYear] = useState(initial.year);
-  const [week, setWeek] = useState(initial.week);
+  const { year, week, goToPreviousWeek, goToNextWeek, withWeek } = useWeekParam();
   const [data, setData] = useState<DigestData | null>(null);
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
