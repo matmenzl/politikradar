@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Sparkles, ExternalLink } from "lucide-react";
 import StoryPreviewModal, { type StorySlide } from "@/components/StoryPreviewModal";
 import StorySlideCard from "@/components/story/StorySlideCard";
-import { fetchBodies, getBodyLabel, fetchAffairById } from "@/lib/api/openparldata";
+import { fetchBodies, getBodyLabel, fetchAffairById, getWeekInstantRange } from "@/lib/api/openparldata";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 interface StoryPost {
@@ -87,7 +87,7 @@ const StoriesCarousel = ({ year, week }: StoriesCarouselProps) => {
       }
       setBodyNames(map);
     });
-  }, [from, to]);
+  }, [rangeStart, rangeEnd]);
 
   if (stories.length === 0) {
     return (
