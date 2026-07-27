@@ -10,13 +10,15 @@ import ShareModal from "@/components/ShareModal";
 import VoteBar from "@/components/VoteBar";
 import PartyOverviewCard from "@/components/PartyOverviewCard";
 import { supabase } from "@/integrations/supabase/client";
+import { useWeekParam } from "@/hooks/use-week";
+
 import {
   fetchWeeklyData,
   fetchBodies,
   getBodyLabel,
-  getCurrentISOWeek,
   getWeekDateRange,
   formatDateRange,
+
   type WeeklyStats,
   type Body,
   isVotingAccepted,
@@ -25,9 +27,7 @@ import {
 const WeeklyOverview = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [shareOpen, setShareOpen] = useState(false);
-  const initial = getCurrentISOWeek();
-  const [year, setYear] = useState(initial.year);
-  const [week, setWeek] = useState(initial.week);
+  const { year, week, goToPreviousWeek, goToNextWeek, withWeek } = useWeekParam();
   const urlBody = searchParams.get("body");
   const [bodyKey, setBodyKeyState] = useState(urlBody && urlBody !== "undefined" ? urlBody : "CHE");
   const [hasUserSelected, setHasUserSelected] = useState(!!urlBody && urlBody !== "undefined");
@@ -37,8 +37,16 @@ const WeeklyOverview = () => {
     if (!key) return;
     setBodyKeyState(key);
     setHasUserSelected(true);
-    setSearchParams({ body: key }, { replace: true });
+    setSearchParams(
+      (prev) => {
+        const next = new URLSearchParams(prev);
+        next.set("body", key);
+        return next;
+      },
+      { replace: true }
+    );
   };
+
   const [data, setData] = useState<WeeklyStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -112,23 +120,8 @@ const WeeklyOverview = () => {
     return data.recentAffairs.filter((a) => tagMap[a.id]?.includes(selectedTag));
   }, [data, selectedTag, tagMap]);
 
-  const goToPreviousWeek = () => {
-    if (week <= 1) {
-      setYear(year - 1);
-      setWeek(52);
-    } else {
-      setWeek(week - 1);
-    }
-  };
 
-  const goToNextWeek = () => {
-    if (week >= 52) {
-      setYear(year + 1);
-      setWeek(1);
-    } else {
-      setWeek(week + 1);
-    }
-  };
+
 
   const { from, to } = getWeekDateRange(year, week);
   const dateRangeLabel = formatDateRange(from, to);
@@ -140,7 +133,7 @@ const WeeklyOverview = () => {
       {/* Header */}
       <header className="sticky top-0 z-10 bg-background/80 backdrop-blur-md border-b border-border/50 px-3 sm:px-4 md:px-6 py-3 md:py-4">
         <div className="max-w-4xl mx-auto flex items-center justify-between gap-2">
-          <Link to="/" className="flex items-center gap-1.5 sm:gap-2 text-muted-foreground hover:text-foreground transition-colors min-w-0">
+          <Link to={withWeek("/")} className="flex items-center gap-1.5 sm:gap-2 text-muted-foreground hover:text-foreground transition-colors min-w-0">
             <ArrowLeft className="w-4 h-4 flex-shrink-0" />
             <span className="font-serif text-base sm:text-lg font-semibold text-foreground truncate">PolitikRadar</span>
           </Link>
@@ -239,9 +232,10 @@ const WeeklyOverview = () => {
                 <CardContent className="p-3 sm:p-4 md:p-6 pt-0">
                   <div className="grid grid-cols-3 gap-1.5 sm:gap-2 md:gap-3">
                     {[
-                      { label: "Geschäfte", value: data.totalAffairs, href: `/list/affairs?body=${encodeURIComponent(bodyKey)}` },
-                      { label: "Abstimmungen", value: data.totalVotings, href: `/list/votings?body=${encodeURIComponent(bodyKey)}` },
-                      { label: "Sitzungen", value: data.totalMeetings, href: `/list/meetings?body=${encodeURIComponent(bodyKey)}` },
+                      { label: "Geschäfte", value: data.totalAffairs, href: withWeek(`/list/affairs?body=${encodeURIComponent(bodyKey)}`) },
+                      { label: "Abstimmungen", value: data.totalVotings, href: withWeek(`/list/votings?body=${encodeURIComponent(bodyKey)}`) },
+                      { label: "Sitzungen", value: data.totalMeetings, href: withWeek(`/list/meetings?body=${encodeURIComponent(bodyKey)}`) },
+
                     ].map((stat) => (
                       <Link key={stat.label} to={stat.href} className="bg-secondary/50 rounded-lg p-2 md:p-3 hover:bg-secondary/80 transition-colors">
                         <p className="text-lg sm:text-xl md:text-2xl font-semibold text-foreground">{stat.value}</p>

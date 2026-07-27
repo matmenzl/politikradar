@@ -1,4 +1,5 @@
 import { Link, useParams, useSearchParams } from "react-router-dom";
+import { useWeekParam } from "@/hooks/use-week";
 import { ArrowLeft, Loader2, ExternalLink, Calendar, FileText, Vote, Tag, Sparkles, Code2, Instagram } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -61,7 +62,8 @@ const DetailPage = () => {
   const [searchParams] = useSearchParams();
   const type = searchParams.get("type") || "voting";
   const bodyParam = searchParams.get("body") || "";
-  const backUrl = bodyParam ? `/weekly?body=${encodeURIComponent(bodyParam)}` : "/weekly";
+  const { withWeek } = useWeekParam();
+  const backUrl = withWeek(bodyParam ? `/weekly?body=${encodeURIComponent(bodyParam)}` : "/weekly");
 
   const [voting, setVoting] = useState<Voting | null>(null);
   const [affair, setAffair] = useState<AffairDetail | null>(null);

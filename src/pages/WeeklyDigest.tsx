@@ -13,10 +13,11 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
 import {
-  getCurrentISOWeek,
   getWeekDateRange,
   formatDateRange } from
 "@/lib/api/openparldata";
+import { useWeekParam } from "@/hooks/use-week";
+
 import VoteBar from "@/components/VoteBar";
 import StoriesCarousel from "@/components/StoriesCarousel";
 import logoImg from "@/assets/politikradar_logo.png";
@@ -53,10 +54,9 @@ interface DigestData {
 }
 
 const WeeklyDigest = () => {
-  const initial = getCurrentISOWeek();
-  const [year, setYear] = useState(initial.year);
-  const [week, setWeek] = useState(initial.week);
+  const { year, week, goToPreviousWeek, goToNextWeek, withWeek } = useWeekParam();
   const [data, setData] = useState<DigestData | null>(null);
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -94,14 +94,8 @@ const WeeklyDigest = () => {
     finally(() => setLoading(false));
   }, [year, week]);
 
-  const goToPreviousWeek = () => {
-    if (week <= 1) {setYear(year - 1);setWeek(52);} else
-    setWeek(week - 1);
-  };
-  const goToNextWeek = () => {
-    if (week >= 52) {setYear(year + 1);setWeek(1);} else
-    setWeek(week + 1);
-  };
+
+
 
   const { from, to } = getWeekDateRange(year, week);
   const dateRangeLabel = formatDateRange(from, to);
@@ -191,7 +185,7 @@ const WeeklyDigest = () => {
             { icon: BarChart3, label: "Geschäfte", value: data.stats.totalAffairs, href: "/list/affairs" },
             { icon: Activity, label: "Sitzungen", value: data.stats.totalMeetings, href: "/list/meetings" }].
             map((stat) =>
-            <Link key={stat.label} to={stat.href}>
+            <Link key={stat.label} to={withWeek(stat.href)}>
                   <Card className="hover:bg-secondary/30 transition-colors cursor-pointer">
                     <CardContent className="p-4 text-center">
                       <stat.icon className="w-5 h-5 mx-auto mb-2 text-muted-foreground" />
@@ -341,7 +335,7 @@ const WeeklyDigest = () => {
                     {data.stats.activeBodies.slice(0, 10).map((body, i) =>
                 <Link
                   key={body.key}
-                  to={`/weekly?body=${encodeURIComponent(body.key)}`}
+                  to={withWeek(`/weekly?body=${encodeURIComponent(body.key)}`)}
                   className="flex items-center justify-between py-2 px-3 -mx-3 rounded-lg hover:bg-secondary/50 transition-colors">
 
                         <div className="flex items-center gap-3">
