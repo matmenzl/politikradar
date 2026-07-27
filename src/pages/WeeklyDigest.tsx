@@ -60,6 +60,20 @@ const WeeklyDigest = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const [searchParams, setSearchParams] = useSearchParams();
+  const tab = searchParams.get("tab") === "admin" ? "admin" : "woche";
+  const [adminLoaded, setAdminLoaded] = useState(tab === "admin");
+
+  const setTab = (value: string) => {
+    if (value === "admin") setAdminLoaded(true);
+    const next = new URLSearchParams(searchParams);
+    if (value === "admin") next.set("tab", "admin");
+    else next.delete("tab");
+    setSearchParams(next, { replace: true });
+  };
+
+
+
   useEffect(() => {
     setLoading(true);
     setError(null);
