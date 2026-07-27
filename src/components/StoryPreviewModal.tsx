@@ -201,7 +201,7 @@ function StoryContent({
   );
 }
 
-const StoryPreviewModal = ({ open, onOpenChange, slides, loading, affairId, votingId }: StoryPreviewModalProps) => {
+const StoryPreviewModal = ({ open, onOpenChange, slides, loading, affairId, votingId, editable, onSlideChange, onSaveSlides, saving }: StoryPreviewModalProps) => {
   const isMobile = useIsMobile();
   const navigate = useNavigate();
   const detailLink = affairId
@@ -231,7 +231,7 @@ const StoryPreviewModal = ({ open, onOpenChange, slides, loading, affairId, voti
               {slides.length} Slides
             </p>
           )}
-          <StoryContent slides={slides} loading={loading} />
+          <StoryContent slides={slides} loading={loading} editable={editable} onSlideChange={onSlideChange} onSaveSlides={onSaveSlides} saving={saving} />
         </div>
       </div>
     );
@@ -249,7 +249,7 @@ const StoryPreviewModal = ({ open, onOpenChange, slides, loading, affairId, voti
             </p>
           )}
         </DialogHeader>
-        <StoryContent slides={slides} loading={loading} />
+        <StoryContent slides={slides} loading={loading} editable={editable} onSlideChange={onSlideChange} onSaveSlides={onSaveSlides} saving={saving} />
         {detailLink && (
           <div className="px-6 pb-4">
             <Button
