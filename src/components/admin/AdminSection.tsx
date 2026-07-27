@@ -696,6 +696,8 @@ function AdminDashboard() {
   const [searching, setSearching] = useState(false);
   const [generatingId, setGeneratingId] = useState<string | null>(null);
   const [previewStory, setPreviewStory] = useState<StoryPost | null>(null);
+  const [savingSlides, setSavingSlides] = useState(false);
+
 
   const [affairs, setAffairs] = useState<AffairWithBody[]>([]);
   const [votings, setVotings] = useState<VotingWithBody[]>([]);
@@ -890,8 +892,48 @@ function AdminDashboard() {
       return;
     }
     toast.success(newStatus === "published" ? "Veröffentlicht" : "Zurückgezogen");
+
+    if (newStatus === "published") {
+      // Persist the AI images permanently so they stay stable after publishing
+      toast.info("Bilder werden dauerhaft gespeichert…");
+      const { error: persistError } = await supabase.functions.invoke("persist-story-images", {
+        body: { story_id: story.id },
+      });
+      if (persistError) {
+        console.error("persist-story-images failed:", persistError);
+        toast.error("Bilder konnten nicht dauerhaft gespeichert werden");
+      } else {
+        toast.success("Bilder gespeichert");
+      }
+    }
+
     loadStories();
   };
+
+  const updatePreviewSlide = (index: number, patch: Partial<StorySlide>) => {
+    setPreviewStory((prev) => {
+      if (!prev) return prev;
+      const slides = prev.slides.map((s, i) => (i === index ? { ...s, ...patch } : s));
+      return { ...prev, slides };
+    });
+  };
+
+  const savePreviewSlides = async () => {
+    if (!previewStory) return;
+    setSavingSlides(true);
+    const { error } = await supabase
+      .from("story_posts")
+      .update({ slides: previewStory.slides as unknown as never })
+      .eq("id", previewStory.id);
+    setSavingSlides(false);
+    if (error) {
+      toast.error("Speichern fehlgeschlagen");
+      return;
+    }
+    toast.success("Bilder übernommen");
+    loadStories();
+  };
+
 
   const deleteStory = async (id: string) => {
     const { error } = await supabase.from("story_posts").delete().eq("id", id);
@@ -1070,6 +1112,12 @@ function AdminDashboard() {
           open={!!previewStory}
           onOpenChange={(open) => !open && setPreviewStory(null)}
           slides={previewStory.slides}
+          affairId={previewStory.affair_id}
+          votingId={previewStory.voting_id}
+          editable
+          onSlideChange={updatePreviewSlide}
+          onSaveSlides={savePreviewSlides}
+          saving={savingSlides}
         />
       )}
     </div>

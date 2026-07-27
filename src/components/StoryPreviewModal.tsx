@@ -1,12 +1,15 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
 import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext, type CarouselApi } from "@/components/ui/carousel";
-import { Download, Loader2, ArrowLeft, FileText } from "lucide-react";
+import { Download, Loader2, ArrowLeft, FileText, RefreshCw, Save } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useRef, useCallback, useState, useEffect } from "react";
 import StorySlideCard from "./story/StorySlideCard";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { downloadSingleSlide, downloadAllSlidesAsZip } from "@/lib/exportSlides";
+import { fallbackImagePrompt, randomSeed } from "@/lib/pollinations";
+
 
 export interface PartyVoteData {
   party: string;
@@ -21,7 +24,14 @@ export interface StorySlide {
   emoji: string;
   slide_type: "hook" | "context" | "result" | "insight" | "cta" | "party";
   partyData?: PartyVoteData[];
+  /** English prompt for the Pollinations.ai background image */
+  image_prompt?: string;
+  /** Seed so the same image is reproduced on every render */
+  image_seed?: number;
+  /** Permanent storage URL, set when the story gets published */
+  image_url?: string;
 }
+
 
 interface StoryPreviewModalProps {
   open: boolean;
@@ -30,15 +40,29 @@ interface StoryPreviewModalProps {
   loading?: boolean;
   affairId?: string | null;
   votingId?: string | null;
+  /** Enables the per-slide image prompt editor (admin only) */
+  editable?: boolean;
+  onSlideChange?: (index: number, patch: Partial<StorySlide>) => void;
+  onSaveSlides?: () => void | Promise<void>;
+  saving?: boolean;
 }
 
 function StoryContent({
   slides,
   loading,
+  editable,
+  onSlideChange,
+  onSaveSlides,
+  saving,
 }: {
   slides: StorySlide[];
   loading?: boolean;
+  editable?: boolean;
+  onSlideChange?: (index: number, patch: Partial<StorySlide>) => void;
+  onSaveSlides?: () => void | Promise<void>;
+  saving?: boolean;
 }) {
+
   const slideRefs = useRef<(HTMLDivElement | null)[]>([]);
   const [api, setApi] = useState<CarouselApi>();
   const [current, setCurrent] = useState(0);
@@ -99,7 +123,30 @@ function StoryContent({
                   <Download className="w-3.5 h-3.5" />
                   Slide {i + 1} speichern
                 </Button>
+                {editable && onSlideChange && (
+                  <div className="space-y-1.5 rounded-lg border border-border/50 p-2">
+                    <label className="text-[10px] uppercase tracking-wide text-muted-foreground">
+                      Bild-Prompt
+                    </label>
+                    <Textarea
+                      value={slide.image_prompt ?? ""}
+                      placeholder={fallbackImagePrompt(slide.headline, slide.slide_type)}
+                      onChange={(e) => onSlideChange(i, { image_prompt: e.target.value })}
+                      className="text-xs min-h-[68px]"
+                    />
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      className="w-full gap-1.5 text-xs"
+                      onClick={() => onSlideChange(i, { image_seed: randomSeed(), image_url: undefined })}
+                    >
+                      <RefreshCw className="w-3.5 h-3.5" />
+                      Neues Bild generieren
+                    </Button>
+                  </div>
+                )}
               </div>
+
             </CarouselItem>
           ))}
         </CarouselContent>
@@ -134,14 +181,27 @@ function StoryContent({
         </Button>
       )}
 
+      {editable && onSaveSlides && (
+        <Button
+          size="sm"
+          className="w-full mt-3 gap-1.5 text-xs"
+          disabled={saving}
+          onClick={() => onSaveSlides()}
+        >
+          {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
+          Bilder übernehmen
+        </Button>
+      )}
+
       <p className="text-[10px] text-muted-foreground text-center mt-3 opacity-70">
         Erstellt mit KI · Inhalte prüfen vor Veröffentlichung
       </p>
+
     </div>
   );
 }
 
-const StoryPreviewModal = ({ open, onOpenChange, slides, loading, affairId, votingId }: StoryPreviewModalProps) => {
+const StoryPreviewModal = ({ open, onOpenChange, slides, loading, affairId, votingId, editable, onSlideChange, onSaveSlides, saving }: StoryPreviewModalProps) => {
   const isMobile = useIsMobile();
   const navigate = useNavigate();
   const detailLink = affairId
@@ -171,7 +231,7 @@ const StoryPreviewModal = ({ open, onOpenChange, slides, loading, affairId, voti
               {slides.length} Slides
             </p>
           )}
-          <StoryContent slides={slides} loading={loading} />
+          <StoryContent slides={slides} loading={loading} editable={editable} onSlideChange={onSlideChange} onSaveSlides={onSaveSlides} saving={saving} />
         </div>
       </div>
     );
@@ -189,7 +249,7 @@ const StoryPreviewModal = ({ open, onOpenChange, slides, loading, affairId, voti
             </p>
           )}
         </DialogHeader>
-        <StoryContent slides={slides} loading={loading} />
+        <StoryContent slides={slides} loading={loading} editable={editable} onSlideChange={onSlideChange} onSaveSlides={onSaveSlides} saving={saving} />
         {detailLink && (
           <div className="px-6 pb-4">
             <Button
