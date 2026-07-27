@@ -123,10 +123,25 @@ const WeeklyDigest = () => {
           <p className="text-lg text-foreground/80">{dateRangeLabel}</p>
         </div>
 
+        <Tabs value={tab} onValueChange={setTab} className="w-full">
+          <TabsList className="w-full grid grid-cols-2 h-11">
+            <TabsTrigger value="woche" className="gap-2">
+              <Newspaper className="w-4 h-4" />
+              Politikwoche
+            </TabsTrigger>
+            <TabsTrigger value="admin" className="gap-2">
+              <Shield className="w-4 h-4" />
+              Admin
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="woche" className="mt-8 space-y-8 md:space-y-12 focus-visible:outline-none">
         {/* Stories – central hero element */}
         <div className="opacity-0 animate-fade-in" style={{ animationDelay: "50ms" }}>
           <StoriesCarousel />
         </div>
+
+
 
         {loading &&
         <div className="space-y-6">
