@@ -155,7 +155,7 @@ const WeeklyDigest = () => {
           <TabsContent value="woche" className="mt-8 space-y-8 md:space-y-12 focus-visible:outline-none">
         {/* Stories – central hero element */}
         <div className="opacity-0 animate-fade-in" style={{ animationDelay: "50ms" }}>
-          <StoriesCarousel from={from} to={to} />
+          <StoriesCarousel year={year} week={week} />
         </div>
 
 

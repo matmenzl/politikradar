@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Sparkles, ExternalLink } from "lucide-react";
 import StoryPreviewModal, { type StorySlide } from "@/components/StoryPreviewModal";
 import StorySlideCard from "@/components/story/StorySlideCard";
-import { fetchBodies, getBodyLabel, fetchAffairById } from "@/lib/api/openparldata";
+import { fetchBodies, getBodyLabel, fetchAffairById, getWeekInstantRange } from "@/lib/api/openparldata";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 interface StoryPost {
@@ -18,13 +18,13 @@ interface StoryPost {
 }
 
 interface StoriesCarouselProps {
-  /** ISO date (YYYY-MM-DD) of the week start – stories are filtered to this week */
-  from?: string;
-  /** ISO date (YYYY-MM-DD) of the week end */
-  to?: string;
+  /** ISO year of the displayed calendar week */
+  year?: number;
+  /** ISO week number of the displayed calendar week */
+  week?: number;
 }
 
-const StoriesCarousel = ({ from, to }: StoriesCarouselProps) => {
+const StoriesCarousel = ({ year, week }: StoriesCarouselProps) => {
   const [stories, setStories] = useState<StoryPost[]>([]);
   const [selectedStory, setSelectedStory] = useState<StoryPost | null>(null);
   const [bodyNames, setBodyNames] = useState<Record<string, string>>({});
@@ -32,14 +32,19 @@ const StoriesCarousel = ({ from, to }: StoriesCarouselProps) => {
   const isMobile = useIsMobile();
   const navigate = useNavigate();
 
+  const range = year && week ? getWeekInstantRange(year, week) : null;
+  const rangeStart = range?.start;
+  const rangeEnd = range?.end;
+
   useEffect(() => {
     let query = supabase
       .from("story_posts")
       .select("id, title, body_key, affair_id, voting_id, slides, published_at")
       .eq("status", "published");
 
-    if (from) query = query.gte("published_at", `${from}T00:00:00.000Z`);
-    if (to) query = query.lte("published_at", `${to}T23:59:59.999Z`);
+    if (rangeStart) query = query.gte("published_at", rangeStart);
+    if (rangeEnd) query = query.lte("published_at", rangeEnd);
+
 
     query
       .order("published_at", { ascending: false })
@@ -82,7 +87,7 @@ const StoriesCarousel = ({ from, to }: StoriesCarouselProps) => {
       }
       setBodyNames(map);
     });
-  }, [from, to]);
+  }, [rangeStart, rangeEnd]);
 
   if (stories.length === 0) {
     return (

@@ -189,9 +189,26 @@ export function getWeekDateRange(year: number, week: number): { from: string; to
   const friday = new Date(monday);
   friday.setDate(monday.getDate() + 4);
 
-  const format = (d: Date) => d.toISOString().split("T")[0];
+  // Format from local date parts – toISOString() would shift the day
+  // backwards in timezones ahead of UTC (e.g. Europe/Zurich).
+  const format = (d: Date) =>
+    `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
   return { from: format(monday), to: format(friday) };
 }
+
+/**
+ * Full calendar week (Monday 00:00 – Sunday 23:59:59.999 local time)
+ * as UTC instants, for querying timestamptz columns.
+ */
+export function getWeekInstantRange(year: number, week: number): { start: string; end: string } {
+  const { from } = getWeekDateRange(year, week);
+  const [y, m, d] = from.split("-").map(Number);
+  const start = new Date(y, m - 1, d, 0, 0, 0, 0);
+  const end = new Date(y, m - 1, d + 7, 0, 0, 0, 0);
+  end.setMilliseconds(end.getMilliseconds() - 1);
+  return { start: start.toISOString(), end: end.toISOString() };
+}
+
 
 export function formatDateRange(from: string, to: string): string {
   const fromDate = new Date(from + "T00:00:00");
