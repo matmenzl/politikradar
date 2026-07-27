@@ -1,14 +1,17 @@
-import { Link } from "react-router-dom";
-import { Loader2, ChevronLeft, ChevronRight, Sparkles, BarChart3, Vote, Building2, Activity, TrendingUp } from "lucide-react";
+import { Link, useSearchParams } from "react-router-dom";
+import { Loader2, ChevronLeft, ChevronRight, Sparkles, BarChart3, Vote, Building2, Activity, TrendingUp, Newspaper, Shield } from "lucide-react";
 import ParliamentBrowser from "@/components/ParliamentBrowser";
+import AdminSection from "@/components/admin/AdminSection";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+
 import {
   getCurrentISOWeek,
   getWeekDateRange,
