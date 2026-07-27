@@ -10,6 +10,8 @@ import ShareModal from "@/components/ShareModal";
 import VoteBar from "@/components/VoteBar";
 import PartyOverviewCard from "@/components/PartyOverviewCard";
 import { supabase } from "@/integrations/supabase/client";
+import { useWeekParam } from "@/hooks/use-week";
+
 import {
   fetchWeeklyData,
   fetchBodies,
