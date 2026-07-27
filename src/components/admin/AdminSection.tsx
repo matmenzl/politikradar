@@ -947,6 +947,17 @@ function AdminDashboard() {
         loadingData={loadingAffairs || loadingVotings}
         onSelectItem={generateStory}
         generatingId={generatingId}
+        dateFrom={dateFrom}
+        dateTo={dateTo}
+        onDateFromChange={setDateFrom}
+        onDateToChange={setDateTo}
+        rangeDirty={dateFrom !== range.from || dateTo !== range.to}
+        onApplyRange={() => setRange({ from: dateFrom, to: dateTo })}
+        onResetRange={() => {
+          setDateFrom(defaultRange.from);
+          setDateTo(defaultRange.to);
+          setRange(defaultRange);
+        }}
       />
 
       {/* Browse affairs & votings */}
