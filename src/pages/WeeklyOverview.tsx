@@ -14,9 +14,9 @@ import {
   fetchWeeklyData,
   fetchBodies,
   getBodyLabel,
-  getCurrentISOWeek,
   getWeekDateRange,
   formatDateRange,
+
   type WeeklyStats,
   type Body,
   isVotingAccepted,
