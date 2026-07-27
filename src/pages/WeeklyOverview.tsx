@@ -232,9 +232,10 @@ const WeeklyOverview = () => {
                 <CardContent className="p-3 sm:p-4 md:p-6 pt-0">
                   <div className="grid grid-cols-3 gap-1.5 sm:gap-2 md:gap-3">
                     {[
-                      { label: "Geschäfte", value: data.totalAffairs, href: `/list/affairs?body=${encodeURIComponent(bodyKey)}` },
-                      { label: "Abstimmungen", value: data.totalVotings, href: `/list/votings?body=${encodeURIComponent(bodyKey)}` },
-                      { label: "Sitzungen", value: data.totalMeetings, href: `/list/meetings?body=${encodeURIComponent(bodyKey)}` },
+                      { label: "Geschäfte", value: data.totalAffairs, href: withWeek(`/list/affairs?body=${encodeURIComponent(bodyKey)}`) },
+                      { label: "Abstimmungen", value: data.totalVotings, href: withWeek(`/list/votings?body=${encodeURIComponent(bodyKey)}`) },
+                      { label: "Sitzungen", value: data.totalMeetings, href: withWeek(`/list/meetings?body=${encodeURIComponent(bodyKey)}`) },
+
                     ].map((stat) => (
                       <Link key={stat.label} to={stat.href} className="bg-secondary/50 rounded-lg p-2 md:p-3 hover:bg-secondary/80 transition-colors">
                         <p className="text-lg sm:text-xl md:text-2xl font-semibold text-foreground">{stat.value}</p>
