@@ -359,7 +359,14 @@ const WeeklyDigest = () => {
         <div className="opacity-0 animate-fade-in" style={{ animationDelay: "600ms" }}>
           <ParliamentBrowser />
         </div>
+          </TabsContent>
+
+          <TabsContent value="admin" className="mt-8 focus-visible:outline-none">
+            {adminLoaded && <AdminSection />}
+          </TabsContent>
+        </Tabs>
       </main>
+
 
       <footer className="px-4 md:px-6 py-5 border-t border-border/50">
         <div className="max-w-4xl mx-auto text-center text-xs text-muted-foreground">
