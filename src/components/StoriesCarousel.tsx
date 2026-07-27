@@ -17,7 +17,14 @@ interface StoryPost {
   published_at: string;
 }
 
-const StoriesCarousel = () => {
+interface StoriesCarouselProps {
+  /** ISO date (YYYY-MM-DD) of the week start – stories are filtered to this week */
+  from?: string;
+  /** ISO date (YYYY-MM-DD) of the week end */
+  to?: string;
+}
+
+const StoriesCarousel = ({ from, to }: StoriesCarouselProps) => {
   const [stories, setStories] = useState<StoryPost[]>([]);
   const [selectedStory, setSelectedStory] = useState<StoryPost | null>(null);
   const [bodyNames, setBodyNames] = useState<Record<string, string>>({});
@@ -26,10 +33,15 @@ const StoriesCarousel = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    supabase
+    let query = supabase
       .from("story_posts")
       .select("id, title, body_key, affair_id, voting_id, slides, published_at")
-      .eq("status", "published")
+      .eq("status", "published");
+
+    if (from) query = query.gte("published_at", `${from}T00:00:00.000Z`);
+    if (to) query = query.lte("published_at", `${to}T23:59:59.999Z`);
+
+    query
       .order("published_at", { ascending: false })
       .limit(10)
       .then(({ data }) => {
@@ -70,7 +82,7 @@ const StoriesCarousel = () => {
       }
       setBodyNames(map);
     });
-  }, []);
+  }, [from, to]);
 
   if (stories.length === 0) {
     return (
