@@ -9,6 +9,7 @@ import StorySlideCard from "./story/StorySlideCard";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { downloadSingleSlide, downloadAllSlidesAsZip } from "@/lib/exportSlides";
 import { fallbackImagePrompt, randomSeed } from "@/lib/pollinations";
+import { toast } from "sonner";
 
 
 export interface PartyVoteData {
@@ -138,7 +139,10 @@ function StoryContent({
                       variant="secondary"
                       size="sm"
                       className="w-full gap-1.5 text-xs"
-                      onClick={() => onSlideChange(i, { image_seed: randomSeed(), image_url: undefined })}
+                      onClick={() => {
+                        onSlideChange(i, { image_seed: randomSeed(), image_url: undefined });
+                        toast.info(`Neues Bild für Slide ${i + 1} wird generiert…`);
+                      }}
                     >
                       <RefreshCw className="w-3.5 h-3.5" />
                       Neues Bild generieren
