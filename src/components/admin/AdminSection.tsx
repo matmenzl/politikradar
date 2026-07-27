@@ -1112,6 +1112,12 @@ function AdminDashboard() {
           open={!!previewStory}
           onOpenChange={(open) => !open && setPreviewStory(null)}
           slides={previewStory.slides}
+          affairId={previewStory.affair_id}
+          votingId={previewStory.voting_id}
+          editable
+          onSlideChange={updatePreviewSlide}
+          onSaveSlides={savePreviewSlides}
+          saving={savingSlides}
         />
       )}
     </div>
