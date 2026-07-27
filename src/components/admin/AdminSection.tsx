@@ -638,15 +638,24 @@ function AdminDashboard() {
   const [loadingAffairs, setLoadingAffairs] = useState(true);
   const [loadingVotings, setLoadingVotings] = useState(true);
 
-  useEffect(() => {
+  const defaultRange = useMemo(() => {
     const { year, week } = getCurrentISOWeek();
     const current = getWeekDateRange(year, week);
     // Extend window: include previous week so Monday/early-week views still have data
     const prevWeekNum = week > 1 ? week - 1 : 52;
     const prevYear = week > 1 ? year : year - 1;
     const prev = getWeekDateRange(prevYear, prevWeekNum);
-    const from = prev.from;
-    const to = current.to;
+    return { from: prev.from, to: current.to };
+  }, []);
+
+  const [dateFrom, setDateFrom] = useState(defaultRange.from);
+  const [dateTo, setDateTo] = useState(defaultRange.to);
+  const [range, setRange] = useState(defaultRange);
+
+  useEffect(() => {
+    const { from, to } = range;
+    setLoadingAffairs(true);
+    setLoadingVotings(true);
     (async () => {
       try {
         const bodies = await fetchBodies();
