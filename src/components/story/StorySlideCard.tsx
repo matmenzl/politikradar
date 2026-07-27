@@ -1,5 +1,7 @@
-import { forwardRef } from "react";
+import { forwardRef, useMemo, useState } from "react";
 import type { StorySlide } from "../StoryPreviewModal";
+import { buildPollinationsUrl, fallbackImagePrompt } from "@/lib/pollinations";
+
 
 const slideStyles: Record<StorySlide["slide_type"], { bg: string; accent: string; glow: string }> = {
   hook: {
