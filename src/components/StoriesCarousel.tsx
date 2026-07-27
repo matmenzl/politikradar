@@ -7,6 +7,7 @@ import StorySlideCard from "@/components/story/StorySlideCard";
 import { fetchBodies, getBodyLabel, fetchAffairById, fetchVotingById, getWeekFullDateRange } from "@/lib/api/openparldata";
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { weekQuery } from "@/hooks/use-week";
 
 interface StoryPost {
   id: string;
@@ -132,7 +133,7 @@ const StoriesCarousel = ({ year, week }: StoriesCarouselProps) => {
           <p className="text-sm text-muted-foreground">
             Es gibt noch keine Social-Media-Posts in dieser Woche.
           </p>
-          <Button variant="outline" size="sm" onClick={() => navigate("/?tab=admin")}>
+          <Button variant="outline" size="sm" onClick={() => navigate(weekQuery(year, week, "/?tab=admin"))}>
             <Shield className="w-4 h-4" />
             Ersten Post im Admin-Bereich erstellen
           </Button>
