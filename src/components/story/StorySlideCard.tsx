@@ -54,17 +54,50 @@ interface StorySlideCardProps {
 const StorySlideCard = forwardRef<HTMLDivElement, StorySlideCardProps>(
   ({ slide, index, total }, ref) => {
     const style = slideStyles[slide.slide_type];
+    const [imgLoaded, setImgLoaded] = useState(false);
+    const [imgFailed, setImgFailed] = useState(false);
+
+    const imageSrc = useMemo(() => {
+      if (slide.image_url) return slide.image_url;
+      const prompt = slide.image_prompt || fallbackImagePrompt(slide.headline, slide.slide_type);
+      return buildPollinationsUrl(prompt, { seed: slide.image_seed });
+      // Re-derive only when the relevant fields change
+    }, [slide.image_url, slide.image_prompt, slide.image_seed, slide.headline, slide.slide_type]);
 
     return (
       <div
         ref={ref}
         className={`relative aspect-[9/16] rounded-2xl bg-gradient-to-b ${style.bg} flex flex-col overflow-hidden select-none`}
       >
+        {/* AI background image */}
+        {!imgFailed && (
+          <img
+            src={imageSrc}
+            alt=""
+            crossOrigin="anonymous"
+            loading="lazy"
+            onLoad={() => setImgLoaded(true)}
+            onError={() => setImgFailed(true)}
+            className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ${
+              imgLoaded ? "opacity-60" : "opacity-0"
+            }`}
+          />
+        )}
+        {/* Readability overlay */}
+        {!imgFailed && imgLoaded && (
+          <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/45 to-black/85 pointer-events-none" />
+        )}
+        {/* Loading shimmer */}
+        {!imgFailed && !imgLoaded && (
+          <div className="absolute inset-0 animate-pulse bg-white/[0.03] pointer-events-none" />
+        )}
+
         {/* Ambient glow */}
         <div
           className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-1/3 rounded-full blur-3xl opacity-20 pointer-events-none"
           style={{ backgroundColor: style.glow }}
         />
+
 
         {/* Top bar: type label + counter */}
         <div className="relative z-10 flex items-center justify-between px-5 pt-5">
