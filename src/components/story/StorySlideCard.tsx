@@ -64,6 +64,12 @@ const StorySlideCard = forwardRef<HTMLDivElement, StorySlideCardProps>(
       // Re-derive only when the relevant fields change
     }, [slide.image_url, slide.image_prompt, slide.image_seed, slide.headline, slide.slide_type]);
 
+    // Reset load/error state whenever a new image is requested (e.g. new seed)
+    useEffect(() => {
+      setImgLoaded(false);
+      setImgFailed(false);
+    }, [imageSrc]);
+
     return (
       <div
         ref={ref}
@@ -72,10 +78,10 @@ const StorySlideCard = forwardRef<HTMLDivElement, StorySlideCardProps>(
         {/* AI background image */}
         {!imgFailed && (
           <img
+            key={imageSrc}
             src={imageSrc}
             alt=""
             crossOrigin="anonymous"
-            loading="lazy"
             onLoad={() => setImgLoaded(true)}
             onError={() => setImgFailed(true)}
             className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ${
@@ -87,10 +93,17 @@ const StorySlideCard = forwardRef<HTMLDivElement, StorySlideCardProps>(
         {!imgFailed && imgLoaded && (
           <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/45 to-black/85 pointer-events-none" />
         )}
-        {/* Loading shimmer */}
+        {/* Loading state */}
         {!imgFailed && !imgLoaded && (
-          <div className="absolute inset-0 animate-pulse bg-white/[0.03] pointer-events-none" />
+          <div className="absolute inset-0 z-20 flex items-end justify-center pb-4 pointer-events-none">
+            <div className="absolute inset-0 animate-pulse bg-white/[0.04]" />
+            <span className="relative flex items-center gap-1.5 rounded-full bg-black/50 px-2.5 py-1 text-[10px] text-white/80 backdrop-blur-sm">
+              <Loader2 className="w-3 h-3 animate-spin" />
+              Bild wird generiert…
+            </span>
+          </div>
         )}
+
 
         {/* Ambient glow */}
         <div
