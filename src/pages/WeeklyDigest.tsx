@@ -13,10 +13,11 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
 import {
-  getCurrentISOWeek,
   getWeekDateRange,
   formatDateRange } from
 "@/lib/api/openparldata";
+import { useWeekParam } from "@/hooks/use-week";
+
 import VoteBar from "@/components/VoteBar";
 import StoriesCarousel from "@/components/StoriesCarousel";
 import logoImg from "@/assets/politikradar_logo.png";
