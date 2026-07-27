@@ -1,4 +1,6 @@
-import { forwardRef, useMemo, useState } from "react";
+import { forwardRef, useEffect, useMemo, useState } from "react";
+import { Loader2 } from "lucide-react";
+
 import type { StorySlide } from "../StoryPreviewModal";
 import { buildPollinationsUrl, fallbackImagePrompt } from "@/lib/pollinations";
 
