@@ -56,7 +56,7 @@ serve(async (req) => {
           {
             role: "system",
             content:
-              "Du erstellst Instagram-Story-Inhalte über Schweizer Parlamentsgeschäfte. Erstelle 4–5 Story-Slides, die das Geschäft als Storytelling aufbereiten. Jeder Slide soll einen klaren Zweck haben. Erwähne immer, in welchem Parlament (z.B. Nationalrat, Kantonsrat Zürich) das Geschäft behandelt wurde – schreibe nicht einfach 'Parlament'. Verwende einfache Sprache, kurze Sätze, und passende Emojis. Die Slides sollen für ein breites Publikum verständlich sein.",
+              "Du erstellst Instagram-Story-Inhalte über Schweizer Parlamentsgeschäfte. Erstelle 4–5 Story-Slides, die das Geschäft als Storytelling aufbereiten. Jeder Slide soll einen klaren Zweck haben. Erwähne immer, in welchem Parlament (z.B. Nationalrat, Kantonsrat Zürich) das Geschäft behandelt wurde – schreibe nicht einfach 'Parlament'. Verwende einfache Sprache, kurze Sätze, und passende Emojis. Die Slides sollen für ein breites Publikum verständlich sein. Liefere zu jedem Slide zusätzlich einen kurzen englischen Bildprompt (image_prompt) für ein abstraktes, redaktionelles Hintergrundbild ohne Text und ohne erkennbare Gesichter.",
           },
           {
             role: "user",
@@ -80,13 +80,18 @@ serve(async (req) => {
                         headline: { type: "string", description: "Kurze, aufmerksamkeitsstarke Überschrift (max 60 Zeichen)" },
                         body: { type: "string", description: "Erklärender Text (max 150 Zeichen)" },
                         emoji: { type: "string", description: "Ein passendes Emoji für den Slide" },
+                        image_prompt: {
+                          type: "string",
+                          description:
+                            "Kurzer englischer Bildprompt (max 25 Wörter) für ein abstraktes, redaktionelles Hintergrundbild zu diesem Slide. Keine Personen mit erkennbaren Gesichtern, kein Text im Bild.",
+                        },
                         slide_type: {
                           type: "string",
                           enum: ["hook", "context", "result", "insight", "cta"],
                           description: "Art des Slides: hook (Aufmacher), context (Hintergrund), result (Ergebnis), insight (Einordnung), cta (Handlungsaufforderung)",
                         },
                       },
-                      required: ["headline", "body", "emoji", "slide_type"],
+                      required: ["headline", "body", "emoji", "slide_type", "image_prompt"],
                       additionalProperties: false,
                     },
                   },
@@ -135,7 +140,13 @@ serve(async (req) => {
 
     const parsed = JSON.parse(toolCall.function.arguments);
 
-    return new Response(JSON.stringify({ slides: parsed.slides }), {
+    // Stable seed per slide so the same image is reproduced on every render
+    const slides = (parsed.slides ?? []).map((s: Record<string, unknown>) => ({
+      ...s,
+      image_seed: Math.floor(Math.random() * 1_000_000),
+    }));
+
+    return new Response(JSON.stringify({ slides }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
