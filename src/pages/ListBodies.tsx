@@ -35,6 +35,7 @@ const ListBodies = () => {
   const [filterLevel, setFilterLevel] = useState("");
 
   useEffect(() => {
+    setLoading(true);
     (async () => {
       try {
         const allBodies = await fetchBodies();
@@ -133,7 +134,7 @@ const ListBodies = () => {
         ) : (
           <div className="space-y-2">
             {filtered.map((b) => (
-              <Link key={b.key} to={`/weekly?body=${encodeURIComponent(b.key)}`} className="block">
+              <Link key={b.key} to={withWeek(`/weekly?body=${encodeURIComponent(b.key)}`)} className="block">
                 <Card className="hover:bg-secondary/30 transition-colors">
                   <CardContent className="p-4 flex items-center gap-4">
                     <div className="flex-1 min-w-0">

@@ -29,6 +29,7 @@ const ListMeetings = () => {
   const [filterBody, setFilterBody] = useState(searchParams.get("body") || "");
 
   useEffect(() => {
+    setLoading(true);
     (async () => {
       try {
         const bodies = await fetchBodies();
