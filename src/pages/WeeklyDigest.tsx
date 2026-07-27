@@ -335,7 +335,7 @@ const WeeklyDigest = () => {
                     {data.stats.activeBodies.slice(0, 10).map((body, i) =>
                 <Link
                   key={body.key}
-                  to={`/weekly?body=${encodeURIComponent(body.key)}`}
+                  to={withWeek(`/weekly?body=${encodeURIComponent(body.key)}`)}
                   className="flex items-center justify-between py-2 px-3 -mx-3 rounded-lg hover:bg-secondary/50 transition-colors">
 
                         <div className="flex items-center gap-3">
