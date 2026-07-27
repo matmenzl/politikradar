@@ -5,20 +5,20 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { useState, useEffect, useMemo } from "react";
 import {
-  getCurrentISOWeek,
   getWeekDateRange,
   formatDateRange,
   fetchBodies,
   fetchMeetingsForWeek,
   type Meeting,
 } from "@/lib/api/openparldata";
+import { useWeekParam } from "@/hooks/use-week";
 
 interface MeetingWithBody extends Meeting {
   bodyName: string;
 }
 
 const ListMeetings = () => {
-  const { year, week } = getCurrentISOWeek();
+  const { year, week, withWeek } = useWeekParam();
   const { from, to } = getWeekDateRange(year, week);
   const dateLabel = formatDateRange(from, to);
 
@@ -52,7 +52,7 @@ const ListMeetings = () => {
         setLoading(false);
       }
     })();
-  }, []);
+  }, [from, to]);
 
   const bodyNames = useMemo(() => [...new Set(meetings.map((m) => m.bodyName))].sort(), [meetings]);
 
@@ -68,7 +68,7 @@ const ListMeetings = () => {
     <div className="min-h-screen bg-background">
       <header className="sticky top-0 z-10 bg-background/80 backdrop-blur-md border-b border-border/50 px-6 py-4">
         <div className="max-w-4xl mx-auto flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
+          <Link to={withWeek("/")} className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
             <ArrowLeft className="w-4 h-4" />
             <span className="text-sm">Zurück</span>
           </Link>

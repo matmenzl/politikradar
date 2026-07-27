@@ -6,7 +6,6 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect, useMemo } from "react";
 import {
-  getCurrentISOWeek,
   getWeekDateRange,
   formatDateRange,
   fetchBodies,
@@ -17,6 +16,7 @@ import {
   LEVEL_LABELS,
   type Body,
 } from "@/lib/api/openparldata";
+import { useWeekParam } from "@/hooks/use-week";
 
 interface BodyWithStats extends Body {
   votings: number;
@@ -25,7 +25,7 @@ interface BodyWithStats extends Body {
 }
 
 const ListBodies = () => {
-  const { year, week } = getCurrentISOWeek();
+  const { year, week, withWeek } = useWeekParam();
   const { from, to } = getWeekDateRange(year, week);
   const dateLabel = formatDateRange(from, to);
 
@@ -66,7 +66,7 @@ const ListBodies = () => {
         setLoading(false);
       }
     })();
-  }, []);
+  }, [from, to]);
 
   const levels = useMemo(() => {
     const s = new Set(bodies.map((b) => {
@@ -91,7 +91,7 @@ const ListBodies = () => {
     <div className="min-h-screen bg-background">
       <header className="sticky top-0 z-10 bg-background/80 backdrop-blur-md border-b border-border/50 px-6 py-4">
         <div className="max-w-4xl mx-auto flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
+          <Link to={withWeek("/")} className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
             <ArrowLeft className="w-4 h-4" />
             <span className="text-sm">Zurück</span>
           </Link>
