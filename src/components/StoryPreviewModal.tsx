@@ -21,7 +21,14 @@ export interface StorySlide {
   emoji: string;
   slide_type: "hook" | "context" | "result" | "insight" | "cta" | "party";
   partyData?: PartyVoteData[];
+  /** English prompt for the Pollinations.ai background image */
+  image_prompt?: string;
+  /** Seed so the same image is reproduced on every render */
+  image_seed?: number;
+  /** Permanent storage URL, set when the story gets published */
+  image_url?: string;
 }
+
 
 interface StoryPreviewModalProps {
   open: boolean;
