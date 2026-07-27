@@ -118,23 +118,8 @@ const WeeklyOverview = () => {
     return data.recentAffairs.filter((a) => tagMap[a.id]?.includes(selectedTag));
   }, [data, selectedTag, tagMap]);
 
-  const goToPreviousWeek = () => {
-    if (week <= 1) {
-      setYear(year - 1);
-      setWeek(52);
-    } else {
-      setWeek(week - 1);
-    }
-  };
 
-  const goToNextWeek = () => {
-    if (week >= 52) {
-      setYear(year + 1);
-      setWeek(1);
-    } else {
-      setWeek(week + 1);
-    }
-  };
+
 
   const { from, to } = getWeekDateRange(year, week);
   const dateRangeLabel = formatDateRange(from, to);
