@@ -439,7 +439,7 @@ function AISuggestionsSection({
     }
 
     if (combined.length === 0) {
-      toast.error("Keine Geschäfte oder Abstimmungen in dieser Woche geladen. Bitte warte, bis die Daten geladen sind, oder wechsle die Woche.");
+      toast.error("Keine Geschäfte oder Abstimmungen im gewählten Zeitraum. Passe den Datums-Bereich an.");
       return;
     }
 
