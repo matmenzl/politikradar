@@ -1,14 +1,17 @@
-import { Link } from "react-router-dom";
-import { Loader2, ChevronLeft, ChevronRight, Sparkles, BarChart3, Vote, Building2, Activity, TrendingUp } from "lucide-react";
+import { Link, useSearchParams } from "react-router-dom";
+import { Loader2, ChevronLeft, ChevronRight, Sparkles, BarChart3, Vote, Building2, Activity, TrendingUp, Newspaper, Shield } from "lucide-react";
 import ParliamentBrowser from "@/components/ParliamentBrowser";
+import AdminSection from "@/components/admin/AdminSection";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+
 import {
   getCurrentISOWeek,
   getWeekDateRange,
@@ -56,6 +59,20 @@ const WeeklyDigest = () => {
   const [data, setData] = useState<DigestData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const [searchParams, setSearchParams] = useSearchParams();
+  const tab = searchParams.get("tab") === "admin" ? "admin" : "woche";
+  const [adminLoaded, setAdminLoaded] = useState(tab === "admin");
+
+  const setTab = (value: string) => {
+    if (value === "admin") setAdminLoaded(true);
+    const next = new URLSearchParams(searchParams);
+    if (value === "admin") next.set("tab", "admin");
+    else next.delete("tab");
+    setSearchParams(next, { replace: true });
+  };
+
+
 
   useEffect(() => {
     setLoading(true);
@@ -123,10 +140,25 @@ const WeeklyDigest = () => {
           <p className="text-lg text-foreground/80">{dateRangeLabel}</p>
         </div>
 
+        <Tabs value={tab} onValueChange={setTab} className="w-full">
+          <TabsList className="w-full grid grid-cols-2 h-11">
+            <TabsTrigger value="woche" className="gap-2">
+              <Newspaper className="w-4 h-4" />
+              Politikwoche
+            </TabsTrigger>
+            <TabsTrigger value="admin" className="gap-2">
+              <Shield className="w-4 h-4" />
+              Admin
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="woche" className="mt-8 space-y-8 md:space-y-12 focus-visible:outline-none">
         {/* Stories – central hero element */}
         <div className="opacity-0 animate-fade-in" style={{ animationDelay: "50ms" }}>
           <StoriesCarousel />
         </div>
+
+
 
         {loading &&
         <div className="space-y-6">
@@ -344,7 +376,14 @@ const WeeklyDigest = () => {
         <div className="opacity-0 animate-fade-in" style={{ animationDelay: "600ms" }}>
           <ParliamentBrowser />
         </div>
+          </TabsContent>
+
+          <TabsContent value="admin" className="mt-8 focus-visible:outline-none">
+            {adminLoaded && <AdminSection />}
+          </TabsContent>
+        </Tabs>
       </main>
+
 
       <footer className="px-4 md:px-6 py-5 border-t border-border/50">
         <div className="max-w-4xl mx-auto text-center text-xs text-muted-foreground">
