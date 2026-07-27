@@ -25,9 +25,7 @@ import {
 const WeeklyOverview = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [shareOpen, setShareOpen] = useState(false);
-  const initial = getCurrentISOWeek();
-  const [year, setYear] = useState(initial.year);
-  const [week, setWeek] = useState(initial.week);
+  const { year, week, goToPreviousWeek, goToNextWeek, withWeek } = useWeekParam();
   const urlBody = searchParams.get("body");
   const [bodyKey, setBodyKeyState] = useState(urlBody && urlBody !== "undefined" ? urlBody : "CHE");
   const [hasUserSelected, setHasUserSelected] = useState(!!urlBody && urlBody !== "undefined");
@@ -37,8 +35,16 @@ const WeeklyOverview = () => {
     if (!key) return;
     setBodyKeyState(key);
     setHasUserSelected(true);
-    setSearchParams({ body: key }, { replace: true });
+    setSearchParams(
+      (prev) => {
+        const next = new URLSearchParams(prev);
+        next.set("body", key);
+        return next;
+      },
+      { replace: true }
+    );
   };
+
   const [data, setData] = useState<WeeklyStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
