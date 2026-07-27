@@ -185,7 +185,7 @@ const WeeklyDigest = () => {
             { icon: BarChart3, label: "Geschäfte", value: data.stats.totalAffairs, href: "/list/affairs" },
             { icon: Activity, label: "Sitzungen", value: data.stats.totalMeetings, href: "/list/meetings" }].
             map((stat) =>
-            <Link key={stat.label} to={stat.href}>
+            <Link key={stat.label} to={withWeek(stat.href)}>
                   <Card className="hover:bg-secondary/30 transition-colors cursor-pointer">
                     <CardContent className="p-4 text-center">
                       <stat.icon className="w-5 h-5 mx-auto mb-2 text-muted-foreground" />
