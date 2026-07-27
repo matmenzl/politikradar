@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { Sparkles, ExternalLink } from "lucide-react";
+import { Sparkles, ExternalLink, Shield } from "lucide-react";
 import StoryPreviewModal, { type StorySlide } from "@/components/StoryPreviewModal";
 import StorySlideCard from "@/components/story/StorySlideCard";
-import { fetchBodies, getBodyLabel, fetchAffairById, getWeekInstantRange } from "@/lib/api/openparldata";
+import { fetchBodies, getBodyLabel, fetchAffairById, fetchVotingById, getWeekFullDateRange } from "@/lib/api/openparldata";
+import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 interface StoryPost {
@@ -32,62 +33,88 @@ const StoriesCarousel = ({ year, week }: StoriesCarouselProps) => {
   const isMobile = useIsMobile();
   const navigate = useNavigate();
 
-  const range = year && week ? getWeekInstantRange(year, week) : null;
-  const rangeStart = range?.start;
-  const rangeEnd = range?.end;
+  const range = year && week ? getWeekFullDateRange(year, week) : null;
+  const rangeFrom = range?.from;
+  const rangeTo = range?.to;
 
   useEffect(() => {
-    let query = supabase
+    let cancelled = false;
+
+    supabase
       .from("story_posts")
       .select("id, title, body_key, affair_id, voting_id, slides, published_at")
-      .eq("status", "published");
-
-    if (rangeStart) query = query.gte("published_at", rangeStart);
-    if (rangeEnd) query = query.lte("published_at", rangeEnd);
-
-
-    query
+      .eq("status", "published")
       .order("published_at", { ascending: false })
-      .limit(10)
-      .then(({ data }) => {
-        if (data) {
-          const mapped = data.map((d) => ({
-            id: d.id,
-            title: d.title,
-            body_key: d.body_key,
-            affair_id: d.affair_id,
-            voting_id: d.voting_id,
-            slides: (d.slides as unknown as StorySlide[]) || [],
-            published_at: d.published_at || "",
-          }));
-          setStories(mapped);
+      .limit(100)
+      .then(async ({ data }) => {
+        if (!data || cancelled) return;
 
-          // Fetch external URLs for affairs
-          const affairIds = [...new Set(mapped.map((s) => s.affair_id).filter(Boolean))] as string[];
-          Promise.all(
-            affairIds.map(async (aid) => {
-              const affair = await fetchAffairById(aid);
-              if (affair?.url_external_de) return [aid, affair.url_external_de] as const;
-              return null;
-            })
-          ).then((results) => {
-            const links: Record<string, string> = {};
-            for (const r of results) {
-              if (r) links[r[0]] = r[1];
-            }
-            setAffairLinks(links);
-          });
+        const mapped: StoryPost[] = data.map((d) => ({
+          id: d.id,
+          title: d.title,
+          body_key: d.body_key,
+          affair_id: d.affair_id,
+          voting_id: d.voting_id,
+          slides: (d.slides as unknown as StorySlide[]) || [],
+          published_at: d.published_at || "",
+        }));
+
+        // Resolve the underlying business date (voting date / affair date)
+        // for each story – that is what the week filter applies to.
+        const affairIds = [...new Set(mapped.map((s) => s.affair_id).filter(Boolean))] as string[];
+        const votingIds = [...new Set(mapped.map((s) => s.voting_id).filter(Boolean))] as string[];
+
+        const [affairEntries, votingEntries] = await Promise.all([
+          Promise.all(affairIds.map(async (aid) => [aid, await fetchAffairById(aid)] as const)),
+          Promise.all(votingIds.map(async (vid) => [vid, await fetchVotingById(vid)] as const)),
+        ]);
+        if (cancelled) return;
+
+        const affairs = Object.fromEntries(affairEntries);
+        const votings = Object.fromEntries(votingEntries);
+
+        const businessDate = (s: StoryPost): string => {
+          const voting = s.voting_id ? votings[s.voting_id] : null;
+          if (voting?.date) return voting.date.slice(0, 10);
+          const affair = s.affair_id ? affairs[s.affair_id] : null;
+          const affairDate = affair?.end_date || affair?.begin_date;
+          if (affairDate) return affairDate.slice(0, 10);
+          return s.published_at.slice(0, 10);
+        };
+
+        const filtered = (
+          rangeFrom && rangeTo
+            ? mapped.filter((s) => {
+                const d = businessDate(s);
+                return d >= rangeFrom && d <= rangeTo;
+              })
+            : mapped
+        )
+          .sort((a, b) => businessDate(b).localeCompare(businessDate(a)))
+          .slice(0, 10);
+
+        setStories(filtered);
+
+        const links: Record<string, string> = {};
+        for (const [aid, affair] of affairEntries) {
+          if (affair?.url_external_de) links[aid] = affair.url_external_de;
         }
+        setAffairLinks(links);
       });
 
     fetchBodies().then((bodies) => {
+      if (cancelled) return;
       const map: Record<string, string> = {};
       for (const b of bodies) {
         map[b.key] = getBodyLabel(b);
       }
       setBodyNames(map);
     });
-  }, [rangeStart, rangeEnd]);
+
+    return () => {
+      cancelled = true;
+    };
+  }, [rangeFrom, rangeTo]);
 
   if (stories.length === 0) {
     return (
@@ -101,12 +128,19 @@ const StoriesCarousel = ({ year, week }: StoriesCarouselProps) => {
             Stories der Woche
           </h2>
         </div>
-        <p className="text-sm text-muted-foreground text-center py-8">
-          Noch keine Stories für diese Woche verfügbar.
-        </p>
+        <div className="text-center py-8 space-y-3">
+          <p className="text-sm text-muted-foreground">
+            Es gibt noch keine Social-Media-Posts in dieser Woche.
+          </p>
+          <Button variant="outline" size="sm" onClick={() => navigate("/?tab=admin")}>
+            <Shield className="w-4 h-4" />
+            Ersten Post im Admin-Bereich erstellen
+          </Button>
+        </div>
       </div>
     );
   }
+
 
   return (
     <>

@@ -260,6 +260,25 @@ export async function fetchAffairById(id: number | string): Promise<Affair | nul
   }
 }
 
+export async function fetchVotingById(id: number | string): Promise<Voting | null> {
+  try {
+    const res = await fetchApi<Voting>(`/votings/${id}`);
+    return res.data?.[0] ?? null;
+  } catch {
+    return null;
+  }
+}
+
+/** Full calendar week as local date strings (Monday – Sunday). */
+export function getWeekFullDateRange(year: number, week: number): { from: string; to: string } {
+  const { from } = getWeekDateRange(year, week);
+  const [y, m, d] = from.split("-").map(Number);
+  const sunday = new Date(y, m - 1, d + 6);
+  const format = (dt: Date) =>
+    `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, "0")}-${String(dt.getDate()).padStart(2, "0")}`;
+  return { from, to: format(sunday) };
+}
+
 export async function fetchAffairsForWeek(from: string, to: string, bodyKey: string = "CHE") {
   const res = await fetchApi<Affair>("/affairs", {
     body_key: bodyKey,
