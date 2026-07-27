@@ -696,6 +696,8 @@ function AdminDashboard() {
   const [searching, setSearching] = useState(false);
   const [generatingId, setGeneratingId] = useState<string | null>(null);
   const [previewStory, setPreviewStory] = useState<StoryPost | null>(null);
+  const [savingSlides, setSavingSlides] = useState(false);
+
 
   const [affairs, setAffairs] = useState<AffairWithBody[]>([]);
   const [votings, setVotings] = useState<VotingWithBody[]>([]);
