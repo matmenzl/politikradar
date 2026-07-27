@@ -386,12 +386,26 @@ function AISuggestionsSection({
   loadingData,
   onSelectItem,
   generatingId,
+  dateFrom,
+  dateTo,
+  onDateFromChange,
+  onDateToChange,
+  onApplyRange,
+  onResetRange,
+  rangeDirty,
 }: {
   affairs: AffairWithBody[];
   votings: VotingWithBody[];
   loadingData: boolean;
   onSelectItem: (item: SearchResult) => void;
   generatingId: string | null;
+  dateFrom: string;
+  dateTo: string;
+  onDateFromChange: (v: string) => void;
+  onDateToChange: (v: string) => void;
+  onApplyRange: () => void;
+  onResetRange: () => void;
+  rangeDirty: boolean;
 }) {
   const [suggestions, setSuggestions] = useState<AISuggestion[]>([]);
   const [items, setItems] = useState<SuggestableItem[]>([]);
