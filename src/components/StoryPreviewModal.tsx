@@ -37,15 +37,29 @@ interface StoryPreviewModalProps {
   loading?: boolean;
   affairId?: string | null;
   votingId?: string | null;
+  /** Enables the per-slide image prompt editor (admin only) */
+  editable?: boolean;
+  onSlideChange?: (index: number, patch: Partial<StorySlide>) => void;
+  onSaveSlides?: () => void | Promise<void>;
+  saving?: boolean;
 }
 
 function StoryContent({
   slides,
   loading,
+  editable,
+  onSlideChange,
+  onSaveSlides,
+  saving,
 }: {
   slides: StorySlide[];
   loading?: boolean;
+  editable?: boolean;
+  onSlideChange?: (index: number, patch: Partial<StorySlide>) => void;
+  onSaveSlides?: () => void | Promise<void>;
+  saving?: boolean;
 }) {
+
   const slideRefs = useRef<(HTMLDivElement | null)[]>([]);
   const [api, setApi] = useState<CarouselApi>();
   const [current, setCurrent] = useState(0);
