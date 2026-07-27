@@ -386,12 +386,26 @@ function AISuggestionsSection({
   loadingData,
   onSelectItem,
   generatingId,
+  dateFrom,
+  dateTo,
+  onDateFromChange,
+  onDateToChange,
+  onApplyRange,
+  onResetRange,
+  rangeDirty,
 }: {
   affairs: AffairWithBody[];
   votings: VotingWithBody[];
   loadingData: boolean;
   onSelectItem: (item: SearchResult) => void;
   generatingId: string | null;
+  dateFrom: string;
+  dateTo: string;
+  onDateFromChange: (v: string) => void;
+  onDateToChange: (v: string) => void;
+  onApplyRange: () => void;
+  onResetRange: () => void;
+  rangeDirty: boolean;
 }) {
   const [suggestions, setSuggestions] = useState<AISuggestion[]>([]);
   const [items, setItems] = useState<SuggestableItem[]>([]);
@@ -425,7 +439,7 @@ function AISuggestionsSection({
     }
 
     if (combined.length === 0) {
-      toast.error("Keine Geschäfte oder Abstimmungen in dieser Woche geladen. Bitte warte, bis die Daten geladen sind, oder wechsle die Woche.");
+      toast.error("Keine Geschäfte oder Abstimmungen im gewählten Zeitraum. Passe den Datums-Bereich an.");
       return;
     }
 
@@ -461,7 +475,7 @@ function AISuggestionsSection({
   return (
     <Card>
       <CardHeader className="pb-3">
-        <div className="flex items-center justify-between">
+        <div className="flex items-start justify-between gap-3 flex-wrap">
           <div>
             <div className="flex items-center gap-2 mb-1">
               <TrendingUp className="w-4 h-4 text-accent" />
@@ -481,7 +495,57 @@ function AISuggestionsSection({
             {hasLoaded ? "Neu analysieren" : "Analysieren"}
           </Button>
         </div>
+
+        {/* Date range */}
+        <div className="mt-4 flex flex-col sm:flex-row sm:items-end gap-2">
+          <div className="flex-1 min-w-[130px]">
+            <label className="text-xs text-muted-foreground mb-1 block">Von</label>
+            <Input
+              type="date"
+              value={dateFrom}
+              max={dateTo}
+              onChange={(e) => onDateFromChange(e.target.value)}
+              className="h-9"
+            />
+          </div>
+          <div className="flex-1 min-w-[130px]">
+            <label className="text-xs text-muted-foreground mb-1 block">Bis</label>
+            <Input
+              type="date"
+              value={dateTo}
+              min={dateFrom}
+              onChange={(e) => onDateToChange(e.target.value)}
+              className="h-9"
+            />
+          </div>
+          <div className="flex gap-2">
+            <Button
+              variant={rangeDirty ? "default" : "secondary"}
+              size="sm"
+              className="h-9 gap-1.5"
+              disabled={!rangeDirty || !dateFrom || !dateTo || dateFrom > dateTo}
+              onClick={onApplyRange}
+            >
+              <Calendar className="w-3.5 h-3.5" />
+              Zeitraum laden
+            </Button>
+            <Button variant="ghost" size="sm" className="h-9" onClick={onResetRange}>
+              Zurücksetzen
+            </Button>
+          </div>
+        </div>
+        {loadingData && (
+          <p className="text-xs text-muted-foreground mt-2 flex items-center gap-1.5">
+            <Loader2 className="w-3 h-3 animate-spin" /> Daten werden geladen…
+          </p>
+        )}
+        {!loadingData && (
+          <p className="text-xs text-muted-foreground mt-2">
+            {affairs.length} Geschäfte · {votings.length} Abstimmungen im gewählten Zeitraum
+          </p>
+        )}
       </CardHeader>
+
       <CardContent>
         {loading ? (
           <div className="flex flex-col items-center justify-center py-12 gap-3">
@@ -638,15 +702,24 @@ function AdminDashboard() {
   const [loadingAffairs, setLoadingAffairs] = useState(true);
   const [loadingVotings, setLoadingVotings] = useState(true);
 
-  useEffect(() => {
+  const defaultRange = useMemo(() => {
     const { year, week } = getCurrentISOWeek();
     const current = getWeekDateRange(year, week);
     // Extend window: include previous week so Monday/early-week views still have data
     const prevWeekNum = week > 1 ? week - 1 : 52;
     const prevYear = week > 1 ? year : year - 1;
     const prev = getWeekDateRange(prevYear, prevWeekNum);
-    const from = prev.from;
-    const to = current.to;
+    return { from: prev.from, to: current.to };
+  }, []);
+
+  const [dateFrom, setDateFrom] = useState(defaultRange.from);
+  const [dateTo, setDateTo] = useState(defaultRange.to);
+  const [range, setRange] = useState(defaultRange);
+
+  useEffect(() => {
+    const { from, to } = range;
+    setLoadingAffairs(true);
+    setLoadingVotings(true);
     (async () => {
       try {
         const bodies = await fetchBodies();
@@ -679,7 +752,7 @@ function AdminDashboard() {
         setLoadingVotings(false);
       }
     })();
-  }, []);
+  }, [range]);
 
   const loadStories = useCallback(async () => {
     const { data } = await supabase
@@ -874,6 +947,17 @@ function AdminDashboard() {
         loadingData={loadingAffairs || loadingVotings}
         onSelectItem={generateStory}
         generatingId={generatingId}
+        dateFrom={dateFrom}
+        dateTo={dateTo}
+        onDateFromChange={setDateFrom}
+        onDateToChange={setDateTo}
+        rangeDirty={dateFrom !== range.from || dateTo !== range.to}
+        onApplyRange={() => setRange({ from: dateFrom, to: dateTo })}
+        onResetRange={() => {
+          setDateFrom(defaultRange.from);
+          setDateTo(defaultRange.to);
+          setRange(defaultRange);
+        }}
       />
 
       {/* Browse affairs & votings */}
