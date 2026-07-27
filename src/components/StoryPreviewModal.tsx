@@ -181,9 +181,22 @@ function StoryContent({
         </Button>
       )}
 
+      {editable && onSaveSlides && (
+        <Button
+          size="sm"
+          className="w-full mt-3 gap-1.5 text-xs"
+          disabled={saving}
+          onClick={() => onSaveSlides()}
+        >
+          {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
+          Bilder übernehmen
+        </Button>
+      )}
+
       <p className="text-[10px] text-muted-foreground text-center mt-3 opacity-70">
         Erstellt mit KI · Inhalte prüfen vor Veröffentlichung
       </p>
+
     </div>
   );
 }
