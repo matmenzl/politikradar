@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { Sparkles, ExternalLink } from "lucide-react";
+import { Sparkles, ExternalLink, Shield } from "lucide-react";
 import StoryPreviewModal, { type StorySlide } from "@/components/StoryPreviewModal";
 import StorySlideCard from "@/components/story/StorySlideCard";
-import { fetchBodies, getBodyLabel, fetchAffairById, getWeekInstantRange } from "@/lib/api/openparldata";
+import { fetchBodies, getBodyLabel, fetchAffairById, fetchVotingById, getWeekFullDateRange } from "@/lib/api/openparldata";
+import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 interface StoryPost {
