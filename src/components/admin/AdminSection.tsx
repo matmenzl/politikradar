@@ -475,7 +475,7 @@ function AISuggestionsSection({
   return (
     <Card>
       <CardHeader className="pb-3">
-        <div className="flex items-center justify-between">
+        <div className="flex items-start justify-between gap-3 flex-wrap">
           <div>
             <div className="flex items-center gap-2 mb-1">
               <TrendingUp className="w-4 h-4 text-accent" />
@@ -495,7 +495,57 @@ function AISuggestionsSection({
             {hasLoaded ? "Neu analysieren" : "Analysieren"}
           </Button>
         </div>
+
+        {/* Date range */}
+        <div className="mt-4 flex flex-col sm:flex-row sm:items-end gap-2">
+          <div className="flex-1 min-w-[130px]">
+            <label className="text-xs text-muted-foreground mb-1 block">Von</label>
+            <Input
+              type="date"
+              value={dateFrom}
+              max={dateTo}
+              onChange={(e) => onDateFromChange(e.target.value)}
+              className="h-9"
+            />
+          </div>
+          <div className="flex-1 min-w-[130px]">
+            <label className="text-xs text-muted-foreground mb-1 block">Bis</label>
+            <Input
+              type="date"
+              value={dateTo}
+              min={dateFrom}
+              onChange={(e) => onDateToChange(e.target.value)}
+              className="h-9"
+            />
+          </div>
+          <div className="flex gap-2">
+            <Button
+              variant={rangeDirty ? "default" : "secondary"}
+              size="sm"
+              className="h-9 gap-1.5"
+              disabled={!rangeDirty || !dateFrom || !dateTo || dateFrom > dateTo}
+              onClick={onApplyRange}
+            >
+              <Calendar className="w-3.5 h-3.5" />
+              Zeitraum laden
+            </Button>
+            <Button variant="ghost" size="sm" className="h-9" onClick={onResetRange}>
+              Zurücksetzen
+            </Button>
+          </div>
+        </div>
+        {loadingData && (
+          <p className="text-xs text-muted-foreground mt-2 flex items-center gap-1.5">
+            <Loader2 className="w-3 h-3 animate-spin" /> Daten werden geladen…
+          </p>
+        )}
+        {!loadingData && (
+          <p className="text-xs text-muted-foreground mt-2">
+            {affairs.length} Geschäfte · {votings.length} Abstimmungen im gewählten Zeitraum
+          </p>
+        )}
       </CardHeader>
+
       <CardContent>
         {loading ? (
           <div className="flex flex-col items-center justify-center py-12 gap-3">
