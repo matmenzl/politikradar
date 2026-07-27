@@ -120,7 +120,30 @@ function StoryContent({
                   <Download className="w-3.5 h-3.5" />
                   Slide {i + 1} speichern
                 </Button>
+                {editable && onSlideChange && (
+                  <div className="space-y-1.5 rounded-lg border border-border/50 p-2">
+                    <label className="text-[10px] uppercase tracking-wide text-muted-foreground">
+                      Bild-Prompt
+                    </label>
+                    <Textarea
+                      value={slide.image_prompt ?? ""}
+                      placeholder={fallbackImagePrompt(slide.headline, slide.slide_type)}
+                      onChange={(e) => onSlideChange(i, { image_prompt: e.target.value })}
+                      className="text-xs min-h-[68px]"
+                    />
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      className="w-full gap-1.5 text-xs"
+                      onClick={() => onSlideChange(i, { image_seed: randomSeed(), image_url: undefined })}
+                    >
+                      <RefreshCw className="w-3.5 h-3.5" />
+                      Neues Bild generieren
+                    </Button>
+                  </div>
+                )}
               </div>
+
             </CarouselItem>
           ))}
         </CarouselContent>
