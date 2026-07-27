@@ -688,7 +688,7 @@ function AdminDashboard() {
         setLoadingVotings(false);
       }
     })();
-  }, []);
+  }, [range]);
 
   const loadStories = useCallback(async () => {
     const { data } = await supabase
