@@ -61,14 +61,17 @@ const WeeklyDigest = () => {
   const [error, setError] = useState<string | null>(null);
 
   const [searchParams, setSearchParams] = useSearchParams();
-  const tab = searchParams.get("tab") === "admin" ? "admin" : "woche";
-  const [adminLoaded, setAdminLoaded] = useState(tab === "admin");
+  const rawTab = searchParams.get("tab");
+  const tab = rawTab === "ki" || rawTab === "redaktion" ? rawTab : rawTab === "admin" ? "redaktion" : "woche";
+  const [aiLoaded, setAiLoaded] = useState(tab === "ki");
+  const [editorialLoaded, setEditorialLoaded] = useState(tab === "redaktion");
 
   const setTab = (value: string) => {
-    if (value === "admin") setAdminLoaded(true);
+    if (value === "ki") setAiLoaded(true);
+    if (value === "redaktion") setEditorialLoaded(true);
     const next = new URLSearchParams(searchParams);
-    if (value === "admin") next.set("tab", "admin");
-    else next.delete("tab");
+    if (value === "woche") next.delete("tab");
+    else next.set("tab", value);
     setSearchParams(next, { replace: true });
   };
 
