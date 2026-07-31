@@ -394,21 +394,24 @@ const WeeklyDigest = () => {
           </TabsContent>
 
 
-          <TabsContent value="ki" className="mt-8 focus-visible:outline-none">
+          <TabsContent value="ki" className="mt-8 space-y-4 focus-visible:outline-none">
+            <WeekContextBar note="Die KI-Analyse startet standardmässig mit dieser Kalenderwoche – der Zeitraum lässt sich unten erweitern." />
             {aiLoaded && (
               <AdminGate title="KI-Analyse" description="Bitte Passwort eingeben">
-                <AiAnalysisSection />
+                <AiAnalysisSection year={year} week={week} />
               </AdminGate>
             )}
           </TabsContent>
 
-          <TabsContent value="redaktion" className="mt-8 focus-visible:outline-none">
+          <TabsContent value="redaktion" className="mt-8 space-y-4 focus-visible:outline-none">
+            <WeekContextBar note="Redaktion zeigt und verwaltet die Stories dieser Kalenderwoche." />
             {editorialLoaded && (
               <AdminGate title="Redaktion" description="Bitte Passwort eingeben">
                 <EditorialSection year={year} week={week} />
               </AdminGate>
             )}
           </TabsContent>
+
         </Tabs>
       </main>
 
