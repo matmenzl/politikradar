@@ -38,6 +38,14 @@ const AiAnalysisSection = ({ year: yearProp, week: weekProp }: AiAnalysisSection
   const [dateTo, setDateTo] = useState(defaultRange.to);
   const [range, setRange] = useState(defaultRange);
 
+  const { affairs, votings, loading: loadingData } = useRangeItems(range.from, range.to);
+
+  const [suggestions, setSuggestions] = useState<AISuggestion[]>([]);
+  const [items, setItems] = useState<SuggestableItem[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [hasLoaded, setHasLoaded] = useState(false);
+  const [generatingId, setGeneratingId] = useState<string | null>(null);
+
   useEffect(() => {
     setDateFrom(defaultRange.from);
     setDateTo(defaultRange.to);
@@ -46,14 +54,6 @@ const AiAnalysisSection = ({ year: yearProp, week: weekProp }: AiAnalysisSection
     setHasLoaded(false);
   }, [defaultRange]);
 
-
-  const { affairs, votings, loading: loadingData } = useRangeItems(range.from, range.to);
-
-  const [suggestions, setSuggestions] = useState<AISuggestion[]>([]);
-  const [items, setItems] = useState<SuggestableItem[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [hasLoaded, setHasLoaded] = useState(false);
-  const [generatingId, setGeneratingId] = useState<string | null>(null);
 
   const rangeDirty = dateFrom !== range.from || dateTo !== range.to;
 
