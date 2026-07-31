@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Sparkles, Calendar, TrendingUp, Zap, Lightbulb } from "lucide-react";
+import { Loader2, Sparkles, Calendar, TrendingUp, Zap, Lightbulb, Check } from "lucide-react";
 import { getCurrentISOWeek, getWeekDateRange } from "@/lib/api/openparldata";
 import { useRangeItems } from "@/hooks/use-range-items";
 import { createStoryDraft, type SearchResult } from "@/components/admin/shared";
@@ -118,82 +118,127 @@ const AiAnalysisSection = () => {
     return "bg-muted text-muted-foreground border-border";
   };
 
+  const totalItems = affairs.length + votings.length;
+  const step1Done = !loadingData && !rangeDirty && totalItems > 0;
+
   return (
     <Card>
       <CardHeader className="pb-3">
-        <div className="flex items-start justify-between gap-3 flex-wrap">
-          <div>
-            <div className="flex items-center gap-2 mb-1">
-              <TrendingUp className="w-4 h-4 text-accent" />
-              <CardTitle className="font-serif text-xl">KI-Vorschläge</CardTitle>
-            </div>
-            <CardDescription>
-              KI analysiert Geschäfte & Abstimmungen nach Social-Media-Potenzial
-            </CardDescription>
+        <div className="flex items-center gap-2 mb-1">
+          <TrendingUp className="w-4 h-4 text-accent" />
+          <CardTitle className="font-serif text-xl">KI-Vorschläge</CardTitle>
+        </div>
+        <CardDescription>
+          In zwei Schritten: zuerst den Zeitraum laden, danach die KI analysieren lassen.
+        </CardDescription>
+
+        {/* Schritt 1 */}
+        <div className="mt-4 rounded-lg border border-border/60 p-3">
+          <div className="flex items-center gap-2 mb-3">
+            <span className={`flex items-center justify-center w-5 h-5 rounded-full text-[11px] font-bold ${step1Done ? "bg-success/20 text-success" : "bg-accent/15 text-accent"}`}>
+              {step1Done ? <Check className="w-3 h-3" /> : "1"}
+            </span>
+            <span className="text-sm font-medium">Zeitraum wählen & Daten laden</span>
           </div>
-          <Button onClick={generateSuggestions} disabled={loading || loadingData} size="sm" className="gap-2">
-            {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Zap className="w-4 h-4" />}
-            {hasLoaded ? "Neu analysieren" : "Analysieren"}
-          </Button>
+
+          <div className="flex flex-col sm:flex-row sm:items-end gap-2">
+            <div className="flex-1 min-w-[130px]">
+              <label className="text-xs text-muted-foreground mb-1 block">Von</label>
+              <Input
+                type="date"
+                value={dateFrom}
+                max={dateTo}
+                onChange={(e) => setDateFrom(e.target.value)}
+                className="h-9"
+              />
+            </div>
+            <div className="flex-1 min-w-[130px]">
+              <label className="text-xs text-muted-foreground mb-1 block">Bis</label>
+              <Input
+                type="date"
+                value={dateTo}
+                min={dateFrom}
+                onChange={(e) => setDateTo(e.target.value)}
+                className="h-9"
+              />
+            </div>
+            <div className="flex gap-2">
+              <Button
+                variant={rangeDirty ? "default" : "secondary"}
+                size="sm"
+                className="h-9 gap-1.5"
+                disabled={!rangeDirty || !dateFrom || !dateTo || dateFrom > dateTo}
+                onClick={() => {
+                  setRange({ from: dateFrom, to: dateTo });
+                  setSuggestions([]);
+                  setHasLoaded(false);
+                }}
+              >
+                <Calendar className="w-3.5 h-3.5" />
+                Zeitraum laden
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-9"
+                onClick={() => {
+                  setDateFrom(defaultRange.from);
+                  setDateTo(defaultRange.to);
+                  setRange(defaultRange);
+                  setSuggestions([]);
+                  setHasLoaded(false);
+                }}
+              >
+                Zurücksetzen
+              </Button>
+            </div>
+          </div>
+
+          {loadingData ? (
+            <p className="text-xs text-muted-foreground mt-2 flex items-center gap-1.5">
+              <Loader2 className="w-3 h-3 animate-spin" /> Daten werden geladen…
+            </p>
+          ) : rangeDirty ? (
+            <p className="text-xs text-accent mt-2">
+              Zeitraum geändert – klicke «Zeitraum laden», um die Daten zu aktualisieren.
+            </p>
+          ) : totalItems === 0 ? (
+            <p className="text-xs text-destructive mt-2">
+              Keine Daten in diesem Zeitraum. Wähle einen anderen Bereich.
+            </p>
+          ) : (
+            <p className="text-xs text-muted-foreground mt-2">
+              Geladen: {affairs.length} Geschäfte · {votings.length} Abstimmungen
+            </p>
+          )}
         </div>
 
-        {/* Date range */}
-        <div className="mt-4 flex flex-col sm:flex-row sm:items-end gap-2">
-          <div className="flex-1 min-w-[130px]">
-            <label className="text-xs text-muted-foreground mb-1 block">Von</label>
-            <Input
-              type="date"
-              value={dateFrom}
-              max={dateTo}
-              onChange={(e) => setDateFrom(e.target.value)}
-              className="h-9"
-            />
-          </div>
-          <div className="flex-1 min-w-[130px]">
-            <label className="text-xs text-muted-foreground mb-1 block">Bis</label>
-            <Input
-              type="date"
-              value={dateTo}
-              min={dateFrom}
-              onChange={(e) => setDateTo(e.target.value)}
-              className="h-9"
-            />
-          </div>
-          <div className="flex gap-2">
-            <Button
-              variant={rangeDirty ? "default" : "secondary"}
-              size="sm"
-              className="h-9 gap-1.5"
-              disabled={!rangeDirty || !dateFrom || !dateTo || dateFrom > dateTo}
-              onClick={() => setRange({ from: dateFrom, to: dateTo })}
-            >
-              <Calendar className="w-3.5 h-3.5" />
-              Zeitraum laden
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-9"
-              onClick={() => {
-                setDateFrom(defaultRange.from);
-                setDateTo(defaultRange.to);
-                setRange(defaultRange);
-              }}
-            >
-              Zurücksetzen
+        {/* Schritt 2 */}
+        <div className="mt-3 rounded-lg border border-border/60 p-3">
+          <div className="flex items-center justify-between gap-3 flex-wrap">
+            <div className="flex items-center gap-2">
+              <span className={`flex items-center justify-center w-5 h-5 rounded-full text-[11px] font-bold ${step1Done ? "bg-accent/15 text-accent" : "bg-muted text-muted-foreground"}`}>
+                2
+              </span>
+              <div>
+                <span className={`text-sm font-medium ${step1Done ? "" : "text-muted-foreground"}`}>
+                  KI-Analyse starten
+                </span>
+                <p className="text-xs text-muted-foreground">
+                  {step1Done
+                    ? `Analysiert ${Math.min(totalItems, 50)} Einträge nach Social-Media-Potenzial`
+                    : "Zuerst Schritt 1 abschliessen"}
+                </p>
+              </div>
+            </div>
+            <Button onClick={generateSuggestions} disabled={loading || !step1Done} size="sm" className="gap-2">
+              {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Zap className="w-4 h-4" />}
+              {hasLoaded ? "Neu analysieren" : "Analysieren"}
             </Button>
           </div>
         </div>
-        {loadingData ? (
-          <p className="text-xs text-muted-foreground mt-2 flex items-center gap-1.5">
-            <Loader2 className="w-3 h-3 animate-spin" /> Daten werden geladen…
-          </p>
-        ) : (
-          <p className="text-xs text-muted-foreground mt-2">
-            {affairs.length} Geschäfte · {votings.length} Abstimmungen im gewählten Zeitraum
-          </p>
-        )}
       </CardHeader>
+
 
       <CardContent>
         {loading ? (
