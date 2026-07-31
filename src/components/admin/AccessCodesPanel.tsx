@@ -17,12 +17,29 @@ interface AccessCode {
   active: boolean;
   created_at: string;
   last_used_at: string | null;
+  logins: number;
+  logins30d: number;
+  first_used_at: string | null;
+}
+
+interface AccessEvent {
+  access_code_id: string | null;
+  label: string;
+  created_at: string;
+}
+
+interface MasterStats {
+  label: string;
+  logins: number;
+  logins30d: number;
 }
 
 /** Admin-only management of personal access codes. */
 const AccessCodesPanel = () => {
   const access = useAccess();
   const [codes, setCodes] = useState<AccessCode[]>([]);
+  const [master, setMaster] = useState<MasterStats | null>(null);
+  const [recent, setRecent] = useState<AccessEvent[]>([]);
   const [loading, setLoading] = useState(false);
   const [label, setLabel] = useState("");
   const [newCode, setNewCode] = useState("");
@@ -46,6 +63,8 @@ const AccessCodesPanel = () => {
     try {
       const data = await call({ action: "list" });
       setCodes(data.codes ?? []);
+      setMaster(data.master ?? null);
+      setRecent(data.recent ?? []);
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Laden fehlgeschlagen");
     } finally {
@@ -159,6 +178,10 @@ const AccessCodesPanel = () => {
                     ? `Zuletzt aktiv: ${new Date(c.last_used_at).toLocaleString("de-CH")}`
                     : "Noch nie verwendet"}
                 </p>
+                <p className="text-xs text-muted-foreground">
+                  {c.logins} Anmeldung{c.logins === 1 ? "" : "en"} gesamt · {c.logins30d} in den
+                  letzten 30 Tagen
+                </p>
               </div>
               <div className="flex items-center gap-2">
                 <Switch
@@ -180,6 +203,35 @@ const AccessCodesPanel = () => {
               </div>
             </div>
           ))}
+        </div>
+
+        <div className="space-y-3 border-t border-border pt-4">
+          <div>
+            <h4 className="text-sm font-medium">Nutzung</h4>
+            <p className="text-xs text-muted-foreground">
+              Jede Anmeldung wird pro Passwort protokolliert.
+            </p>
+          </div>
+          {master && (
+            <p className="text-xs text-muted-foreground">
+              Hauptpasswort: {master.logins} Anmeldung{master.logins === 1 ? "" : "en"} gesamt ·{" "}
+              {master.logins30d} in den letzten 30 Tagen
+            </p>
+          )}
+          {recent.length === 0 ? (
+            <p className="text-sm text-muted-foreground">Noch keine Anmeldungen erfasst.</p>
+          ) : (
+            <ul className="space-y-1">
+              {recent.map((ev, i) => (
+                <li key={`${ev.created_at}-${i}`} className="flex justify-between gap-3 text-xs">
+                  <span className="truncate font-medium text-foreground">{ev.label}</span>
+                  <span className="text-muted-foreground whitespace-nowrap">
+                    {new Date(ev.created_at).toLocaleString("de-CH")}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
       </CardContent>
     </Card>
