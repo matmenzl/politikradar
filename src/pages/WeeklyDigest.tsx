@@ -385,14 +385,14 @@ const WeeklyDigest = () => {
           </div>
         }
 
-        {/* Parliament Browser */}
+        {/* Stories der Woche */}
         <div className="opacity-0 animate-fade-in" style={{ animationDelay: "600ms" }}>
-          <ParliamentBrowser />
+          <StoriesCarousel year={year} week={week} />
         </div>
 
-        {/* Stories der Woche */}
+        {/* Parliament Browser */}
         <div className="opacity-0 animate-fade-in" style={{ animationDelay: "650ms" }}>
-          <StoriesCarousel year={year} week={week} />
+          <ParliamentBrowser />
         </div>
           </TabsContent>
 
