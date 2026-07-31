@@ -12,7 +12,7 @@ Deno.serve(async (req) => {
       { auth: { persistSession: false } },
     );
 
-    const identity = await resolveCode(supabase, code);
+    const identity = await resolveCode(supabase, code, true);
     if (!identity) return json({ valid: false });
 
     return json({ valid: true, label: identity.label, isAdmin: identity.isAdmin });

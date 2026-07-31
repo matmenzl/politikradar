@@ -14,6 +14,38 @@ export type Database = {
   }
   public: {
     Tables: {
+      access_code_events: {
+        Row: {
+          access_code_id: string | null
+          created_at: string
+          event_type: string
+          id: string
+          label: string
+        }
+        Insert: {
+          access_code_id?: string | null
+          created_at?: string
+          event_type?: string
+          id?: string
+          label: string
+        }
+        Update: {
+          access_code_id?: string | null
+          created_at?: string
+          event_type?: string
+          id?: string
+          label?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "access_code_events_access_code_id_fkey"
+            columns: ["access_code_id"]
+            isOneToOne: false
+            referencedRelation: "access_codes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       access_codes: {
         Row: {
           active: boolean
