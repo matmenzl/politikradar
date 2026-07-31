@@ -1,7 +1,10 @@
 import { Link, useSearchParams } from "react-router-dom";
 import { Loader2, ChevronLeft, ChevronRight, Sparkles, BarChart3, Vote, Building2, Activity, TrendingUp, Newspaper, Shield } from "lucide-react";
 import ParliamentBrowser from "@/components/ParliamentBrowser";
-import AdminSection from "@/components/admin/AdminSection";
+import AdminGate from "@/components/admin/AdminGate";
+import AiAnalysisSection from "@/components/admin/AiAnalysisSection";
+import EditorialSection from "@/components/admin/EditorialSection";
+import AffairSearch from "@/components/AffairSearch";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
