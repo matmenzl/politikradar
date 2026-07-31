@@ -30,7 +30,41 @@ Deno.serve(async (req) => {
       .select("id, label, is_admin, active, created_at, last_used_at")
       .order("created_at", { ascending: false });
     if (error) return json({ error: error.message }, 500);
-    return json({ codes: data });
+
+    const since = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
+    const { data: events } = await supabase
+      .from("access_code_events")
+      .select("access_code_id, label, created_at")
+      .order("created_at", { ascending: false })
+      .limit(5000);
+
+    const stats: Record<string, { total: number; last30: number; firstUsedAt: string | null }> = {};
+    for (const ev of events ?? []) {
+      const key = (ev.access_code_id as string | null) ?? `label:${ev.label}`;
+      const entry = (stats[key] ??= { total: 0, last30: 0, firstUsedAt: null });
+      entry.total += 1;
+      if ((ev.created_at as string) >= since) entry.last30 += 1;
+      entry.firstUsedAt = ev.created_at as string;
+    }
+
+    const codes = (data ?? []).map((c: Record<string, unknown>) => ({
+      ...c,
+      logins: stats[c.id as string]?.total ?? 0,
+      logins30d: stats[c.id as string]?.last30 ?? 0,
+      first_used_at: stats[c.id as string]?.firstUsedAt ?? null,
+    }));
+
+    const master = stats["label:Hauptzugang"];
+
+    return json({
+      codes,
+      master: {
+        label: "Hauptzugang",
+        logins: master?.total ?? 0,
+        logins30d: master?.last30 ?? 0,
+      },
+      recent: (events ?? []).slice(0, 20),
+    });
   }
 
   if (action === "create") {
