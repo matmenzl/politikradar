@@ -24,6 +24,7 @@ Fokus: Stories sehen, erstellen, prüfen, veröffentlichen, löschen.
 - Stories der gewählten Kalenderwoche (mit Live/Entwurf-Status)
 - Ältere Stories in eigenem Block
 - Pro Story: Vorschau (Slide-Editor inkl. Bild-Prompts), Veröffentlichen/Zurückziehen, Löschen
+- Neu pro Story: Schalter "Auf Startseite zeigen". Nur damit erscheint die Story für Besucher in Bereich 1. Der Schalter ist nur bei veröffentlichten Stories aktiv; wird eine Story zurückgezogen, verschwindet sie automatisch auch von der Startseite.
 - Manuelles Anlegen: Suche nach Geschäft/Abstimmung → "Story generieren"
 - Empty-State mit Hinweis auf die KI-Analyse
 
