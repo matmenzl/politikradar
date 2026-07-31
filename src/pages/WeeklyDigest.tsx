@@ -1,7 +1,10 @@
 import { Link, useSearchParams } from "react-router-dom";
 import { Loader2, ChevronLeft, ChevronRight, Sparkles, BarChart3, Vote, Building2, Activity, TrendingUp, Newspaper, Shield } from "lucide-react";
 import ParliamentBrowser from "@/components/ParliamentBrowser";
-import AdminSection from "@/components/admin/AdminSection";
+import AdminGate from "@/components/admin/AdminGate";
+import AiAnalysisSection from "@/components/admin/AiAnalysisSection";
+import EditorialSection from "@/components/admin/EditorialSection";
+import AffairSearch from "@/components/AffairSearch";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -61,14 +64,17 @@ const WeeklyDigest = () => {
   const [error, setError] = useState<string | null>(null);
 
   const [searchParams, setSearchParams] = useSearchParams();
-  const tab = searchParams.get("tab") === "admin" ? "admin" : "woche";
-  const [adminLoaded, setAdminLoaded] = useState(tab === "admin");
+  const rawTab = searchParams.get("tab");
+  const tab = rawTab === "ki" || rawTab === "redaktion" ? rawTab : rawTab === "admin" ? "redaktion" : "woche";
+  const [aiLoaded, setAiLoaded] = useState(tab === "ki");
+  const [editorialLoaded, setEditorialLoaded] = useState(tab === "redaktion");
 
   const setTab = (value: string) => {
-    if (value === "admin") setAdminLoaded(true);
+    if (value === "ki") setAiLoaded(true);
+    if (value === "redaktion") setEditorialLoaded(true);
     const next = new URLSearchParams(searchParams);
-    if (value === "admin") next.set("tab", "admin");
-    else next.delete("tab");
+    if (value === "woche") next.delete("tab");
+    else next.set("tab", value);
     setSearchParams(next, { replace: true });
   };
 
@@ -135,14 +141,18 @@ const WeeklyDigest = () => {
         </div>
 
         <Tabs value={tab} onValueChange={setTab} className="w-full">
-          <TabsList className="w-full grid grid-cols-2 h-11">
+          <TabsList className="w-full grid grid-cols-3 h-11">
             <TabsTrigger value="woche" className="gap-2">
               <Newspaper className="w-4 h-4" />
               Politikwoche
             </TabsTrigger>
-            <TabsTrigger value="admin" className="gap-2">
+            <TabsTrigger value="ki" className="gap-2">
+              <Sparkles className="w-4 h-4" />
+              KI-Analyse
+            </TabsTrigger>
+            <TabsTrigger value="redaktion" className="gap-2">
               <Shield className="w-4 h-4" />
-              Admin
+              Redaktion
             </TabsTrigger>
           </TabsList>
 
@@ -151,6 +161,12 @@ const WeeklyDigest = () => {
         <div className="opacity-0 animate-fade-in" style={{ animationDelay: "50ms" }}>
           <StoriesCarousel year={year} week={week} />
         </div>
+
+        {/* Research: search affairs & votings */}
+        <div className="opacity-0 animate-fade-in" style={{ animationDelay: "80ms" }}>
+          <AffairSearch />
+        </div>
+
 
 
 
@@ -372,8 +388,20 @@ const WeeklyDigest = () => {
         </div>
           </TabsContent>
 
-          <TabsContent value="admin" className="mt-8 focus-visible:outline-none">
-            {adminLoaded && <AdminSection />}
+          <TabsContent value="ki" className="mt-8 focus-visible:outline-none">
+            {aiLoaded && (
+              <AdminGate title="KI-Analyse" description="Bitte Passwort eingeben">
+                <AiAnalysisSection />
+              </AdminGate>
+            )}
+          </TabsContent>
+
+          <TabsContent value="redaktion" className="mt-8 focus-visible:outline-none">
+            {editorialLoaded && (
+              <AdminGate title="Redaktion" description="Bitte Passwort eingeben">
+                <EditorialSection year={year} week={week} />
+              </AdminGate>
+            )}
           </TabsContent>
         </Tabs>
       </main>

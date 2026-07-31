@@ -45,6 +45,7 @@ const StoriesCarousel = ({ year, week }: StoriesCarouselProps) => {
       .from("story_posts")
       .select("id, title, body_key, affair_id, voting_id, slides, published_at")
       .eq("status", "published")
+      .eq("show_on_home", true)
       .order("published_at", { ascending: false })
       .limit(100)
       .then(async ({ data }) => {
@@ -133,9 +134,9 @@ const StoriesCarousel = ({ year, week }: StoriesCarouselProps) => {
           <p className="text-sm text-muted-foreground">
             Es gibt noch keine Social-Media-Posts in dieser Woche.
           </p>
-          <Button variant="outline" size="sm" onClick={() => navigate(weekQuery(year, week, "/?tab=admin"))}>
+          <Button variant="outline" size="sm" onClick={() => navigate(weekQuery(year, week, "/?tab=redaktion"))}>
             <Shield className="w-4 h-4" />
-            Ersten Post im Admin-Bereich erstellen
+            Ersten Post in der Redaktion erstellen
           </Button>
         </div>
       </div>

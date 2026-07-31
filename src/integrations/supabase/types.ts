@@ -42,6 +42,7 @@ export type Database = {
           created_at: string
           id: string
           published_at: string | null
+          show_on_home: boolean
           slides: Json
           status: string
           title: string
@@ -53,6 +54,7 @@ export type Database = {
           created_at?: string
           id?: string
           published_at?: string | null
+          show_on_home?: boolean
           slides?: Json
           status?: string
           title: string
@@ -64,6 +66,7 @@ export type Database = {
           created_at?: string
           id?: string
           published_at?: string | null
+          show_on_home?: boolean
           slides?: Json
           status?: string
           title?: string
