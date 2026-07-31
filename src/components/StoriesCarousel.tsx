@@ -45,6 +45,7 @@ const StoriesCarousel = ({ year, week }: StoriesCarouselProps) => {
       .from("story_posts")
       .select("id, title, body_key, affair_id, voting_id, slides, published_at")
       .eq("status", "published")
+      .eq("show_on_home", true)
       .order("published_at", { ascending: false })
       .limit(100)
       .then(async ({ data }) => {
