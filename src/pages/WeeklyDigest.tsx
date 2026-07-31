@@ -138,14 +138,18 @@ const WeeklyDigest = () => {
         </div>
 
         <Tabs value={tab} onValueChange={setTab} className="w-full">
-          <TabsList className="w-full grid grid-cols-2 h-11">
+          <TabsList className="w-full grid grid-cols-3 h-11">
             <TabsTrigger value="woche" className="gap-2">
               <Newspaper className="w-4 h-4" />
               Politikwoche
             </TabsTrigger>
-            <TabsTrigger value="admin" className="gap-2">
+            <TabsTrigger value="ki" className="gap-2">
+              <Sparkles className="w-4 h-4" />
+              KI-Analyse
+            </TabsTrigger>
+            <TabsTrigger value="redaktion" className="gap-2">
               <Shield className="w-4 h-4" />
-              Admin
+              Redaktion
             </TabsTrigger>
           </TabsList>
 
@@ -154,6 +158,12 @@ const WeeklyDigest = () => {
         <div className="opacity-0 animate-fade-in" style={{ animationDelay: "50ms" }}>
           <StoriesCarousel year={year} week={week} />
         </div>
+
+        {/* Research: search affairs & votings */}
+        <div className="opacity-0 animate-fade-in" style={{ animationDelay: "80ms" }}>
+          <AffairSearch />
+        </div>
+
 
 
 
