@@ -385,8 +385,20 @@ const WeeklyDigest = () => {
         </div>
           </TabsContent>
 
-          <TabsContent value="admin" className="mt-8 focus-visible:outline-none">
-            {adminLoaded && <AdminSection />}
+          <TabsContent value="ki" className="mt-8 focus-visible:outline-none">
+            {aiLoaded && (
+              <AdminGate title="KI-Analyse" description="Bitte Passwort eingeben">
+                <AiAnalysisSection />
+              </AdminGate>
+            )}
+          </TabsContent>
+
+          <TabsContent value="redaktion" className="mt-8 focus-visible:outline-none">
+            {editorialLoaded && (
+              <AdminGate title="Redaktion" description="Bitte Passwort eingeben">
+                <EditorialSection year={year} week={week} />
+              </AdminGate>
+            )}
           </TabsContent>
         </Tabs>
       </main>
