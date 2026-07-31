@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -21,15 +21,18 @@ interface SuggestableItem extends SearchResult {
   bodyName: string;
 }
 
-const AiAnalysisSection = () => {
+interface AiAnalysisSectionProps {
+  year?: number;
+  week?: number;
+}
+
+const AiAnalysisSection = ({ year: yearProp, week: weekProp }: AiAnalysisSectionProps) => {
   const defaultRange = useMemo(() => {
-    const { year, week } = getCurrentISOWeek();
-    const current = getWeekDateRange(year, week);
-    const prevWeekNum = week > 1 ? week - 1 : 52;
-    const prevYear = week > 1 ? year : year - 1;
-    const prev = getWeekDateRange(prevYear, prevWeekNum);
-    return { from: prev.from, to: current.to };
-  }, []);
+    const current = getCurrentISOWeek();
+    const year = yearProp ?? current.year;
+    const week = weekProp ?? current.week;
+    return getWeekDateRange(year, week);
+  }, [yearProp, weekProp]);
 
   const [dateFrom, setDateFrom] = useState(defaultRange.from);
   const [dateTo, setDateTo] = useState(defaultRange.to);
@@ -42,6 +45,15 @@ const AiAnalysisSection = () => {
   const [loading, setLoading] = useState(false);
   const [hasLoaded, setHasLoaded] = useState(false);
   const [generatingId, setGeneratingId] = useState<string | null>(null);
+
+  useEffect(() => {
+    setDateFrom(defaultRange.from);
+    setDateTo(defaultRange.to);
+    setRange(defaultRange);
+    setSuggestions([]);
+    setHasLoaded(false);
+  }, [defaultRange]);
+
 
   const rangeDirty = dateFrom !== range.from || dateTo !== range.to;
 

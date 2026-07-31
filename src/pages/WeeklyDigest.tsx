@@ -23,6 +23,7 @@ import { useWeekParam } from "@/hooks/use-week";
 
 import VoteBar from "@/components/VoteBar";
 import StoriesCarousel from "@/components/StoriesCarousel";
+import WeekContextBar from "@/components/WeekContextBar";
 import logoImg from "@/assets/politikradar_logo.png";
 // Logo imported above
 
@@ -138,7 +139,11 @@ const WeeklyDigest = () => {
             🇨🇭 Politikwoche
           </h1>
           <p className="text-lg text-foreground/80">{dateRangeLabel}</p>
+          <p className="text-xs text-muted-foreground">
+            Diese Kalenderwoche gilt für alle drei Bereiche: Politikwoche, KI-Analyse und Redaktion.
+          </p>
         </div>
+
 
         <Tabs value={tab} onValueChange={setTab} className="w-full">
           <TabsList className="w-full grid grid-cols-3 h-11">
@@ -157,7 +162,9 @@ const WeeklyDigest = () => {
           </TabsList>
 
           <TabsContent value="woche" className="mt-8 space-y-8 md:space-y-12 focus-visible:outline-none">
+        <WeekContextBar note="Alle Zahlen, Themen und Stories unten beziehen sich auf diese Kalenderwoche." />
         {/* Research: search affairs & votings */}
+
         <div className="opacity-0 animate-fade-in" style={{ animationDelay: "50ms" }}>
           <AffairSearch />
         </div>
@@ -390,21 +397,24 @@ const WeeklyDigest = () => {
           </TabsContent>
 
 
-          <TabsContent value="ki" className="mt-8 focus-visible:outline-none">
+          <TabsContent value="ki" className="mt-8 space-y-4 focus-visible:outline-none">
+            <WeekContextBar note="Die KI-Analyse startet standardmässig mit dieser Kalenderwoche – der Zeitraum lässt sich unten erweitern." />
             {aiLoaded && (
               <AdminGate title="KI-Analyse" description="Bitte Passwort eingeben">
-                <AiAnalysisSection />
+                <AiAnalysisSection year={year} week={week} />
               </AdminGate>
             )}
           </TabsContent>
 
-          <TabsContent value="redaktion" className="mt-8 focus-visible:outline-none">
+          <TabsContent value="redaktion" className="mt-8 space-y-4 focus-visible:outline-none">
+            <WeekContextBar note="Redaktion zeigt und verwaltet die Stories dieser Kalenderwoche." />
             {editorialLoaded && (
               <AdminGate title="Redaktion" description="Bitte Passwort eingeben">
                 <EditorialSection year={year} week={week} />
               </AdminGate>
             )}
           </TabsContent>
+
         </Tabs>
       </main>
 
