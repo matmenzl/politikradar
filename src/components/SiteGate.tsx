@@ -108,6 +108,19 @@ const SiteGate = ({ children }: { children: ReactNode }) => {
         },
       }}
     >
+      <div className="flex items-center justify-end gap-3 px-4 md:px-6 py-1.5 text-xs text-muted-foreground border-b border-border/50">
+        <span className="truncate">Angemeldet als {session.label}</span>
+        <button
+          type="button"
+          className="underline hover:text-foreground"
+          onClick={() => {
+            localStorage.removeItem(STORAGE_KEY);
+            setSession(null);
+          }}
+        >
+          Abmelden
+        </button>
+      </div>
       {children}
     </AccessContext.Provider>
   );
