@@ -1,7 +1,7 @@
 import { Link, useSearchParams } from "react-router-dom";
 import { Loader2, ChevronLeft, ChevronRight, Sparkles, BarChart3, Vote, Building2, Activity, TrendingUp, Newspaper, Shield } from "lucide-react";
 import ParliamentBrowser from "@/components/ParliamentBrowser";
-import AdminGate from "@/components/admin/AdminGate";
+import AccessCodesPanel from "@/components/admin/AccessCodesPanel";
 import AiAnalysisSection from "@/components/admin/AiAnalysisSection";
 import EditorialSection from "@/components/admin/EditorialSection";
 import AffairSearch from "@/components/AffairSearch";
@@ -399,19 +399,16 @@ const WeeklyDigest = () => {
 
           <TabsContent value="ki" className="mt-8 space-y-4 focus-visible:outline-none">
             <WeekContextBar note="Die KI-Analyse startet standardmässig mit dieser Kalenderwoche – der Zeitraum lässt sich unten erweitern." />
-            {aiLoaded && (
-              <AdminGate title="KI-Analyse" description="Bitte Passwort eingeben">
-                <AiAnalysisSection year={year} week={week} />
-              </AdminGate>
-            )}
+            {aiLoaded && <AiAnalysisSection year={year} week={week} />}
           </TabsContent>
 
           <TabsContent value="redaktion" className="mt-8 space-y-4 focus-visible:outline-none">
             <WeekContextBar note="Redaktion zeigt und verwaltet die Stories dieser Kalenderwoche." />
             {editorialLoaded && (
-              <AdminGate title="Redaktion" description="Bitte Passwort eingeben">
+              <>
                 <EditorialSection year={year} week={week} />
-              </AdminGate>
+                <AccessCodesPanel />
+              </>
             )}
           </TabsContent>
 
