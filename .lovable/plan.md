@@ -41,9 +41,6 @@ Drei Tabs auf der Startseite: `Politikwoche` · `KI-Analyse` · `Redaktion`, ges
   - `admin/EditorialSection.tsx` – Story-Liste (Woche/älter), `StoryRow`, `StoryPreviewModal`, `generateStory`, `togglePublish`, `deleteStory`, API-Suche
   - Gemeinsame Typen und `generateStory` in `admin/shared.ts`, damit beide Bereiche Stories anlegen können
 - Der bisherige `BrowseSection` (Geschäfte/Abstimmungen der Woche mit Filter) zieht in Bereich 1 als öffentliche Recherche-Komponente `src/components/AffairSearch.tsx` um – ohne den "Story"-Button.
-- `StoriesCarousel` (Stories der Woche) wird in Bereich 3 eingebunden; die Wochenauswahl kommt weiterhin aus `useWeekParam`.
-- Keine Änderungen an Datenbank oder Edge Functions.
-
-## Offene Frage
-
-Sollen die veröffentlichten "Stories der Woche" für normale Besucher weiterhin oben in der Politikwoche sichtbar bleiben (Leseansicht), oder komplett in die Redaktion wandern? Standard im Plan: sie bleiben in Bereich 1 als Leseansicht sichtbar, die Verwaltung passiert in Bereich 3.
+- `StoriesCarousel` wird in Bereich 3 als Redaktionsliste genutzt und filtert in Bereich 1 zusätzlich auf freigegebene Stories; die Wochenauswahl kommt weiterhin aus `useWeekParam`.
+- Datenbank: neue Spalte `show_on_home boolean not null default false` auf `story_posts`. Die öffentliche Abfrage in Bereich 1 filtert auf `status = 'published' and show_on_home = true`; die Redaktion liest wie bisher alle Stories.
+- Keine Änderungen an Edge Functions.
