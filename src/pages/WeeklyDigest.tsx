@@ -162,7 +162,9 @@ const WeeklyDigest = () => {
           </TabsList>
 
           <TabsContent value="woche" className="mt-8 space-y-8 md:space-y-12 focus-visible:outline-none">
+        <WeekContextBar note="Alle Zahlen, Themen und Stories unten beziehen sich auf diese Kalenderwoche." />
         {/* Research: search affairs & votings */}
+
         <div className="opacity-0 animate-fade-in" style={{ animationDelay: "50ms" }}>
           <AffairSearch />
         </div>
