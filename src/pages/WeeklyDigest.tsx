@@ -138,7 +138,11 @@ const WeeklyDigest = () => {
             🇨🇭 Politikwoche
           </h1>
           <p className="text-lg text-foreground/80">{dateRangeLabel}</p>
+          <p className="text-xs text-muted-foreground">
+            Diese Kalenderwoche gilt für alle drei Bereiche: Politikwoche, KI-Analyse und Redaktion.
+          </p>
         </div>
+
 
         <Tabs value={tab} onValueChange={setTab} className="w-full">
           <TabsList className="w-full grid grid-cols-3 h-11">
