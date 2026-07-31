@@ -157,15 +157,11 @@ const WeeklyDigest = () => {
           </TabsList>
 
           <TabsContent value="woche" className="mt-8 space-y-8 md:space-y-12 focus-visible:outline-none">
-        {/* Stories – central hero element */}
-        <div className="opacity-0 animate-fade-in" style={{ animationDelay: "50ms" }}>
-          <StoriesCarousel year={year} week={week} />
-        </div>
-
         {/* Research: search affairs & votings */}
-        <div className="opacity-0 animate-fade-in" style={{ animationDelay: "80ms" }}>
+        <div className="opacity-0 animate-fade-in" style={{ animationDelay: "50ms" }}>
           <AffairSearch />
         </div>
+
 
 
 
