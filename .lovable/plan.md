@@ -8,7 +8,7 @@ Bleibt inhaltlich wie heute, ergänzt um Recherche:
 - Wochennavigation, Kennzahlen (Parlamente, Abstimmungen, Geschäfte, Sitzungen)
 - Wochenzusammenfassung, Themen-Radar, Aktivste Parlamente, Parlaments-Browser
 - Neu: Suche nach Geschäften und Abstimmungen (Volltextsuche über OpenParlData, Filter nach Parlament). Treffer verlinken auf die Detailseite – ohne Story-Generierung, das gehört in Bereich 3.
-- Stories der Woche werden aus diesem Tab entfernt und wandern in die Redaktion (Bereich 3). Alternativ: als reine Leseansicht behalten – siehe offene Frage unten.
+- Stories der Woche erscheinen hier nicht automatisch. Sichtbar wird eine Story nur, wenn sie in der Redaktion (Bereich 3) explizit für die Startseite freigegeben wurde. Ist keine Story freigegeben, entfällt der Block komplett.
 
 ## Bereich 2 – KI-Analyse (PIN-geschützt)
 
