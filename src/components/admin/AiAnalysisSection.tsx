@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Sparkles, Calendar, TrendingUp, Zap, Lightbulb } from "lucide-react";
+import { Loader2, Sparkles, Calendar, TrendingUp, Zap, Lightbulb, Check } from "lucide-react";
 import { getCurrentISOWeek, getWeekDateRange } from "@/lib/api/openparldata";
 import { useRangeItems } from "@/hooks/use-range-items";
 import { createStoryDraft, type SearchResult } from "@/components/admin/shared";
