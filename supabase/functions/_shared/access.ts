@@ -29,11 +29,15 @@ export interface AccessIdentity {
 export async function resolveCode(
   supabase: { from: (t: string) => any },
   code: unknown,
+  logUsage = false,
 ): Promise<AccessIdentity | null> {
   if (typeof code !== "string" || !normalizeCode(code)) return null;
 
   const masterPin = Deno.env.get("ADMIN_PIN");
   if (masterPin && normalizeCode(code) === masterPin) {
+    if (logUsage) {
+      await supabase.from("access_code_events").insert({ label: "Hauptzugang", event_type: "login" });
+    }
     return { label: "Hauptzugang", isAdmin: true };
   }
 
@@ -46,10 +50,15 @@ export async function resolveCode(
 
   if (error || !data || !data.active) return null;
 
-  await supabase
-    .from("access_codes")
-    .update({ last_used_at: new Date().toISOString() })
-    .eq("id", data.id);
+  if (logUsage) {
+    await supabase
+      .from("access_codes")
+      .update({ last_used_at: new Date().toISOString() })
+      .eq("id", data.id);
+    await supabase
+      .from("access_code_events")
+      .insert({ access_code_id: data.id, label: data.label, event_type: "login" });
+  }
 
   return { label: data.label as string, isAdmin: Boolean(data.is_admin) };
 }
