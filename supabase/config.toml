@@ -17,3 +17,8 @@ verify_jwt = false
 
 [functions.suggest-stories]
 verify_jwt = false
+[functions.verify-access-code]
+verify_jwt = false
+
+[functions.manage-access-codes]
+verify_jwt = false
