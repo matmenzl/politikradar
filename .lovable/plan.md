@@ -8,7 +8,7 @@ Bleibt inhaltlich wie heute, ergänzt um Recherche:
 - Wochennavigation, Kennzahlen (Parlamente, Abstimmungen, Geschäfte, Sitzungen)
 - Wochenzusammenfassung, Themen-Radar, Aktivste Parlamente, Parlaments-Browser
 - Neu: Suche nach Geschäften und Abstimmungen (Volltextsuche über OpenParlData, Filter nach Parlament). Treffer verlinken auf die Detailseite – ohne Story-Generierung, das gehört in Bereich 3.
-- Stories der Woche werden aus diesem Tab entfernt und wandern in die Redaktion (Bereich 3). Alternativ: als reine Leseansicht behalten – siehe offene Frage unten.
+- Stories der Woche erscheinen hier nicht automatisch. Sichtbar wird eine Story nur, wenn sie in der Redaktion (Bereich 3) explizit für die Startseite freigegeben wurde. Ist keine Story freigegeben, entfällt der Block komplett.
 
 ## Bereich 2 – KI-Analyse (PIN-geschützt)
 
@@ -24,6 +24,7 @@ Fokus: Stories sehen, erstellen, prüfen, veröffentlichen, löschen.
 - Stories der gewählten Kalenderwoche (mit Live/Entwurf-Status)
 - Ältere Stories in eigenem Block
 - Pro Story: Vorschau (Slide-Editor inkl. Bild-Prompts), Veröffentlichen/Zurückziehen, Löschen
+- Neu pro Story: Schalter "Auf Startseite zeigen". Nur damit erscheint die Story für Besucher in Bereich 1. Der Schalter ist nur bei veröffentlichten Stories aktiv; wird eine Story zurückgezogen, verschwindet sie automatisch auch von der Startseite.
 - Manuelles Anlegen: Suche nach Geschäft/Abstimmung → "Story generieren"
 - Empty-State mit Hinweis auf die KI-Analyse
 
@@ -40,9 +41,6 @@ Drei Tabs auf der Startseite: `Politikwoche` · `KI-Analyse` · `Redaktion`, ges
   - `admin/EditorialSection.tsx` – Story-Liste (Woche/älter), `StoryRow`, `StoryPreviewModal`, `generateStory`, `togglePublish`, `deleteStory`, API-Suche
   - Gemeinsame Typen und `generateStory` in `admin/shared.ts`, damit beide Bereiche Stories anlegen können
 - Der bisherige `BrowseSection` (Geschäfte/Abstimmungen der Woche mit Filter) zieht in Bereich 1 als öffentliche Recherche-Komponente `src/components/AffairSearch.tsx` um – ohne den "Story"-Button.
-- `StoriesCarousel` (Stories der Woche) wird in Bereich 3 eingebunden; die Wochenauswahl kommt weiterhin aus `useWeekParam`.
-- Keine Änderungen an Datenbank oder Edge Functions.
-
-## Offene Frage
-
-Sollen die veröffentlichten "Stories der Woche" für normale Besucher weiterhin oben in der Politikwoche sichtbar bleiben (Leseansicht), oder komplett in die Redaktion wandern? Standard im Plan: sie bleiben in Bereich 1 als Leseansicht sichtbar, die Verwaltung passiert in Bereich 3.
+- `StoriesCarousel` wird in Bereich 3 als Redaktionsliste genutzt und filtert in Bereich 1 zusätzlich auf freigegebene Stories; die Wochenauswahl kommt weiterhin aus `useWeekParam`.
+- Datenbank: neue Spalte `show_on_home boolean not null default false` auf `story_posts`. Die öffentliche Abfrage in Bereich 1 filtert auf `status = 'published' and show_on_home = true`; die Redaktion liest wie bisher alle Stories.
+- Keine Änderungen an Edge Functions.
