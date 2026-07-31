@@ -23,6 +23,7 @@ import { useWeekParam } from "@/hooks/use-week";
 
 import VoteBar from "@/components/VoteBar";
 import StoriesCarousel from "@/components/StoriesCarousel";
+import WeekContextBar from "@/components/WeekContextBar";
 import logoImg from "@/assets/politikradar_logo.png";
 // Logo imported above
 
