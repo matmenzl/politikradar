@@ -382,7 +382,13 @@ const WeeklyDigest = () => {
         <div className="opacity-0 animate-fade-in" style={{ animationDelay: "600ms" }}>
           <ParliamentBrowser />
         </div>
+
+        {/* Stories der Woche */}
+        <div className="opacity-0 animate-fade-in" style={{ animationDelay: "650ms" }}>
+          <StoriesCarousel year={year} week={week} />
+        </div>
           </TabsContent>
+
 
           <TabsContent value="ki" className="mt-8 focus-visible:outline-none">
             {aiLoaded && (
