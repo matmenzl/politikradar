@@ -69,7 +69,7 @@ const SiteGate = ({ children }: { children: ReactNode }) => {
         <Card className="w-full max-w-sm">
           <CardHeader className="text-center">
             <Lock className="w-8 h-8 mx-auto mb-2 text-muted-foreground" />
-            <CardTitle className="font-serif">PolitikRadar</CardTitle>
+            <CardTitle className="font-serif">politikradar<span className="text-brand-red">.</span></CardTitle>
             <CardDescription>Bitte persönliches Passwort eingeben</CardDescription>
           </CardHeader>
           <CardContent>

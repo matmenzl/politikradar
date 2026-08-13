@@ -192,7 +192,7 @@ const EmbedDetailPage = () => {
             <VoteBar ja={voting.results_yes} nein={voting.results_no} enthaltungen={voting.results_abstention} />
             <div className="grid gap-2 sm:grid-cols-2">
               <DetailRow label="Entscheid">
-                <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${isVotingAccepted(voting) ? "bg-success/10 text-success" : "bg-destructive/10 text-destructive"}`}>
+                <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${isVotingAccepted(voting) ? "bg-brand-green-soft text-brand-green" : "bg-brand-red-soft text-brand-red"}`}>
                   {isVotingAccepted(voting) ? "Angenommen" : "Abgelehnt"}
                 </span>
               </DetailRow>
@@ -229,7 +229,7 @@ const EmbedDetailPage = () => {
                   </p>
                   <div className="flex items-center gap-2 flex-shrink-0">
                     <VoteBar ja={v.results_yes} nein={v.results_no} enthaltungen={v.results_abstention} compact />
-                    <span className={`text-xs font-medium px-1.5 py-0.5 rounded-full ${isVotingAccepted(v) ? "bg-success/10 text-success" : "bg-destructive/10 text-destructive"}`}>
+                    <span className={`text-xs font-medium px-1.5 py-0.5 rounded-full ${isVotingAccepted(v) ? "bg-brand-green-soft text-brand-green" : "bg-brand-red-soft text-brand-red"}`}>
                       {v.results_yes}:{v.results_no}
                     </span>
                   </div>

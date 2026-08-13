@@ -131,19 +131,22 @@ const WeeklyOverview = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="sticky top-0 z-10 bg-background/80 backdrop-blur-md border-b border-border/50 px-3 sm:px-4 md:px-6 py-3 md:py-4">
+      <header className="sticky top-0 z-10 bg-background/90 backdrop-blur-md border-b-2 border-ink px-3 sm:px-4 md:px-6 py-3 md:py-4">
         <div className="max-w-4xl mx-auto flex items-center justify-between gap-2">
           <Link to={withWeek("/")} className="flex items-center gap-1.5 sm:gap-2 text-muted-foreground hover:text-foreground transition-colors min-w-0">
             <ArrowLeft className="w-4 h-4 flex-shrink-0" />
-            <span className="font-serif text-base sm:text-lg font-semibold text-foreground truncate">PolitikRadar</span>
+            <span className="font-serif text-base sm:text-lg font-semibold text-foreground truncate">
+              politikradar<span className="text-brand-red">.</span>
+            </span>
           </Link>
-          <Button variant="outline" size="sm" className="gap-1.5 sm:gap-2 rounded-full flex-shrink-0 text-xs sm:text-sm" onClick={() => setShareOpen(true)}>
+          <Button variant="outline" size="sm" className="gap-1.5 sm:gap-2 flex-shrink-0 text-xs sm:text-sm" onClick={() => setShareOpen(true)}>
             <Share2 className="w-3.5 h-3.5" />
             <span className="hidden xs:inline">Teilen</span>
             <span className="xs:hidden">↗</span>
           </Button>
         </div>
       </header>
+
 
       <main className="max-w-4xl mx-auto px-3 sm:px-4 md:px-6 py-4 sm:py-6 md:py-10 space-y-4 sm:space-y-6 md:space-y-8">
         {/* Parliament selector */}
@@ -162,17 +165,18 @@ const WeeklyOverview = () => {
         {/* Week header with navigation */}
         <div className="space-y-1.5 sm:space-y-2 opacity-0 animate-fade-in" style={{ animationDelay: "50ms" }}>
           <div className="flex items-center gap-2 sm:gap-3">
-            <Button variant="ghost" size="icon" className="h-7 w-7 sm:h-8 sm:w-8" onClick={goToPreviousWeek}>
+            <Button variant="outline" size="icon" className="h-7 w-7 sm:h-8 sm:w-8" onClick={goToPreviousWeek}>
               <ChevronLeft className="w-4 h-4" />
             </Button>
-            <p className="text-[10px] sm:text-xs font-medium uppercase tracking-widest text-muted-foreground">
+            <p className="text-[10px] sm:text-xs font-bold uppercase tracking-[0.2em] text-brand-blue">
               Kalenderwoche {week}
             </p>
-            <Button variant="ghost" size="icon" className="h-7 w-7 sm:h-8 sm:w-8" onClick={goToNextWeek}>
+            <Button variant="outline" size="icon" className="h-7 w-7 sm:h-8 sm:w-8" onClick={goToNextWeek}>
               <ChevronRight className="w-4 h-4" />
             </Button>
           </div>
-          <h1 className="font-serif text-xl sm:text-2xl md:text-4xl font-bold text-foreground">{dateRangeLabel}</h1>
+          <h1 className="font-serif text-2xl sm:text-3xl md:text-5xl font-medium leading-[1.05] text-foreground">{dateRangeLabel}</h1>
+
           <p className="text-base sm:text-lg font-medium text-foreground/80">
             {bodies.length === 0 ? "Lade Parlament…" : (selectedBody ? getBodyLabel(selectedBody) : bodyKey)}
           </p>
@@ -216,7 +220,7 @@ const WeeklyOverview = () => {
           <div className="space-y-4 sm:space-y-5 md:space-y-8">
             <div className="grid gap-3 sm:gap-4 md:gap-5 md:grid-cols-2">
               {/* Card 1: Gesamtaktivität */}
-              <Card className="group hover:shadow-lg hover:border-accent/30 transition-all duration-300 opacity-0 animate-fade-in overflow-hidden" style={{ animationDelay: "100ms" }}>
+              <Card className="group hover:border-accent/30 transition-all duration-300 opacity-0 animate-fade-in overflow-hidden" style={{ animationDelay: "100ms" }}>
                 <CardHeader className="pb-2 md:pb-3 p-3 sm:p-4 md:p-6">
                   <div className="flex items-center gap-2 text-muted-foreground">
                     <Activity className="w-4 h-4 flex-shrink-0" />
@@ -232,23 +236,24 @@ const WeeklyOverview = () => {
                 <CardContent className="p-3 sm:p-4 md:p-6 pt-0">
                   <div className="grid grid-cols-3 gap-1.5 sm:gap-2 md:gap-3">
                     {[
-                      { label: "Geschäfte", value: data.totalAffairs, href: withWeek(`/list/affairs?body=${encodeURIComponent(bodyKey)}`) },
-                      { label: "Abstimmungen", value: data.totalVotings, href: withWeek(`/list/votings?body=${encodeURIComponent(bodyKey)}`) },
-                      { label: "Sitzungen", value: data.totalMeetings, href: withWeek(`/list/meetings?body=${encodeURIComponent(bodyKey)}`) },
+                      { label: "Geschäfte", value: data.totalAffairs, tone: "bg-brand-blue-soft text-brand-blue", href: withWeek(`/list/affairs?body=${encodeURIComponent(bodyKey)}`) },
+                      { label: "Abstimmungen", value: data.totalVotings, tone: "bg-brand-red-soft text-brand-red", href: withWeek(`/list/votings?body=${encodeURIComponent(bodyKey)}`) },
+                      { label: "Sitzungen", value: data.totalMeetings, tone: "bg-brand-green-soft text-brand-green", href: withWeek(`/list/meetings?body=${encodeURIComponent(bodyKey)}`) },
 
                     ].map((stat) => (
-                      <Link key={stat.label} to={stat.href} className="bg-secondary/50 rounded-lg p-2 md:p-3 hover:bg-secondary/80 transition-colors">
-                        <p className="text-lg sm:text-xl md:text-2xl font-semibold text-foreground">{stat.value}</p>
-                        <p className="text-[10px] md:text-xs text-muted-foreground">{stat.label}</p>
+                      <Link key={stat.label} to={stat.href} className={`${stat.tone} p-2 md:p-3 transition-opacity hover:opacity-80`}>
+                        <p className="font-serif text-xl sm:text-2xl md:text-3xl font-medium">{stat.value}</p>
+                        <p className="text-[10px] md:text-xs font-semibold uppercase tracking-wider text-foreground/70">{stat.label}</p>
                       </Link>
                     ))}
+
                   </div>
                 </CardContent>
               </Card>
 
               {/* Card 2: Knappste Abstimmung */}
               <Link to={closestVoting ? `/detail/${closestVoting.id}?type=voting&body=${encodeURIComponent(bodyKey)}` : "#"} className="block">
-              <Card className="group hover:shadow-lg hover:border-accent/30 transition-all duration-300 opacity-0 animate-fade-in cursor-pointer overflow-hidden" style={{ animationDelay: "200ms" }}>
+              <Card className="group hover:border-accent/30 transition-all duration-300 opacity-0 animate-fade-in cursor-pointer overflow-hidden" style={{ animationDelay: "200ms" }}>
                 <CardHeader className="pb-2 md:pb-3 p-3 sm:p-4 md:p-6">
                   <div className="flex items-center gap-2 text-muted-foreground">
                     <Vote className="w-4 h-4 flex-shrink-0" />
@@ -276,7 +281,7 @@ const WeeklyOverview = () => {
               </Link>
 
               {/* Card 3: Alle Abstimmungen */}
-              <Card className="group hover:shadow-lg hover:border-accent/30 transition-all duration-300 opacity-0 animate-fade-in overflow-hidden" style={{ animationDelay: "300ms" }}>
+              <Card className="group hover:border-accent/30 transition-all duration-300 opacity-0 animate-fade-in overflow-hidden" style={{ animationDelay: "300ms" }}>
                 <CardHeader className="pb-2 md:pb-3 p-3 sm:p-4 md:p-6">
                   <div className="flex items-center gap-2 text-muted-foreground">
                     <BarChart3 className="w-4 h-4 flex-shrink-0" />
@@ -296,7 +301,7 @@ const WeeklyOverview = () => {
                         <span className="text-xs sm:text-sm text-foreground line-clamp-2 flex-1 min-w-0">
                           {v.affair_title_de || v.title_de || `Abstimmung #${v.id}`}
                         </span>
-                        <span className={`text-[10px] sm:text-xs font-medium px-1.5 sm:px-2 py-0.5 rounded-full flex-shrink-0 ${isVotingAccepted(v) ? "bg-success/10 text-success" : "bg-destructive/10 text-destructive"}`}>
+                        <span className={`text-[10px] sm:text-xs font-medium px-1.5 sm:px-2 py-0.5 rounded-full flex-shrink-0 ${isVotingAccepted(v) ? "bg-brand-green-soft text-brand-green" : "bg-brand-red-soft text-brand-red"}`}>
                           {v.results_yes}:{v.results_no}
                         </span>
                       </Link>
@@ -309,7 +314,7 @@ const WeeklyOverview = () => {
               </Card>
 
               {/* Card 4: Neueste Geschäfte with AI tags */}
-              <Card className="group hover:shadow-lg hover:border-accent/30 transition-all duration-300 opacity-0 animate-fade-in overflow-hidden" style={{ animationDelay: "400ms" }}>
+              <Card className="group hover:border-accent/30 transition-all duration-300 opacity-0 animate-fade-in overflow-hidden" style={{ animationDelay: "400ms" }}>
                 <CardHeader className="pb-2 md:pb-3 p-3 sm:p-4 md:p-6">
                   <div className="flex items-center justify-between gap-2">
                     <div className="flex items-center gap-2 text-muted-foreground min-w-0">

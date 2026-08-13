@@ -145,7 +145,7 @@ const ListVotings = () => {
                       </div>
                       <div className="flex items-center gap-3 shrink-0">
                         <VoteBar ja={v.results_yes} nein={v.results_no} enthaltungen={v.results_abstention} compact />
-                        <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${accepted ? "bg-success/10 text-success" : "bg-destructive/10 text-destructive"}`}>
+                        <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${accepted ? "bg-brand-green-soft text-brand-green" : "bg-brand-red-soft text-brand-red"}`}>
                           {v.results_yes}:{v.results_no}
                         </span>
                       </div>

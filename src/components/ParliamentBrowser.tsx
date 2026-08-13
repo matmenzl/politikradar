@@ -127,7 +127,7 @@ const ParliamentBrowser = () => {
               <Link
                 key={body.id}
                 to={`/weekly?body=${body.key}`}
-                className="flex items-center gap-3 p-3 rounded-lg border border-border/50 hover:border-accent/40 hover:shadow-md transition-all group bg-card"
+                className="flex items-center gap-3 p-3 rounded-lg border border-border/50 hover:border-accent/40 transition-all group bg-card"
               >
                 <div className="text-accent flex-shrink-0">
                   {LEVEL_ICONS[level] || <Building2 className="w-4 h-4" />}
