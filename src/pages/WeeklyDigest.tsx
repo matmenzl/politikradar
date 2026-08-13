@@ -135,7 +135,7 @@ const WeeklyDigest = () => {
               <ChevronRight className="w-4 h-4" />
             </Button>
           </div>
-          <h1 className="font-serif text-3xl md:text-4xl font-bold text-foreground">
+          <h1 className="font-serif text-3xl md:text-4xl font-normal text-foreground">
             🇨🇭 Politikwoche
           </h1>
           <p className="text-lg text-foreground/80">{dateRangeLabel}</p>

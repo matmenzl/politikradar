@@ -108,7 +108,7 @@ const PersonProfile = () => {
             <AvatarFallback className="text-lg font-semibold">{initials}</AvatarFallback>
           </Avatar>
           <div className="flex-1 min-w-0 space-y-2">
-            <h1 className="font-serif text-3xl font-bold text-foreground">{person.fullname}</h1>
+            <h1 className="font-serif text-3xl font-normal text-foreground">{person.fullname}</h1>
             <div className="flex flex-wrap items-center gap-2">
               {party && <Badge variant="secondary">{party}</Badge>}
               {person.active && <Badge className="bg-brand-green-soft text-brand-green border-success/20">Aktiv</Badge>}

@@ -147,7 +147,7 @@ const EmbedDetailPage = () => {
             {type === "voting" ? "Abstimmung" : "Parlamentarisches Geschäft"}
           </p>
         </div>
-        <h1 className="font-serif text-xl md:text-2xl font-bold text-foreground leading-tight">
+        <h1 className="font-serif text-xl md:text-2xl font-normal text-foreground leading-tight">
           {voting
             ? voting.affair_title_de || voting.title_de || `Abstimmung #${voting.id}`
             : affair?.title_de || `Geschäft #${affair?.id}`}

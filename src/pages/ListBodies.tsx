@@ -104,7 +104,7 @@ const ListBodies = () => {
         <div className="space-y-1">
           <div className="flex items-center gap-2">
             <Building2 className="w-5 h-5 text-muted-foreground" />
-            <h1 className="font-serif text-2xl font-bold">Aktive Parlamente</h1>
+            <h1 className="font-serif text-2xl font-normal">Aktive Parlamente</h1>
           </div>
           <p className="text-sm text-muted-foreground">
             {loading ? "Laden…" : `${filtered.length} Parlamente mit Aktivität diese Woche`}

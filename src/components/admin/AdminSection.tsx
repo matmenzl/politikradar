@@ -8,7 +8,7 @@ const AdminSection = () => {
   const { year, week } = getCurrentISOWeek();
   return (
     <div className="space-y-8">
-      <h2 className="font-serif text-2xl md:text-3xl font-bold text-foreground">Admin-Bereich</h2>
+      <h2 className="font-serif text-2xl md:text-3xl font-normal text-foreground">Admin-Bereich</h2>
       <AiAnalysisSection />
       <EditorialSection year={year} week={week} />
       <AccessCodesPanel />

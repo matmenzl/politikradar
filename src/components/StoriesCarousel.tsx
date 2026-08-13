@@ -129,7 +129,7 @@ const StoriesCarousel = ({ year, week }: StoriesCarouselProps) => {
             <Sparkles className="w-4 h-4" />
             <span className="text-xs font-medium uppercase tracking-wider">Stories</span>
           </div>
-          <h2 className="font-serif text-2xl md:text-3xl font-bold text-foreground">
+          <h2 className="font-serif text-2xl md:text-3xl font-normal text-foreground">
             Stories der Woche
           </h2>
         </div>
@@ -155,7 +155,7 @@ const StoriesCarousel = ({ year, week }: StoriesCarouselProps) => {
             <Sparkles className="w-4 h-4" />
             <span className="text-xs font-medium uppercase tracking-wider">Stories</span>
           </div>
-          <h2 className="font-serif text-2xl md:text-3xl font-bold text-foreground">
+          <h2 className="font-serif text-2xl md:text-3xl font-normal text-foreground">
             Stories der Woche
           </h2>
           <p className="text-sm text-muted-foreground mt-1">
@@ -226,7 +226,7 @@ const StoriesCarousel = ({ year, week }: StoriesCarouselProps) => {
                 <Image className="w-4 h-4" />
                 <span className="text-xs font-medium uppercase tracking-wider">Feed</span>
               </div>
-              <h2 className="font-serif text-xl md:text-2xl font-bold text-foreground">Social-Media Feed</h2>
+              <h2 className="font-serif text-xl md:text-2xl font-normal text-foreground">Social-Media Feed</h2>
             </div>
             <div className="flex gap-4 md:gap-5 overflow-x-auto pb-3 -mx-1 px-1 snap-x snap-mandatory">
               {allFeed.map(({ story, slide, i, total }) => (
