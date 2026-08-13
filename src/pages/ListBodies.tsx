@@ -39,24 +39,27 @@ const ListBodies = () => {
     setLoading(true);
     (async () => {
       try {
-        const allBodies = await fetchBodies();
-        const withStats: BodyWithStats[] = [];
-        const batchSize = 5;
+        const [allBodies, votings, affairs, meetings] = await Promise.all([
+          fetchBodies(),
+          fetchAllVotingsInRange(from, to),
+          fetchAllAffairsInRange(from, to),
+          fetchAllMeetingsInRange(from, to),
+        ]);
+        const count = (rows: { body_key: string }[]) => {
+          const m = new Map<string, number>();
+          rows.forEach((r) => m.set(r.body_key, (m.get(r.body_key) || 0) + 1));
+          return m;
+        };
+        const vMap = count(votings);
+        const aMap = count(affairs);
+        const mMap = count(meetings);
+        const withStats: BodyWithStats[] = allBodies.map((b) => ({
+          ...b,
+          votings: vMap.get(b.key) || 0,
+          affairs: aMap.get(b.key) || 0,
+          meetings: mMap.get(b.key) || 0,
+        }));
 
-        for (let i = 0; i < allBodies.length; i += batchSize) {
-          const batch = allBodies.slice(i, i + batchSize);
-          const results = await Promise.all(
-            batch.map(async (b) => {
-              const [v, a, m] = await Promise.all([
-                fetchVotingsForWeek(from, to, b.key),
-                fetchAffairsForWeek(from, to, b.key),
-                fetchMeetingsForWeek(from, to, b.key),
-              ]);
-              return { ...b, votings: v.total, affairs: a.total, meetings: m.total };
-            })
-          );
-          withStats.push(...results);
-        }
 
         // Only show bodies with activity
         const active = withStats.filter((b) => b.votings > 0 || b.affairs > 0 || b.meetings > 0);
