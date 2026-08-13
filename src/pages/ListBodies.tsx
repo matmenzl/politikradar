@@ -9,9 +9,10 @@ import {
   getWeekDateRange,
   formatDateRange,
   fetchBodies,
-  fetchVotingsForWeek,
-  fetchAffairsForWeek,
-  fetchMeetingsForWeek,
+  fetchAllVotingsInRange,
+  fetchAllAffairsInRange,
+  fetchAllMeetingsInRange,
+
   groupBodiesByLevel,
   LEVEL_LABELS,
   type Body,
