@@ -111,38 +111,41 @@ const WeeklyDigest = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="sticky top-0 z-10 bg-background/80 backdrop-blur-md border-b border-border/50 px-4 md:px-6 py-3 md:py-4">
-        <div className="max-w-4xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <img src={logoImg} alt="PolitikRadar Logo" className="h-8 w-8 object-contain" />
-            <span className="font-serif text-lg font-normal text-foreground">politikradar<span className="text-brand-red">.</span></span>
+      <header className="sticky top-0 z-10 bg-background/90 backdrop-blur-md border-b-2 border-ink px-3 sm:px-4 md:px-6 py-3 md:py-4">
+        <div className="max-w-4xl mx-auto flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 min-w-0">
+            <img src={logoImg} alt="PolitikRadar Logo" className="h-7 w-7 object-contain flex-shrink-0" />
+            <span className="font-serif text-base sm:text-lg font-normal text-foreground truncate">politikradar<span className="text-brand-red">.</span></span>
           </div>
-          <Badge variant="secondary" className="text-xs">Alle Parlamente</Badge>
+          <Link to={withWeek("/weekly")}>
+            <Button variant="bubble" size="sm" className="text-xs sm:text-sm">Alle Parlamente</Button>
+          </Link>
         </div>
       </header>
 
-      <main className="max-w-4xl mx-auto px-4 md:px-6 py-6 md:py-10 space-y-8 md:space-y-12">
+      <main className="max-w-4xl mx-auto px-3 sm:px-4 md:px-6 py-4 sm:py-6 md:py-10 space-y-6 md:space-y-10">
         {/* Week header */}
-        <div className="space-y-2 opacity-0 animate-fade-in" style={{ animationDelay: "0ms" }}>
-          <div className="flex items-center gap-3">
-            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={goToPreviousWeek}>
+        <div className="space-y-1.5 sm:space-y-2 opacity-0 animate-fade-in" style={{ animationDelay: "0ms" }}>
+          <div className="flex items-center gap-2 sm:gap-3">
+            <Button variant="outline" size="icon" className="h-7 w-7 sm:h-8 sm:w-8" onClick={goToPreviousWeek}>
               <ChevronLeft className="w-4 h-4" />
             </Button>
-            <p className="text-xs kicker text-muted-foreground">
-              Kalenderwoche {week}
+            <p className="kicker text-[10px] sm:text-xs text-brand-blue">
+              Kalenderwoche {week} · {year}
             </p>
-            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={goToNextWeek}>
+            <Button variant="outline" size="icon" className="h-7 w-7 sm:h-8 sm:w-8" onClick={goToNextWeek}>
               <ChevronRight className="w-4 h-4" />
             </Button>
           </div>
-          <h1 className="font-serif text-3xl md:text-4xl font-normal text-foreground">
-            🇨🇭 Politikwoche
+          <h1 className="font-serif text-2xl sm:text-3xl md:text-5xl font-normal leading-[1.05] text-foreground">
+            {dateRangeLabel}
           </h1>
-          <p className="text-lg text-foreground/80">{dateRangeLabel}</p>
-          <p className="text-xs text-muted-foreground">
+          <p className="text-base sm:text-lg font-medium text-foreground/80">Politikwoche · alle Parlamente</p>
+          <p className="text-[10px] sm:text-xs text-muted-foreground">
             Diese Kalenderwoche gilt für alle drei Bereiche: Politikwoche, KI-Analyse und Redaktion.
           </p>
         </div>
+
 
 
         <Tabs value={tab} onValueChange={setTab} className="w-full">
