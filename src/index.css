@@ -127,10 +127,48 @@
 
   body {
     @apply bg-background text-foreground font-sans antialiased;
-    font-family: 'Hanken Grotesk', ui-sans-serif, system-ui, sans-serif;
+    font-weight: 400;
   }
 
-  h1, h2, h3, h4 {
-    font-family: 'Newsreader', Georgia, serif;
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-serif;
+    font-weight: 400;
+    font-variation-settings: "opsz" 32;
+  }
+
+  blockquote {
+    @apply font-serif italic;
+    font-weight: 400;
   }
 }
+
+@layer components {
+  /* Kicker / Label: Hanken Grotesk 700 uppercase */
+  .kicker {
+    @apply font-sans font-bold uppercase;
+    letter-spacing: 0.14em;
+  }
+
+  /* Pills / Badges: 600 */
+  .pill {
+    @apply font-sans font-semibold;
+  }
+
+  /* CTA-Buttons: 800 */
+  .cta {
+    @apply font-sans;
+    font-weight: 800;
+  }
+
+  /* Betonung innerhalb von Serif-Headlines */
+  .headline-em {
+    font-weight: 600;
+  }
+
+  /* Zahlen im Newsreader */
+  .num {
+    @apply font-serif tabular-nums;
+    font-weight: 500;
+  }
+}
+
