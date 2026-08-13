@@ -15,7 +15,8 @@ import {
   body as bodyStyle,
   pill as pillStyle,
   cta as ctaStyle,
-  resultPill,
+  resultBubble,
+  hashtagPill,
   isQuote,
 } from "@/lib/storyTheme";
 
@@ -93,7 +94,7 @@ const CarouselSlideCard = forwardRef<HTMLDivElement, CarouselSlideCardProps>(
           {slide.hashtags?.length ? (
             <div className="absolute flex flex-wrap" style={{ left: "10cqw", bottom: "11cqw", gap: "1.7cqw" }}>
               {slide.hashtags.map((h) => (
-                <span key={h} style={{ ...pillStyle("3cqw", BRAND.greenSoft, BRAND.green), padding: "1.6cqw 3cqw" }}>#{h.replace(/^#/, "")}</span>
+                <span key={h} style={{ ...hashtagPill("3cqw", BRAND.greenSoft, BRAND.green), padding: "1.6cqw 3cqw" }}>#{h.replace(/^#/, "")}</span>
               ))}
             </div>
           ) : null}
@@ -115,7 +116,7 @@ const CarouselSlideCard = forwardRef<HTMLDivElement, CarouselSlideCardProps>(
           <div
             className="absolute flex items-center justify-center"
             style={{
-              ...resultPill("4.4cqw", accepted ? BRAND.greenSoft : BRAND.redSoft, accepted ? BRAND.green : BRAND.redDeep),
+              ...resultBubble("4.4cqw", accepted ? BRAND.green : BRAND.redDeep, BRAND.paper),
               left: "9cqw",
               top: format === "square" ? "44cqw" : "52cqw",
               width: "42cqw",
