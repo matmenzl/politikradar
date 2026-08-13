@@ -103,7 +103,20 @@
 
     --success: 152 60% 40%;
     --warning: 38 92% 50%;
+
+    --ink: 0 0% 95%;
+    --paper: 220 20% 10%;
+    --brand-red: 8 80% 60%;
+    --brand-blue: 224 73% 62%;
+    --brand-yellow: 48 92% 62%;
+    --brand-green: 138 46% 45%;
+    --brand-purple: 301 45% 60%;
+    --brand-red-soft: 8 40% 22%;
+    --brand-blue-soft: 224 40% 22%;
+    --brand-green-soft: 138 30% 20%;
+    --brand-purple-soft: 301 30% 22%;
   }
+
 }
 
 @layer base {
