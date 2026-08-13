@@ -5,9 +5,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Search, Sparkles, Trash2, Eye, EyeOff, Home } from "lucide-react";
+import { Loader2, Search, Sparkles, Trash2, Eye, EyeOff, Home, Pencil } from "lucide-react";
 import StoryPreviewModal, { type StorySlide } from "@/components/StoryPreviewModal";
+import type { CarouselSlide } from "@/components/story/CarouselSlideCard";
 import { getWeekDateRange } from "@/lib/api/openparldata";
 import {
   BASE_URL,
@@ -22,12 +26,14 @@ function StoryRow({
   onTogglePublish,
   onToggleHome,
   onDelete,
+  onEditFeed,
 }: {
   story: StoryPost;
   onPreview: (s: StoryPost) => void;
   onTogglePublish: (s: StoryPost) => void;
   onToggleHome: (s: StoryPost, value: boolean) => void;
   onDelete: (id: string) => void;
+  onEditFeed: (s: StoryPost) => void;
 }) {
   return (
     <div className="flex items-center justify-between gap-3 p-3 rounded-lg border border-border/50 flex-wrap">
@@ -52,6 +58,9 @@ function StoryRow({
           />
         </label>
         <div className="flex items-center gap-1">
+          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => onEditFeed(story)} title="Feed-Karussell">
+            <Pencil className="w-4 h-4" />
+          </Button>
           <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => onPreview(story)} title="Vorschau">
             <Eye className="w-4 h-4" />
           </Button>
@@ -89,6 +98,9 @@ const EditorialSection = ({ year, week }: EditorialSectionProps) => {
   const [loading, setLoading] = useState(true);
   const [previewStory, setPreviewStory] = useState<StoryPost | null>(null);
   const [savingSlides, setSavingSlides] = useState(false);
+  const [feedStory, setFeedStory] = useState<StoryPost | null>(null);
+  const [feedJson, setFeedJson] = useState("");
+  const [savingFeed, setSavingFeed] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [searching, setSearching] = useState(false);
@@ -104,6 +116,7 @@ const EditorialSection = ({ year, week }: EditorialSectionProps) => {
         data.map((d) => ({
           ...d,
           slides: (d.slides as unknown as StorySlide[]) || [],
+          feed_slides: (d.feed_slides as unknown as CarouselSlide[]) || [],
         })) as StoryPost[]
       );
     }
