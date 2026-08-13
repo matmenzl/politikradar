@@ -358,7 +358,7 @@ const DetailPage = () => {
             ) : (
               <FileText className="w-4 h-4 text-muted-foreground" />
             )}
-            <p className="text-xs font-medium uppercase tracking-widest text-muted-foreground">
+            <p className="text-xs kicker text-muted-foreground">
               {type === "voting" ? "Abstimmung" : "Parlamentarisches Geschäft"}
             </p>
           </div>

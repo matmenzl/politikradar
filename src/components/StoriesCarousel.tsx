@@ -127,7 +127,7 @@ const StoriesCarousel = ({ year, week }: StoriesCarouselProps) => {
         <div className="mb-4">
           <div className="flex items-center gap-2 text-muted-foreground mb-1">
             <Sparkles className="w-4 h-4" />
-            <span className="text-xs font-medium uppercase tracking-wider">Stories</span>
+            <span className="text-xs kicker">Stories</span>
           </div>
           <h2 className="font-serif text-2xl md:text-3xl font-normal text-foreground">
             Stories der Woche
@@ -153,7 +153,7 @@ const StoriesCarousel = ({ year, week }: StoriesCarouselProps) => {
         <div className="mb-4">
           <div className="flex items-center gap-2 text-muted-foreground mb-1">
             <Sparkles className="w-4 h-4" />
-            <span className="text-xs font-medium uppercase tracking-wider">Stories</span>
+            <span className="text-xs kicker">Stories</span>
           </div>
           <h2 className="font-serif text-2xl md:text-3xl font-normal text-foreground">
             Stories der Woche
@@ -224,7 +224,7 @@ const StoriesCarousel = ({ year, week }: StoriesCarouselProps) => {
             <div className="mb-4">
               <div className="flex items-center gap-2 text-muted-foreground mb-1">
                 <Image className="w-4 h-4" />
-                <span className="text-xs font-medium uppercase tracking-wider">Feed</span>
+                <span className="text-xs kicker">Feed</span>
               </div>
               <h2 className="font-serif text-xl md:text-2xl font-normal text-foreground">Social-Media Feed</h2>
             </div>

@@ -126,7 +126,7 @@ function StoryContent({
                 </Button>
                 {editable && onSlideChange && (
                   <div className="space-y-1.5 rounded-lg border border-border/50 p-2">
-                    <label className="text-[10px] uppercase tracking-wide text-muted-foreground">
+                    <label className="text-[10px] kicker text-muted-foreground">
                       Bild-Prompt
                     </label>
                     <Textarea

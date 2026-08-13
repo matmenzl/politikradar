@@ -143,7 +143,7 @@ const EmbedDetailPage = () => {
           ) : (
             <FileText className="w-3.5 h-3.5 text-muted-foreground" />
           )}
-          <p className="text-xs font-medium uppercase tracking-widest text-muted-foreground">
+          <p className="text-xs kicker text-muted-foreground">
             {type === "voting" ? "Abstimmung" : "Parlamentarisches Geschäft"}
           </p>
         </div>
