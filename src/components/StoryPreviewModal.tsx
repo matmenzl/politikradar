@@ -8,6 +8,7 @@ import StorySlideCard from "./story/StorySlideCard";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { downloadSingleSlide, downloadAllSlidesAsZip } from "@/lib/exportSlides";
 import ImagePromptEditor from "./story/ImagePromptEditor";
+import { composeStoryVariants, type CompositionId } from "@/lib/storyVariants";
 
 
 export interface PartyVoteData {
@@ -35,6 +36,10 @@ export interface StorySlide {
   image_negative?: string;
   /** Override: show/hide the image bubble on this slide */
   image_enabled?: boolean;
+  /** Manuell fixierte Komposition (sonst automatisch gewürfelt) */
+  composition?: CompositionId;
+  /** Manuell fixierte Farbwelt des Slide-Typs */
+  palette_index?: number;
 }
 
 
