@@ -31,6 +31,12 @@ export interface StorySlide {
   image_seed?: number;
   /** Permanent storage URL, set when the story gets published */
   image_url?: string;
+  /** Visual style preset id (see POLLINATIONS_STYLES) */
+  image_style?: string;
+  /** Additional things the image should avoid */
+  image_negative?: string;
+  /** Override: show/hide the image bubble on this slide */
+  image_enabled?: boolean;
 }
 
 
