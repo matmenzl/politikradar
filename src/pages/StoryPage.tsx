@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { ArrowLeft, Loader2, FileText, Download } from "lucide-react";
 import StorySlideCard from "@/components/story/StorySlideCard";
+import { composeStoryVariants } from "@/lib/storyVariants";
 import { Button } from "@/components/ui/button";
 import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext, type CarouselApi } from "@/components/ui/carousel";
 import { useRef, useCallback } from "react";
@@ -93,6 +94,7 @@ const StoryPage = () => {
                         slide={slide}
                         index={i}
                         total={slides.length}
+                        variant={variants[i]}
                         ref={(el) => { slideRefs.current[i] = el; }}
                       />
                       <Button

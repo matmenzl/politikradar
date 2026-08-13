@@ -178,6 +178,7 @@ const StoriesCarousel = ({ year, week }: StoriesCarouselProps) => {
                       slide={firstSlide}
                       index={0}
                       total={story.slides.length}
+                      seed={story.id}
                     />
                   </div>
                   <div className="mt-2.5 text-center">
