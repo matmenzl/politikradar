@@ -13,7 +13,6 @@ import {
   kicker as kickerStyle,
   quote as quoteStyle,
   body as bodyStyle,
-  pill as pillStyle,
   cta as ctaStyle,
   resultBubble,
   hashtagPill,
