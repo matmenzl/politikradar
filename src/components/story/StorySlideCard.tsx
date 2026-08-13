@@ -1,226 +1,162 @@
+// StorySlideCard.tsx — Redesign "Sprechblasen" (Drop-in-Ersatz)
+// Gleiche Props/API wie bisher: { slide, index, total } + forwardRef.
+// Skaliert über Container-Queries (cqw) — funktioniert in Preview UND beim Bild-Export.
 import { forwardRef, useEffect, useMemo, useState } from "react";
 import { Loader2 } from "lucide-react";
-
 import type { StorySlide } from "../StoryPreviewModal";
 import { buildPollinationsUrl, fallbackImagePrompt } from "@/lib/pollinations";
 
-
-const slideStyles: Record<StorySlide["slide_type"], { bg: string; accent: string; glow: string }> = {
-  hook: {
-    bg: "from-[hsl(220,25%,8%)] via-[hsl(210,40%,14%)] to-[hsl(200,60%,18%)]",
-    accent: "text-[hsl(200,80%,70%)]",
-    glow: "hsl(200,80%,50%)",
-  },
-  context: {
-    bg: "from-[hsl(220,20%,8%)] via-[hsl(220,18%,12%)] to-[hsl(230,25%,16%)]",
-    accent: "text-[hsl(220,60%,70%)]",
-    glow: "hsl(220,60%,50%)",
-  },
-  result: {
-    bg: "from-[hsl(160,30%,8%)] via-[hsl(152,40%,12%)] to-[hsl(152,50%,16%)]",
-    accent: "text-[hsl(152,60%,60%)]",
-    glow: "hsl(152,60%,40%)",
-  },
-  insight: {
-    bg: "from-[hsl(30,30%,8%)] via-[hsl(35,50%,12%)] to-[hsl(38,60%,16%)]",
-    accent: "text-[hsl(38,80%,65%)]",
-    glow: "hsl(38,80%,45%)",
-  },
-  cta: {
-    bg: "from-[hsl(200,50%,10%)] via-[hsl(200,60%,16%)] to-[hsl(200,70%,22%)]",
-    accent: "text-[hsl(200,80%,75%)]",
-    glow: "hsl(200,80%,55%)",
-  },
-  party: {
-    bg: "from-[hsl(260,25%,8%)] via-[hsl(260,30%,12%)] to-[hsl(260,35%,18%)]",
-    accent: "text-[hsl(260,60%,75%)]",
-    glow: "hsl(260,60%,50%)",
-  },
+// Farbwelt pro Slide-Typ (statt dunkler Gradients)
+const slideStyles: Record<StorySlide["slide_type"], { bg: string; text: string; accent: string; pillBg: string; track: string }> = {
+  hook:    { bg: "#E8442E", text: "#F4F2EC", accent: "#F7D344", pillBg: "#F8D9D3", track: "rgba(244,242,236,0.25)" },
+  context: { bg: "#F4F2EC", text: "#1A1A1A", accent: "#2151D1", pillBg: "#DCE4F7", track: "rgba(26,26,26,0.15)" },
+  result:  { bg: "#F7D344", text: "#1A1A1A", accent: "#2E7D46", pillBg: "#E3EDDD", track: "rgba(26,26,26,0.15)" },
+  insight: { bg: "#7A1E78", text: "#F4F2EC", accent: "#F2B8C6", pillBg: "#EBD6EA", track: "rgba(244,242,236,0.25)" },
+  cta:     { bg: "#2151D1", text: "#F4F2EC", accent: "#63B348", pillBg: "#DFF0D8", track: "rgba(244,242,236,0.25)" },
+  party:   { bg: "#2E7D46", text: "#F4F2EC", accent: "#F7D344", pillBg: "#E3EDDD", track: "rgba(244,242,236,0.18)" },
 };
 
 const slideTypeLabel: Record<StorySlide["slide_type"], string> = {
-  hook: "AUFMACHER",
-  context: "HINTERGRUND",
-  result: "ERGEBNIS",
-  insight: "EINORDNUNG",
-  cta: "MEHR ERFAHREN",
-  party: "PARTEIVERHALTEN",
+  hook: "AUFMACHER", context: "HINTERGRUND", result: "ERGEBNIS",
+  insight: "EINORDNUNG", cta: "MEHR ERFAHREN", party: "PARTEIVERHALTEN",
 };
 
-interface StorySlideCardProps {
-  slide: StorySlide;
-  index: number;
-  total: number;
-}
+// Sprechblasen-Formen (unregelmässig geschnittene Ecken)
+const BUBBLE_TAIL = "polygon(3% 5%, 97% 0%, 100% 92%, 24% 95%, 19% 100%, 15% 93%, 0% 96%)";
+const FRAME = "polygon(3% 1%, 97% 0%, 100% 3%, 99% 97%, 96% 100%, 4% 99%, 0% 96%, 1% 2%)";
 
-const StorySlideCard = forwardRef<HTMLDivElement, StorySlideCardProps>(
-  ({ slide, index, total }, ref) => {
-    const style = slideStyles[slide.slide_type];
-    const [imgLoaded, setImgLoaded] = useState(false);
-    const [imgFailed, setImgFailed] = useState(false);
+const SERIF = "'Newsreader', Georgia, serif";
+const SANS = "'Hanken Grotesk', system-ui, sans-serif";
 
-    const imageSrc = useMemo(() => {
-      if (slide.image_url) return slide.image_url;
-      const prompt = slide.image_prompt || fallbackImagePrompt(slide.headline, slide.slide_type);
-      return buildPollinationsUrl(prompt, { seed: slide.image_seed });
-      // Re-derive only when the relevant fields change
-    }, [slide.image_url, slide.image_prompt, slide.image_seed, slide.headline, slide.slide_type]);
+interface StorySlideCardProps { slide: StorySlide; index: number; total: number; }
 
-    // Reset load/error state whenever a new image is requested (e.g. new seed)
-    useEffect(() => {
-      setImgLoaded(false);
-      setImgFailed(false);
-    }, [imageSrc]);
+const StorySlideCard = forwardRef<HTMLDivElement, StorySlideCardProps>(({ slide, index, total }, ref) => {
+  const s = slideStyles[slide.slide_type];
+  const showImage = slide.slide_type === "hook"; // Bild nur als Bubble auf dem Hook-Slide
+  const [imgLoaded, setImgLoaded] = useState(false);
+  const [imgFailed, setImgFailed] = useState(false);
 
-    return (
-      <div
-        ref={ref}
-        className={`relative aspect-[9/16] rounded-2xl bg-gradient-to-b ${style.bg} flex flex-col overflow-hidden select-none`}
-      >
-        {/* AI background image */}
-        {!imgFailed && (
-          <img
-            key={imageSrc}
-            src={imageSrc}
-            alt=""
-            crossOrigin="anonymous"
-            onLoad={() => setImgLoaded(true)}
-            onError={() => setImgFailed(true)}
-            className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ${
-              imgLoaded ? "opacity-60" : "opacity-0"
-            }`}
-          />
+  const imageSrc = useMemo(() => {
+    if (!showImage) return "";
+    if (slide.image_url) return slide.image_url;
+    const prompt = slide.image_prompt || fallbackImagePrompt(slide.headline, slide.slide_type);
+    return buildPollinationsUrl(prompt, { seed: slide.image_seed, width: 800, height: 760 });
+  }, [showImage, slide.image_url, slide.image_prompt, slide.image_seed, slide.headline, slide.slide_type]);
+
+  useEffect(() => { setImgLoaded(false); setImgFailed(false); }, [imageSrc]);
+
+  return (
+    <div
+      ref={ref}
+      className="relative aspect-[9/16] rounded-2xl flex flex-col overflow-hidden select-none"
+      style={{ backgroundColor: s.bg, color: s.text, fontFamily: SANS, containerType: "inline-size" }}
+    >
+      {/* CTA: Rahmen-Variante */}
+      {slide.slide_type === "cta" && (
+        <div className="absolute pointer-events-none" style={{ inset: "2.5cqw", border: "1.2cqw solid " + s.accent, clipPath: FRAME }} />
+      )}
+
+      {/* Top bar: Typ-Label + Zähler */}
+      <div className="relative z-10 flex items-center justify-between" style={{ padding: "8cqw 9cqw 0" }}>
+        <span className="font-bold uppercase" style={{ fontSize: "2.6cqw", letterSpacing: "0.22em", color: s.accent }}>
+          {slideTypeLabel[slide.slide_type]}
+        </span>
+        <span className="font-semibold tabular-nums" style={{ fontSize: "2.6cqw", opacity: 0.5 }}>
+          {index + 1}/{total}
+        </span>
+      </div>
+
+      {/* Progress-Segmente */}
+      <div className="relative z-10 flex" style={{ gap: "1cqw", padding: "1.6cqw 9cqw 0" }}>
+        {Array.from({ length: total }).map((_, i) => (
+          <div key={i} className="flex-1" style={{ height: "0.55cqw", backgroundColor: i <= index ? s.text : s.track }} />
+        ))}
+      </div>
+
+      {/* Inhalt */}
+      <div className="relative z-10 flex-1 flex flex-col justify-center" style={{ padding: "0 9cqw" }}>
+        {slide.slide_type === "party" && slide.partyData ? (
+          <PartyContent slide={slide} s={s} />
+        ) : (
+          <>
+            <h3 style={{ fontFamily: SERIF, fontWeight: 400, fontSize: "9.5cqw", lineHeight: 1.08, margin: 0 }}>
+              {slide.headline}
+            </h3>
+            <div style={{ width: "9cqw", height: "0.7cqw", backgroundColor: s.accent, margin: "4cqw 0" }} />
+            <p style={{ fontSize: "3.7cqw", lineHeight: 1.5, fontWeight: 500, margin: 0, opacity: 0.95, maxWidth: "88%" }}>
+              {slide.body}
+            </p>
+            {slide.slide_type === "cta" && (
+              <div
+                className="self-start font-extrabold"
+                style={{ marginTop: "6cqw", fontSize: "3.7cqw", padding: "2.4cqw 4.2cqw", backgroundColor: s.accent, color: "#1A1A1A", clipPath: BUBBLE_TAIL }}
+              >
+                politikradar.ch → Story lesen
+              </div>
+            )}
+          </>
         )}
-        {/* Readability overlay */}
-        {!imgFailed && imgLoaded && (
-          <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/45 to-black/85 pointer-events-none" />
-        )}
-        {/* Loading state */}
-        {!imgFailed && !imgLoaded && (
-          <div className="absolute inset-0 z-20 flex items-end justify-center pb-4 pointer-events-none">
-            <div className="absolute inset-0 animate-pulse bg-white/[0.04]" />
-            <span className="relative flex items-center gap-1.5 rounded-full bg-black/50 px-2.5 py-1 text-[10px] text-white/80 backdrop-blur-sm">
-              <Loader2 className="w-3 h-3 animate-spin" />
-              Bild wird generiert…
-            </span>
-          </div>
-        )}
+      </div>
 
-
-        {/* Ambient glow */}
+      {/* Bild-Bubble (nur Hook) */}
+      {showImage && !imgFailed && (
         <div
-          className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-1/3 rounded-full blur-3xl opacity-20 pointer-events-none"
-          style={{ backgroundColor: style.glow }}
-        />
-
-
-        {/* Top bar: type label + counter */}
-        <div className="relative z-10 flex items-center justify-between px-5 pt-5">
-          <span className={`text-[9px] font-bold tracking-[0.25em] uppercase ${style.accent} opacity-70`}>
-            {slideTypeLabel[slide.slide_type]}
-          </span>
-          <span className="text-white/30 text-[9px] font-medium tabular-nums">
-            {index + 1}/{total}
-          </span>
-        </div>
-
-        {/* Progress dots */}
-        <div className="relative z-10 flex gap-1 px-5 mt-3">
-          {Array.from({ length: total }).map((_, i) => (
-            <div
-              key={i}
-              className={`flex-1 h-[2px] rounded-full transition-colors ${
-                i <= index ? "bg-white/60" : "bg-white/15"
-              }`}
-            />
-          ))}
-        </div>
-
-        {/* Content area */}
-        <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-6 text-center">
-          {slide.slide_type === "party" && slide.partyData ? (
-            <PartySlideContent slide={slide} style={style} />
-          ) : (
-            <DefaultSlideContent slide={slide} />
+          className="absolute z-0"
+          style={{ bottom: "12cqw", right: "-5cqw", width: "48cqw", height: "44cqw", backgroundColor: "#7A1E78", clipPath: BUBBLE_TAIL, overflow: "hidden" }}
+        >
+          <img
+            key={imageSrc} src={imageSrc} alt="" crossOrigin="anonymous"
+            onLoad={() => setImgLoaded(true)} onError={() => setImgFailed(true)}
+            className={`w-full h-full object-cover transition-opacity duration-700 ${imgLoaded ? "opacity-100" : "opacity-0"}`}
+          />
+          {!imgLoaded && (
+            <span className="absolute inset-0 flex items-center justify-center">
+              <Loader2 className="w-4 h-4 animate-spin" style={{ color: "#F4F2EC" }} />
+            </span>
           )}
         </div>
+      )}
 
-        {/* Branding */}
-        <div className="relative z-10 pb-5 flex flex-col items-center gap-1">
-          <div className="w-8 h-[1px] bg-white/10 mb-1" />
-          <span className="text-white/25 text-[8px] font-semibold tracking-[0.3em] uppercase">
-            politikradar.ch
-          </span>
-        </div>
+      {/* Branding-Footer */}
+      <div className="relative z-10 text-center" style={{ paddingBottom: "4.5cqw" }}>
+        <span style={{ fontFamily: SERIF, fontWeight: 600, fontSize: "3.1cqw" }}>politikradar.ch</span>
       </div>
-    );
-  }
-);
+    </div>
+  );
+});
 
 StorySlideCard.displayName = "StorySlideCard";
 
-function DefaultSlideContent({ slide }: { slide: StorySlide }) {
+function PartyContent({ slide, s }: { slide: StorySlide; s: { accent: string; track: string } }) {
   return (
     <>
-      <span className="text-4xl mb-5 drop-shadow-lg">{slide.emoji}</span>
-      <h3
-        className="text-white font-bold text-lg leading-snug mb-3 px-1"
-        style={{ fontFamily: "'Source Serif 4', Georgia, serif" }}
-      >
+      <h3 style={{ fontFamily: SERIF, fontWeight: 400, fontSize: "7.5cqw", lineHeight: 1.1, margin: "0 0 5cqw" }}>
         {slide.headline}
       </h3>
-      <p className="text-white/70 text-[13px] leading-relaxed px-2 max-w-[90%]">
-        {slide.body}
-      </p>
-    </>
-  );
-}
-
-function PartySlideContent({ slide, style }: { slide: StorySlide; style: { accent: string } }) {
-  return (
-    <>
-      <span className="text-3xl mb-2 drop-shadow-lg">🏛️</span>
-      <h3
-        className="text-white font-bold text-[15px] leading-tight mb-4 px-2"
-        style={{ fontFamily: "'Source Serif 4', Georgia, serif" }}
-      >
-        {slide.headline}
-      </h3>
-      <div className="w-full px-3 space-y-1.5">
+      <div className="flex flex-col" style={{ gap: "2.6cqw" }}>
         {slide.partyData?.map((p) => {
           const yesP = p.total > 0 ? Math.round((p.yes / p.total) * 100) : 0;
           const noP = p.total > 0 ? Math.round((p.no / p.total) * 100) : 0;
           return (
-            <div key={p.party} className="flex items-center gap-2">
-              <span className="text-white/80 text-[10px] font-semibold w-[72px] text-right truncate">
-                {p.party}
-              </span>
-              <div
-                className="flex-1 flex h-3 rounded-full overflow-hidden"
-                style={{ backgroundColor: "hsla(220,20%,30%,0.4)" }}
-              >
-                <div
-                  className="rounded-l-full transition-all duration-500"
-                  style={{ width: `${yesP}%`, backgroundColor: "hsl(152, 60%, 50%)" }}
-                />
-                <div
-                  className="rounded-r-full transition-all duration-500"
-                  style={{ width: `${noP}%`, backgroundColor: "hsl(0, 72%, 55%)" }}
-                />
+            <div key={p.party} className="flex items-center" style={{ gap: "2.4cqw" }}>
+              <span className="font-bold text-right truncate" style={{ width: "13cqw", fontSize: "3cqw" }}>{p.party}</span>
+              <div className="flex-1 flex overflow-hidden" style={{ height: "4.4cqw", backgroundColor: s.track }}>
+                <div style={{ width: `${yesP}%`, backgroundColor: "#63B348" }} />
+                <div style={{ width: `${noP}%`, backgroundColor: "#E8442E" }} />
               </div>
-              <span className="text-white/50 text-[9px] font-mono w-[36px]">
+              <span className="font-semibold tabular-nums" style={{ width: "10cqw", fontSize: "2.6cqw", opacity: 0.7 }}>
                 {p.yes}/{p.no}
               </span>
             </div>
           );
         })}
       </div>
-      <div className="flex items-center gap-4 mt-3 text-[9px] text-white/40">
-        <span className="flex items-center gap-1">
-          <span className="w-2 h-2 rounded-full" style={{ backgroundColor: "hsl(152, 60%, 50%)" }} /> Ja
+      <div className="flex font-semibold" style={{ gap: "4cqw", marginTop: "3cqw", fontSize: "2.6cqw", opacity: 0.85 }}>
+        <span className="flex items-center" style={{ gap: "1.2cqw" }}>
+          <span style={{ width: "2.2cqw", height: "2.2cqw", backgroundColor: "#63B348", display: "inline-block" }} /> Ja
         </span>
-        <span className="flex items-center gap-1">
-          <span className="w-2 h-2 rounded-full" style={{ backgroundColor: "hsl(0, 72%, 55%)" }} /> Nein
+        <span className="flex items-center" style={{ gap: "1.2cqw" }}>
+          <span style={{ width: "2.2cqw", height: "2.2cqw", backgroundColor: "#E8442E", display: "inline-block" }} /> Nein
         </span>
       </div>
     </>
