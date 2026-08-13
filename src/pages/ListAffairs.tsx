@@ -8,9 +8,10 @@ import {
   getWeekDateRange,
   formatDateRange,
   fetchBodies,
-  fetchAffairsForWeek,
+  fetchAllAffairsInRange,
   type Affair,
 } from "@/lib/api/openparldata";
+
 import { useWeekParam } from "@/hooks/use-week";
 
 interface AffairWithBody extends Affair {
