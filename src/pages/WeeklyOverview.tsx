@@ -220,7 +220,7 @@ const WeeklyOverview = () => {
           <div className="space-y-4 sm:space-y-5 md:space-y-8">
             <div className="grid gap-3 sm:gap-4 md:gap-5 md:grid-cols-2">
               {/* Card 1: Gesamtaktivität */}
-              <Card className="group hover:shadow-lg hover:border-accent/30 transition-all duration-300 opacity-0 animate-fade-in overflow-hidden" style={{ animationDelay: "100ms" }}>
+              <Card className="group hover:border-accent/30 transition-all duration-300 opacity-0 animate-fade-in overflow-hidden" style={{ animationDelay: "100ms" }}>
                 <CardHeader className="pb-2 md:pb-3 p-3 sm:p-4 md:p-6">
                   <div className="flex items-center gap-2 text-muted-foreground">
                     <Activity className="w-4 h-4 flex-shrink-0" />
@@ -252,7 +252,7 @@ const WeeklyOverview = () => {
 
               {/* Card 2: Knappste Abstimmung */}
               <Link to={closestVoting ? `/detail/${closestVoting.id}?type=voting&body=${encodeURIComponent(bodyKey)}` : "#"} className="block">
-              <Card className="group hover:shadow-lg hover:border-accent/30 transition-all duration-300 opacity-0 animate-fade-in cursor-pointer overflow-hidden" style={{ animationDelay: "200ms" }}>
+              <Card className="group hover:border-accent/30 transition-all duration-300 opacity-0 animate-fade-in cursor-pointer overflow-hidden" style={{ animationDelay: "200ms" }}>
                 <CardHeader className="pb-2 md:pb-3 p-3 sm:p-4 md:p-6">
                   <div className="flex items-center gap-2 text-muted-foreground">
                     <Vote className="w-4 h-4 flex-shrink-0" />
@@ -280,7 +280,7 @@ const WeeklyOverview = () => {
               </Link>
 
               {/* Card 3: Alle Abstimmungen */}
-              <Card className="group hover:shadow-lg hover:border-accent/30 transition-all duration-300 opacity-0 animate-fade-in overflow-hidden" style={{ animationDelay: "300ms" }}>
+              <Card className="group hover:border-accent/30 transition-all duration-300 opacity-0 animate-fade-in overflow-hidden" style={{ animationDelay: "300ms" }}>
                 <CardHeader className="pb-2 md:pb-3 p-3 sm:p-4 md:p-6">
                   <div className="flex items-center gap-2 text-muted-foreground">
                     <BarChart3 className="w-4 h-4 flex-shrink-0" />
@@ -313,7 +313,7 @@ const WeeklyOverview = () => {
               </Card>
 
               {/* Card 4: Neueste Geschäfte with AI tags */}
-              <Card className="group hover:shadow-lg hover:border-accent/30 transition-all duration-300 opacity-0 animate-fade-in overflow-hidden" style={{ animationDelay: "400ms" }}>
+              <Card className="group hover:border-accent/30 transition-all duration-300 opacity-0 animate-fade-in overflow-hidden" style={{ animationDelay: "400ms" }}>
                 <CardHeader className="pb-2 md:pb-3 p-3 sm:p-4 md:p-6">
                   <div className="flex items-center justify-between gap-2">
                     <div className="flex items-center gap-2 text-muted-foreground min-w-0">

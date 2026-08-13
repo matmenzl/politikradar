@@ -53,7 +53,7 @@ const PartyOverviewCard = ({ votings }: Props) => {
   }
 
   return (
-    <Card className="group hover:shadow-lg hover:border-accent/30 transition-all duration-300 opacity-0 animate-fade-in md:col-span-2" style={{ animationDelay: "500ms" }}>
+    <Card className="group hover:border-accent/30 transition-all duration-300 opacity-0 animate-fade-in md:col-span-2" style={{ animationDelay: "500ms" }}>
       <CardHeader className="pb-3">
         <div className="flex items-center gap-2 text-muted-foreground">
           <Users className="w-4 h-4" />
