@@ -6,48 +6,62 @@
 
 @layer base {
   :root {
-    --background: 40 20% 94%;
+    --background: 45 27% 94%;
     --foreground: 0 0% 10%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 220 20% 10%;
+    --card: 45 50% 98%;
+    --card-foreground: 0 0% 10%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 220 20% 10%;
+    --popover: 45 50% 98%;
+    --popover-foreground: 0 0% 10%;
 
-    --primary: 220 14% 20%;
-    --primary-foreground: 0 0% 98%;
+    --primary: 0 0% 10%;
+    --primary-foreground: 45 27% 94%;
 
-    --secondary: 220 10% 94%;
-    --secondary-foreground: 220 14% 20%;
+    --secondary: 44 18% 90%;
+    --secondary-foreground: 0 0% 10%;
 
-    --muted: 220 10% 94%;
-    --muted-foreground: 220 10% 46%;
+    --muted: 44 18% 90%;
+    --muted-foreground: 42 6% 39%;
 
     --accent: 224 73% 47%;
     --accent-foreground: 0 0% 100%;
 
-    --destructive: 7 80% 55%;
-    --destructive-foreground: 0 0% 98%;
+    --destructive: 8 80% 55%;
+    --destructive-foreground: 45 27% 94%;
 
-    --border: 220 13% 90%;
-    --input: 220 13% 90%;
+    --border: 44 18% 84%;
+    --input: 44 18% 84%;
     --ring: 224 73% 47%;
 
     --radius: 0rem;
 
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 240 5.9% 10%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 200 80% 44%;
+    /* Marken-Palette "Sprechblasen" */
+    --ink: 0 0% 10%;
+    --paper: 45 50% 98%;
+    --brand-red: 8 80% 55%;
+    --brand-blue: 224 73% 47%;
+    --brand-yellow: 48 92% 62%;
+    --brand-green: 138 46% 34%;
+    --brand-purple: 301 61% 30%;
+    --brand-red-soft: 12 62% 90%;
+    --brand-blue-soft: 221 62% 92%;
+    --brand-green-soft: 104 27% 90%;
+    --brand-purple-soft: 303 32% 88%;
+
+    --sidebar-background: 45 50% 98%;
+    --sidebar-foreground: 0 0% 10%;
+    --sidebar-primary: 0 0% 10%;
+    --sidebar-primary-foreground: 45 27% 94%;
+    --sidebar-accent: 44 18% 90%;
+    --sidebar-accent-foreground: 0 0% 10%;
+    --sidebar-border: 44 18% 84%;
+    --sidebar-ring: 224 73% 47%;
 
     --success: 138 46% 34%;
     --warning: 48 92% 62%;
   }
+
 
   .dark {
     --background: 220 20% 7%;
