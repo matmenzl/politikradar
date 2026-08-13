@@ -59,7 +59,25 @@ export default {
         },
         success: "hsl(var(--success))",
         warning: "hsl(var(--warning))",
+        ink: "hsl(var(--ink))",
+        paper: "hsl(var(--paper))",
+        brand: {
+          red: "hsl(var(--brand-red))",
+          blue: "hsl(var(--brand-blue))",
+          yellow: "hsl(var(--brand-yellow))",
+          green: "hsl(var(--brand-green))",
+          purple: "hsl(var(--brand-purple))",
+          "red-soft": "hsl(var(--brand-red-soft))",
+          "blue-soft": "hsl(var(--brand-blue-soft))",
+          "green-soft": "hsl(var(--brand-green-soft))",
+          "purple-soft": "hsl(var(--brand-purple-soft))",
+        },
       },
+      fontFamily: {
+        serif: ["Newsreader", "Georgia", "serif"],
+        sans: ["'Hanken Grotesk'", "ui-sans-serif", "system-ui", "sans-serif"],
+      },
+
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
