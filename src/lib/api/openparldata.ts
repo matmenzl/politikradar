@@ -604,3 +604,24 @@ export async function fetchAllAffairsInRange(from: string, to: string): Promise<
   }
   return rangeCache.get(key)!;
 }
+
+/** All meetings across all parliaments within a date range (single fast pass). */
+export async function fetchAllMeetingsInRange(from: string, to: string): Promise<Meeting[]> {
+  const key = `m:${from}:${to}`;
+  if (!rangeCache.has(key)) {
+    rangeCache.set(
+      key,
+      fetchRange<Meeting>(
+        "/meetings",
+        { sort_by: "-begin_date", exclude_null: "begin_date" },
+        "begin_date",
+        from,
+        to
+      ).catch((e) => {
+        rangeCache.delete(key);
+        throw e;
+      })
+    );
+  }
+  return rangeCache.get(key)!;
+}
