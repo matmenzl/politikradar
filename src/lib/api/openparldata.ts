@@ -494,3 +494,104 @@ export async function fetchWeeklyData(year: number, week: number, bodyKey: strin
     votings: votingsRes.data,
   };
 }
+
+/* ------------------------------------------------------------------
+ * Fast cross-parliament range queries
+ * Instead of querying every body separately (~200 bodies × 2 requests),
+ * we use the global, date-sorted endpoints and page only through the
+ * relevant window. A binary search over the offset locates the window
+ * start, so old weeks stay cheap too.
+ * ------------------------------------------------------------------ */
+
+const rangeCache = new Map<string, Promise<any>>();
+
+async function findStartOffset(
+  endpoint: string,
+  params: Record<string, string>,
+  dateField: string,
+  toDate: Date
+): Promise<{ offset: number; total: number }> {
+  const probe = await fetchApi<any>(endpoint, { ...params, limit: "1", offset: "0" });
+  const total = probe.meta.total_records;
+  const dateOf = (row: any) => new Date(row?.[dateField] ?? 0).getTime();
+  if (probe.data.length && dateOf(probe.data[0]) <= toDate.getTime()) return { offset: 0, total };
+
+  let lo = 0;
+  let hi = Math.max(0, total - 1);
+  while (lo < hi) {
+    const mid = Math.floor((lo + hi) / 2);
+    const res = await fetchApi<any>(endpoint, { ...params, limit: "1", offset: String(mid) });
+    const d = res.data.length ? dateOf(res.data[0]) : -Infinity;
+    if (d > toDate.getTime()) lo = mid + 1;
+    else hi = mid;
+  }
+  return { offset: lo, total };
+}
+
+async function fetchRange<T>(
+  endpoint: string,
+  params: Record<string, string>,
+  dateField: string,
+  from: string,
+  to: string
+): Promise<T[]> {
+  const fromDate = new Date(from + "T00:00:00");
+  const toDate = new Date(to + "T23:59:59");
+  const { offset: start, total } = await findStartOffset(endpoint, params, dateField, toDate);
+
+  const limit = 500;
+  const out: T[] = [];
+  let offset = start;
+  while (offset < total) {
+    const res = await fetchApi<any>(endpoint, { ...params, limit: String(limit), offset: String(offset) });
+    if (!res.data.length) break;
+    let done = false;
+    for (const row of res.data) {
+      const raw = row?.[dateField];
+      if (!raw) continue;
+      const d = new Date(raw);
+      if (d > toDate) continue;
+      if (d < fromDate) { done = true; break; }
+      out.push(row as T);
+    }
+    if (done || !res.meta.has_more) break;
+    offset += limit;
+  }
+  return out;
+}
+
+/** All votings across all parliaments within a date range (single fast pass). */
+export async function fetchAllVotingsInRange(from: string, to: string): Promise<Voting[]> {
+  const key = `v:${from}:${to}`;
+  if (!rangeCache.has(key)) {
+    rangeCache.set(
+      key,
+      fetchRange<Voting>("/votings", { sort_by: "-date" }, "date", from, to).catch((e) => {
+        rangeCache.delete(key);
+        throw e;
+      })
+    );
+  }
+  return rangeCache.get(key)!;
+}
+
+/** All affairs across all parliaments within a date range (single fast pass). */
+export async function fetchAllAffairsInRange(from: string, to: string): Promise<Affair[]> {
+  const key = `a:${from}:${to}`;
+  if (!rangeCache.has(key)) {
+    rangeCache.set(
+      key,
+      fetchRange<Affair>(
+        "/affairs",
+        { sort_by: "-begin_date", exclude_null: "begin_date" },
+        "begin_date",
+        from,
+        to
+      ).catch((e) => {
+        rangeCache.delete(key);
+        throw e;
+      })
+    );
+  }
+  return rangeCache.get(key)!;
+}
