@@ -14,7 +14,7 @@ const TemplateGallery = () => (
   <div className="min-h-screen bg-background p-8 flex flex-wrap gap-8 items-start" data-gallery-ready="true">
     {STORY_FIXTURES.map((slide, i) => (
       <Shot key={`story-${slide.slide_type}`} id={`story-${slide.slide_type}`} width={360}>
-        <StorySlideCard slide={slide} index={i} total={STORY_FIXTURES.length} />
+        <StorySlideCard slide={slide} index={i} total={STORY_FIXTURES.length} seed={`fixture-${slide.slide_type}`} />
       </Shot>
     ))}
 
