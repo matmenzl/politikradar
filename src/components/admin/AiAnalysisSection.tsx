@@ -90,26 +90,29 @@ const AiAnalysisSection = ({ year: yearProp, week: weekProp }: AiAnalysisSection
 
     setLoading(true);
     setSuggestions([]);
-    const subset = combined.slice(0, 50);
-    setItems(subset);
+    setItems(combined);
+
+    // In Blöcken à 50 analysieren, damit alle Einträge berücksichtigt werden
+    const chunks: SuggestableItem[][] = [];
+    for (let i = 0; i < combined.length; i += 50) chunks.push(combined.slice(i, i + 50));
 
     try {
-      const { data, error } = await supabase.functions.invoke("suggest-stories", {
-        body: { items: subset },
-      });
-      if (error) throw error;
-      if (data?.suggestions) {
-        const sorted = [...data.suggestions].sort(
-          (a: AISuggestion, b: AISuggestion) => b.score - a.score
-        );
-        setSuggestions(sorted);
+      const all: AISuggestion[] = [];
+      for (const chunk of chunks) {
+        const { data, error } = await supabase.functions.invoke("suggest-stories", {
+          body: { items: chunk },
+        });
+        if (error) throw error;
+        if (data?.suggestions) all.push(...data.suggestions);
       }
+      setSuggestions(all.sort((a, b) => b.score - a.score));
     } catch (e: any) {
       toast.error(e.message || "Fehler bei KI-Analyse");
     } finally {
       setLoading(false);
       setHasLoaded(true);
     }
+
   };
 
   const handleGenerate = async (item: SuggestableItem) => {
