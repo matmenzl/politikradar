@@ -196,6 +196,36 @@ const EditorialSection = ({ year, week }: EditorialSectionProps) => {
     loadStories();
   };
 
+  const openFeedEditor = (story: StoryPost) => {
+    setFeedStory(story);
+    setFeedJson(JSON.stringify(story.feed_slides, null, 2));
+  };
+
+  const saveFeedSlides = async () => {
+    if (!feedStory) return;
+    let parsed: CarouselSlide[];
+    try {
+      parsed = JSON.parse(feedJson);
+      if (!Array.isArray(parsed)) throw new Error("Feed-Slides müssen ein Array sein");
+    } catch (e: any) {
+      toast.error("Ungültiges JSON: " + e.message);
+      return;
+    }
+    setSavingFeed(true);
+    const { error } = await supabase
+      .from("story_posts")
+      .update({ feed_slides: parsed as unknown as never })
+      .eq("id", feedStory.id);
+    setSavingFeed(false);
+    if (error) {
+      toast.error("Speichern fehlgeschlagen");
+      return;
+    }
+    toast.success("Feed-Karussell gespeichert");
+    setFeedStory(null);
+    loadStories();
+  };
+
   const updatePreviewSlide = (index: number, patch: Partial<StorySlide>) => {
     setPreviewStory((prev) => {
       if (!prev) return prev;
