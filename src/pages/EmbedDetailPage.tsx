@@ -134,7 +134,7 @@ const EmbedDetailPage = () => {
   const fullUrl = `${window.location.origin}/detail/${id}?type=${type}`;
 
   return (
-    <div className="bg-background text-foreground p-4 space-y-4" style={{ fontFamily: "'Source Serif 4', 'Inter', sans-serif" }}>
+    <div className="bg-background text-foreground p-4 space-y-4">
       {/* Title */}
       <div className="space-y-2">
         <div className="flex items-center gap-2">

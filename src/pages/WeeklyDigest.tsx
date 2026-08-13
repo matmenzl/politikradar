@@ -115,7 +115,7 @@ const WeeklyDigest = () => {
         <div className="max-w-4xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-2">
             <img src={logoImg} alt="PolitikRadar Logo" className="h-8 w-8 object-contain" />
-            <span className="font-serif text-lg font-medium text-foreground">politikradar<span className="text-brand-red">.</span></span>
+            <span className="font-serif text-lg font-normal text-foreground">politikradar<span className="text-brand-red">.</span></span>
           </div>
           <Badge variant="secondary" className="text-xs">Alle Parlamente</Badge>
         </div>
