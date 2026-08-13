@@ -35,43 +35,45 @@ export const BUBBLE_FRAME = "polygon(3% 1%, 97% 0%, 100% 4%, 99% 96%, 96% 100%, 
 /** Grosse Sprechblase mit Schwanz (Headline-Bubble im Feed-Cover) */
 export const BUBBLE_TAIL = "polygon(2% 4%, 98% 0%, 100% 8%, 99% 90%, 24% 93%, 20% 100%, 15% 93%, 1% 95%)";
 
-/** Headline: Newsreader 400, Betonung 600 (siehe .headline-em) */
-export const headline = (fontSize: string, lineHeight = 1.08) => ({
+/** Headline: Newsreader 600 (kräftig wie im Design-Sheet), Betonung 700 */
+export const headline = (fontSize: string, lineHeight = 1.04) => ({
   fontFamily: SERIF,
-  fontWeight: 400 as const,
+  fontWeight: 600 as const,
   fontSize,
   lineHeight,
+  letterSpacing: "-0.015em",
   margin: 0,
 });
 
-/** Kicker: Hanken Grotesk 700, uppercase, 0.14em */
+/** Kicker: Hanken Grotesk 800, uppercase, 0.14em */
 export const kicker = (fontSize: string, color?: string) => ({
   fontFamily: SANS,
-  fontWeight: 700 as const,
+  fontWeight: 800 as const,
   fontSize,
   textTransform: "uppercase" as const,
   letterSpacing: "0.14em",
   ...(color ? { color } : {}),
 });
 
-/** Zitat: Newsreader 400 italic */
-export const quote = (fontSize: string, lineHeight = 1.35) => ({
+/** Zitat: Newsreader 600 italic */
+export const quote = (fontSize: string, lineHeight = 1.3) => ({
   fontFamily: SERIF,
-  fontWeight: 400 as const,
+  fontWeight: 600 as const,
   fontStyle: "italic" as const,
   fontSize,
   lineHeight,
   margin: 0,
 });
 
-/** Fliesstext: Hanken Grotesk 500 */
-export const body = (fontSize: string, lineHeight = 1.45) => ({
+/** Fliesstext: Hanken Grotesk 700 (Design-Sheet: kräftiger Sans) */
+export const body = (fontSize: string, lineHeight = 1.4) => ({
   fontFamily: SANS,
-  fontWeight: 500 as const,
+  fontWeight: 700 as const,
   fontSize,
   lineHeight,
   margin: 0,
 });
+
 
 /** Pill / Badge: Hanken Grotesk 600 in Sprechblasen-Chipform */
 export const pill = (fontSize: string, bg: string, color: string) => ({
