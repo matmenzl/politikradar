@@ -410,7 +410,7 @@ const DetailPage = () => {
                 <>
                   <div className="flex items-center gap-2">
                     <Sparkles className="w-4 h-4 text-muted-foreground" />
-                    <h2 className="font-serif text-lg font-semibold">Zusammenfassung</h2>
+                    <h2 className="font-serif text-lg font-normal">Zusammenfassung</h2>
                   </div>
                   <p className="text-sm text-foreground leading-relaxed">{summary}</p>
                   <p className="text-xs text-muted-foreground pt-1">Erstellt mit KI · Angaben ohne Gewähr</p>
@@ -434,7 +434,7 @@ const DetailPage = () => {
           <>
             <Card className="opacity-0 animate-fade-in" style={{ animationDelay: "100ms" }}>
               <CardContent className="p-4 md:p-6 space-y-4">
-                <h2 className="font-serif text-lg font-semibold">Ergebnis</h2>
+                <h2 className="font-serif text-lg font-normal">Ergebnis</h2>
                 {voting.meaning_of_yes_de && (
                   <p className="text-sm text-muted-foreground">
                     Ja = {voting.meaning_of_yes_de}
@@ -481,7 +481,7 @@ const DetailPage = () => {
             {affair && (
               <Card className="opacity-0 animate-fade-in" style={{ animationDelay: "120ms" }}>
                 <CardContent className="p-6 space-y-4">
-                  <h2 className="font-serif text-lg font-semibold">Zugehöriges Geschäft</h2>
+                  <h2 className="font-serif text-lg font-normal">Zugehöriges Geschäft</h2>
                   <div className="grid gap-3 sm:grid-cols-2">
                     <DetailRow label="Geschäftstitel">
                       <span className="text-right">{affair.title_de || "–"}</span>
@@ -530,7 +530,7 @@ const DetailPage = () => {
             {relatedVotings.length > 0 && (
               <Card className="opacity-0 animate-fade-in" style={{ animationDelay: "130ms" }}>
                 <CardContent className="p-6 space-y-4">
-                  <h2 className="font-serif text-lg font-semibold">
+                  <h2 className="font-serif text-lg font-normal">
                     Weitere Abstimmungen zum selben Geschäft ({relatedVotings.length})
                   </h2>
                   <div className="space-y-2">
@@ -580,7 +580,7 @@ const DetailPage = () => {
           <>
             <Card className="opacity-0 animate-fade-in" style={{ animationDelay: "100ms" }}>
               <CardContent className="p-6 space-y-4">
-                <h2 className="font-serif text-lg font-semibold">Details</h2>
+                <h2 className="font-serif text-lg font-normal">Details</h2>
                 <div className="grid gap-3 sm:grid-cols-2">
                   {affair.type_de && (
                     <DetailRow label="Typ">{affair.type_de}</DetailRow>
@@ -615,7 +615,7 @@ const DetailPage = () => {
             {relatedVotings.length > 0 && (
               <Card className="opacity-0 animate-fade-in" style={{ animationDelay: "200ms" }}>
                 <CardContent className="p-6 space-y-4">
-                  <h2 className="font-serif text-lg font-semibold">
+                  <h2 className="font-serif text-lg font-normal">
                     Abstimmungen zu diesem Geschäft ({relatedVotings.length})
                   </h2>
                   <div className="space-y-2">
@@ -660,7 +660,7 @@ const DetailPage = () => {
         {/* Source */}
         <Card className="opacity-0 animate-fade-in" style={{ animationDelay: "300ms" }}>
           <CardContent className="p-6 space-y-3">
-            <h2 className="font-serif text-lg font-semibold">Quelle</h2>
+            <h2 className="font-serif text-lg font-normal">Quelle</h2>
             <p className="text-sm text-muted-foreground leading-relaxed">
               Daten bereitgestellt von <a href="https://openparldata.ch" target="_blank" rel="noopener noreferrer" className="underline hover:text-foreground">OpenParlData.ch</a> unter CC BY 4.0 Lizenz.
             </p>

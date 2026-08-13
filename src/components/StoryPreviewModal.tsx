@@ -226,7 +226,7 @@ const StoryPreviewModal = ({ open, onOpenChange, slides, loading, affairId, voti
             <ArrowLeft className="w-4 h-4" />
             <span className="text-sm">Zurück</span>
           </button>
-          <span className="font-serif text-base font-semibold text-foreground">Stories</span>
+          <span className="font-serif text-base font-normal text-foreground">Stories</span>
           <div className="w-16" /> {/* spacer */}
         </header>
         <div className="flex-1 overflow-y-auto py-4">

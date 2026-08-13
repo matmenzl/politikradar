@@ -170,7 +170,7 @@ const EmbedDetailPage = () => {
           <CardContent className="p-4 space-y-2">
             <div className="flex items-center gap-2">
               <Sparkles className="w-3.5 h-3.5 text-muted-foreground" />
-              <h2 className="font-serif text-sm font-semibold">Zusammenfassung</h2>
+              <h2 className="font-serif text-sm font-normal">Zusammenfassung</h2>
             </div>
             <p className="text-sm text-foreground leading-relaxed">{summary}</p>
             <p className="text-xs text-muted-foreground">Erstellt mit KI · Angaben ohne Gewähr</p>
@@ -182,7 +182,7 @@ const EmbedDetailPage = () => {
       {voting && (
         <Card>
           <CardContent className="p-4 space-y-3">
-            <h2 className="font-serif text-sm font-semibold">Ergebnis</h2>
+            <h2 className="font-serif text-sm font-normal">Ergebnis</h2>
             {voting.meaning_of_yes_de && (
               <p className="text-xs text-muted-foreground">
                 Ja = {voting.meaning_of_yes_de}
@@ -218,7 +218,7 @@ const EmbedDetailPage = () => {
       {relatedVotings.length > 0 && (
         <Card>
           <CardContent className="p-4 space-y-2">
-            <h2 className="font-serif text-sm font-semibold">
+            <h2 className="font-serif text-sm font-normal">
               {type === "voting" ? "Weitere Abstimmungen" : "Abstimmungen"} ({relatedVotings.length})
             </h2>
             <div className="space-y-1">
