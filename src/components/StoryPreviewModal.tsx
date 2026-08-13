@@ -1,9 +1,10 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext, type CarouselApi } from "@/components/ui/carousel";
-import { Download, Loader2, ArrowLeft, FileText, Save } from "lucide-react";
+import { Download, Loader2, ArrowLeft, FileText, Save, Shuffle } from "lucide-react";
+import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
-import { useRef, useCallback, useState, useEffect } from "react";
+import { useRef, useCallback, useMemo, useState, useEffect } from "react";
 import StorySlideCard from "./story/StorySlideCard";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { downloadSingleSlide, downloadAllSlidesAsZip } from "@/lib/exportSlides";
@@ -55,6 +56,8 @@ interface StoryPreviewModalProps {
   onSlideChange?: (index: number, patch: Partial<StorySlide>) => void;
   onSaveSlides?: () => void | Promise<void>;
   saving?: boolean;
+  /** Seed für die Kachel-Komposition (z. B. Story-ID) */
+  variantSeed?: string | number;
 }
 
 function StoryContent({
@@ -64,6 +67,7 @@ function StoryContent({
   onSlideChange,
   onSaveSlides,
   saving,
+  variantSeed,
 }: {
   slides: StorySlide[];
   loading?: boolean;
@@ -71,6 +75,7 @@ function StoryContent({
   onSlideChange?: (index: number, patch: Partial<StorySlide>) => void;
   onSaveSlides?: () => void | Promise<void>;
   saving?: boolean;
+  variantSeed?: string | number;
 }) {
 
   const slideRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -82,6 +87,20 @@ function StoryContent({
     setCurrent(api.selectedScrollSnap());
     api.on("select", () => setCurrent(api.selectedScrollSnap()));
   }, [api]);
+
+  const variants = useMemo(
+    () => composeStoryVariants(slides, variantSeed ?? slides.map((s) => s.headline).join("|")),
+    [slides, variantSeed],
+  );
+
+  const shuffle = useCallback(() => {
+    if (!onSlideChange) return;
+    const fresh = composeStoryVariants(slides, Math.floor(Math.random() * 1_000_000));
+    fresh.forEach((v, i) =>
+      onSlideChange(i, { composition: v.composition, palette_index: v.paletteIndex }),
+    );
+    toast.success("Kacheln neu zusammengestellt");
+  }, [slides, onSlideChange]);
 
   const downloadSlide = useCallback(async (index: number) => {
     const el = slideRefs.current[index];
@@ -113,6 +132,17 @@ function StoryContent({
 
   return (
     <div className="px-2 sm:px-8">
+      {editable && onSlideChange && (
+        <Button
+          variant="outline"
+          size="sm"
+          className="w-full mb-3 gap-1.5 text-xs"
+          onClick={shuffle}
+        >
+          <Shuffle className="w-3.5 h-3.5" />
+          Kacheln neu zusammenstellen
+        </Button>
+      )}
       <Carousel opts={{ align: "center" }} setApi={setApi}>
         <CarouselContent>
           {slides.map((slide, i) => (
@@ -122,6 +152,7 @@ function StoryContent({
                   slide={slide}
                   index={i}
                   total={slides.length}
+                  variant={variants[i]}
                   ref={(el) => { slideRefs.current[i] = el; }}
                 />
                 <Button
@@ -201,7 +232,7 @@ function StoryContent({
   );
 }
 
-const StoryPreviewModal = ({ open, onOpenChange, slides, loading, affairId, votingId, editable, onSlideChange, onSaveSlides, saving }: StoryPreviewModalProps) => {
+const StoryPreviewModal = ({ open, onOpenChange, slides, loading, affairId, votingId, editable, onSlideChange, onSaveSlides, saving, variantSeed }: StoryPreviewModalProps) => {
   const isMobile = useIsMobile();
   const navigate = useNavigate();
   const detailLink = affairId
@@ -231,7 +262,7 @@ const StoryPreviewModal = ({ open, onOpenChange, slides, loading, affairId, voti
               {slides.length} Slides
             </p>
           )}
-          <StoryContent slides={slides} loading={loading} editable={editable} onSlideChange={onSlideChange} onSaveSlides={onSaveSlides} saving={saving} />
+          <StoryContent slides={slides} loading={loading} editable={editable} onSlideChange={onSlideChange} onSaveSlides={onSaveSlides} saving={saving} variantSeed={variantSeed} />
         </div>
       </div>
     );
@@ -249,7 +280,7 @@ const StoryPreviewModal = ({ open, onOpenChange, slides, loading, affairId, voti
             </p>
           )}
         </DialogHeader>
-        <StoryContent slides={slides} loading={loading} editable={editable} onSlideChange={onSlideChange} onSaveSlides={onSaveSlides} saving={saving} />
+        <StoryContent slides={slides} loading={loading} editable={editable} onSlideChange={onSlideChange} onSaveSlides={onSaveSlides} saving={saving} variantSeed={variantSeed} />
         {detailLink && (
           <div className="px-6 pb-4">
             <Button
