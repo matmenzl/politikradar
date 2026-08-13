@@ -53,7 +53,9 @@ def compare(name: str) -> tuple[str, float]:
     if base.size != cur.size:
         return "size", 1.0
     diff = ImageChops.difference(base, cur)
-    changed = sum(1 for px in diff.getdata() if px != (0, 0, 0))
+    gray = diff.convert("L")
+    hist = gray.histogram()
+    changed = sum(hist[1:])
     ratio = changed / (base.size[0] * base.size[1])
     if ratio > THRESHOLD:
         diff.point(lambda v: min(255, v * 8)).save(DIFF / f"{name}.png")
