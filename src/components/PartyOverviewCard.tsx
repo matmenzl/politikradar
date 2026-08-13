@@ -143,7 +143,7 @@ const PartyOverviewCard = ({ votings }: Props) => {
                           <div key={i} className="flex items-start gap-2 text-xs">
                             <span className="font-medium text-foreground shrink-0">{d.name}</span>
                             <span className="text-muted-foreground truncate flex-1">
-                              stimmte <span className={d.vote === "Ja" ? "text-success font-medium" : "text-destructive font-medium"}>{d.vote}</span> statt {d.majorityVote} bei «{d.votingTitle}»
+                              stimmte <span className={d.vote === "Ja" ? "text-success font-medium" : "text-destructive font-medium"}>{d.vote}</span> statt {d.majorityVote} bei <span className="quote">«{d.votingTitle}»</span>
                             </span>
                           </div>
                         ))}
