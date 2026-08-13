@@ -173,7 +173,7 @@ const StoriesCarousel = ({ year, week }: StoriesCarouselProps) => {
                   onClick={() => isMobile ? navigate(`/story/${story.id}`) : setSelectedStory(story)}
                   className="w-full group focus:outline-none"
                 >
-                  <div className="w-full rounded-xl overflow-hidden ring-2 ring-transparent group-hover:ring-accent/50 transition-all shadow-lg">
+                  <div className="w-full overflow-hidden ring-2 ring-transparent group-hover:ring-ink transition-all shadow-lg">
                     <StorySlideCard
                       slide={firstSlide}
                       index={0}
@@ -235,7 +235,7 @@ const StoriesCarousel = ({ year, week }: StoriesCarouselProps) => {
                     onClick={() => (isMobile ? navigate(`/story/${story.id}`) : setSelectedStory(story))}
                     className="w-full group focus:outline-none"
                   >
-                    <div className="w-full rounded-xl overflow-hidden ring-2 ring-transparent group-hover:ring-accent/50 transition-all shadow-lg">
+                    <div className="w-full overflow-hidden ring-2 ring-transparent group-hover:ring-ink transition-all shadow-lg">
                       <CarouselSlideCard slide={slide} index={i} total={total} format="portrait" />
                     </div>
                   </button>

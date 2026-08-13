@@ -301,7 +301,7 @@ const WeeklyOverview = () => {
                         <span className="text-xs sm:text-sm text-foreground line-clamp-2 flex-1 min-w-0">
                           {v.affair_title_de || v.title_de || `Abstimmung #${v.id}`}
                         </span>
-                        <span className={`text-[10px] sm:text-xs font-medium px-1.5 sm:px-2 py-0.5 rounded-full flex-shrink-0 ${isVotingAccepted(v) ? "bg-success/10 text-success" : "bg-destructive/10 text-destructive"}`}>
+                        <span className={`text-[10px] sm:text-xs font-medium px-1.5 sm:px-2 py-0.5 rounded-full flex-shrink-0 ${isVotingAccepted(v) ? "bg-brand-green-soft text-brand-green" : "bg-brand-red-soft text-brand-red"}`}>
                           {v.results_yes}:{v.results_no}
                         </span>
                       </Link>

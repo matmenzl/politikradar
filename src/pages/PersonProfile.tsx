@@ -111,7 +111,7 @@ const PersonProfile = () => {
             <h1 className="font-serif text-3xl font-bold text-foreground">{person.fullname}</h1>
             <div className="flex flex-wrap items-center gap-2">
               {party && <Badge variant="secondary">{party}</Badge>}
-              {person.active && <Badge className="bg-success/10 text-success border-success/20">Aktiv</Badge>}
+              {person.active && <Badge className="bg-brand-green-soft text-brand-green border-success/20">Aktiv</Badge>}
               {person.active === false && <Badge variant="outline" className="text-muted-foreground">Inaktiv</Badge>}
             </div>
             <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-muted-foreground">
