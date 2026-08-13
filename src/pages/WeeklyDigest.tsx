@@ -184,7 +184,7 @@ const WeeklyDigest = () => {
             </div>
             <div className="grid gap-5 md:grid-cols-4">
               {[1, 2, 3, 4].map((i) =>
-            <Skeleton key={i} className="h-24 rounded-lg" />
+            <Skeleton key={i} className="h-24 rounded-none" />
             )}
             </div>
           </div>
@@ -258,9 +258,9 @@ const WeeklyDigest = () => {
                                 {topic.count}× in {topic.bodies.length} {topic.bodies.length === 1 ? "Parlament" : "Parlamenten"}
                               </span>
                             </div>
-                            <div className="h-2 bg-secondary rounded-full overflow-hidden">
+                            <div className="h-2 bg-secondary overflow-hidden">
                               <div
-                          className="h-full bg-accent rounded-full transition-all"
+                          className="h-full bg-brand-blue transition-all"
                           style={{ width: `${topic.count / maxTopicCount * 100}%` }} />
 
                             </div>
@@ -310,7 +310,7 @@ const WeeklyDigest = () => {
               <Link
                 key={cv.voting.id}
                 to={`/detail/${cv.voting.id}?type=voting&body=${encodeURIComponent(cv.voting.body_key)}`}
-                className="block p-3 -mx-3 rounded-lg hover:bg-secondary/50 transition-colors">
+                className="block py-3 px-1 -mx-1 border-b border-hairline last:border-0 hover:bg-secondary/40 transition-colors">
 
                       <div className="flex items-center justify-between mb-2">
                         <div className="flex-1 min-w-0 mr-3">
@@ -320,7 +320,7 @@ const WeeklyDigest = () => {
                           <p className="text-xs text-muted-foreground">{cv.bodyName}</p>
                         </div>
                         <div className="flex items-center gap-2 flex-shrink-0">
-                          <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${(cv.voting.decision ? ["ja","accepted","angenommen"].includes(cv.voting.decision.toLowerCase()) : cv.voting.results_yes > cv.voting.results_no) ? "bg-brand-green-soft text-brand-green" : "bg-brand-red-soft text-brand-red"}`}>
+                          <span className={`result-pill text-xs ${(cv.voting.decision ? ["ja","accepted","angenommen"].includes(cv.voting.decision.toLowerCase()) : cv.voting.results_yes > cv.voting.results_no) ? "bg-brand-green-soft text-brand-green" : "bg-brand-red-soft text-brand-red"}`}>
                             {cv.voting.results_yes}:{cv.voting.results_no}
                           </span>
                           <Badge variant="outline" className="text-xs">Δ{cv.margin}</Badge>
@@ -354,7 +354,7 @@ const WeeklyDigest = () => {
                 <Link
                   key={body.key}
                   to={withWeek(`/weekly?body=${encodeURIComponent(body.key)}`)}
-                  className="flex items-center justify-between py-2 px-3 -mx-3 rounded-lg hover:bg-secondary/50 transition-colors">
+                  className="flex items-center justify-between py-2.5 px-1 -mx-1 border-b border-hairline last:border-0 hover:bg-secondary/40 transition-colors">
 
                         <div className="flex items-center gap-3">
                           <span className="text-xs font-medium text-muted-foreground w-5">{i + 1}.</span>
