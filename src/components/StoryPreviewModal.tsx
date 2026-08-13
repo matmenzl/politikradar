@@ -8,7 +8,6 @@ import { useRef, useCallback, useMemo, useState, useEffect } from "react";
 import StorySlideCard from "./story/StorySlideCard";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { downloadSingleSlide, downloadAllSlidesAsZip } from "@/lib/exportSlides";
-import ImagePromptEditor from "./story/ImagePromptEditor";
 import { composeStoryVariants, type CompositionId } from "@/lib/storyVariants";
 
 
