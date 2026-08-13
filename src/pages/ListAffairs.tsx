@@ -33,19 +33,15 @@ const ListAffairs = () => {
     setLoading(true);
     (async () => {
       try {
-        const bodies = await fetchBodies();
-        const all: AffairWithBody[] = [];
-        const batchSize = 5;
-        for (let i = 0; i < bodies.length; i += batchSize) {
-          const batch = bodies.slice(i, i + batchSize);
-          const results = await Promise.all(
-            batch.map(async (b) => {
-              const res = await fetchAffairsForWeek(from, to, b.key);
-              return res.data.map((a) => ({ ...a, bodyName: b.name_de || b.key }));
-            })
-          );
-          results.forEach((r) => all.push(...r));
-        }
+        const [bodies, rows] = await Promise.all([
+          fetchBodies(),
+          fetchAllAffairsInRange(from, to),
+        ]);
+        const nameByKey = new Map(bodies.map((b) => [b.key, b.name_de || b.key]));
+        const all: AffairWithBody[] = rows
+          .filter((a) => nameByKey.has(a.body_key))
+          .map((a) => ({ ...a, bodyName: nameByKey.get(a.body_key)! }));
+
         all.sort((a, b) => new Date(b.begin_date || "").getTime() - new Date(a.begin_date || "").getTime());
         setAffairs(all);
       } catch (e) {
