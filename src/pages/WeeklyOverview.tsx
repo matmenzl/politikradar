@@ -168,8 +168,8 @@ const WeeklyOverview = () => {
             <Button variant="outline" size="icon" className="h-7 w-7 sm:h-8 sm:w-8" onClick={goToPreviousWeek}>
               <ChevronLeft className="w-4 h-4" />
             </Button>
-            <p className="text-[10px] sm:text-xs font-bold uppercase tracking-[0.2em] text-brand-blue">
-              Kalenderwoche {week}
+            <p className="kicker text-[10px] sm:text-xs text-brand-blue">
+              Kalenderwoche {week} · {year}
             </p>
             <Button variant="outline" size="icon" className="h-7 w-7 sm:h-8 sm:w-8" onClick={goToNextWeek}>
               <ChevronRight className="w-4 h-4" />
