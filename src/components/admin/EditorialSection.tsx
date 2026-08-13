@@ -324,13 +324,14 @@ const EditorialSection = ({ year, week }: EditorialSectionProps) => {
           ) : (
             <div className="space-y-3">
               {weekStories.map((story) => (
-                <StoryRow
+              <StoryRow
                   key={story.id}
                   story={story}
                   onPreview={setPreviewStory}
                   onTogglePublish={togglePublish}
                   onToggleHome={toggleHome}
                   onDelete={deleteStory}
+                  onEditFeed={openFeedEditor}
                 />
               ))}
             </div>
