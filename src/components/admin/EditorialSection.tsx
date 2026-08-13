@@ -53,8 +53,12 @@ function StoryRow({
           <span className="hidden sm:inline">Startseite</span>
           <Switch
             checked={story.show_on_home}
-            disabled={story.status !== "published"}
             onCheckedChange={(v) => onToggleHome(story, v)}
+            title={
+              story.status === "published"
+                ? "Auf Startseite anzeigen"
+                : "Aktivieren veröffentlicht die Story und zeigt sie auf der Startseite"
+            }
           />
         </label>
         <div className="flex items-center gap-1">
@@ -174,16 +178,40 @@ const EditorialSection = ({ year, week }: EditorialSectionProps) => {
   };
 
   const toggleHome = async (story: StoryPost, value: boolean) => {
+    // Entwürfe werden beim Aktivieren automatisch veröffentlicht,
+    // sonst wäre die Story auf der Startseite unsichtbar.
+    const needsPublish = value && story.status !== "published";
     const { error } = await supabase
       .from("story_posts")
-      .update({ show_on_home: value })
+      .update({
+        show_on_home: value,
+        ...(needsPublish
+          ? { status: "published", published_at: new Date().toISOString() }
+          : {}),
+      })
       .eq("id", story.id);
     if (error) {
       toast.error("Fehler beim Aktualisieren");
       return;
     }
-    toast.success(value ? "Auf Startseite sichtbar" : "Von Startseite entfernt");
-    loadStories();
+    toast.success(
+      value
+        ? needsPublish
+          ? "Veröffentlicht und auf Startseite sichtbar"
+          : "Auf Startseite sichtbar"
+        : "Von Startseite entfernt",
+    );
+    await loadStories();
+
+    if (needsPublish) {
+      const { error: persistError } = await supabase.functions.invoke("persist-story-images", {
+        body: { story_id: story.id },
+      });
+      if (persistError) {
+        console.error("persist-story-images failed:", persistError);
+        toast.error("Bilder konnten nicht dauerhaft gespeichert werden");
+      }
+    }
   };
 
   const deleteStory = async (id: string) => {
