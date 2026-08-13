@@ -165,17 +165,18 @@ const WeeklyOverview = () => {
         {/* Week header with navigation */}
         <div className="space-y-1.5 sm:space-y-2 opacity-0 animate-fade-in" style={{ animationDelay: "50ms" }}>
           <div className="flex items-center gap-2 sm:gap-3">
-            <Button variant="ghost" size="icon" className="h-7 w-7 sm:h-8 sm:w-8" onClick={goToPreviousWeek}>
+            <Button variant="outline" size="icon" className="h-7 w-7 sm:h-8 sm:w-8" onClick={goToPreviousWeek}>
               <ChevronLeft className="w-4 h-4" />
             </Button>
-            <p className="text-[10px] sm:text-xs font-medium uppercase tracking-widest text-muted-foreground">
+            <p className="text-[10px] sm:text-xs font-bold uppercase tracking-[0.2em] text-brand-blue">
               Kalenderwoche {week}
             </p>
-            <Button variant="ghost" size="icon" className="h-7 w-7 sm:h-8 sm:w-8" onClick={goToNextWeek}>
+            <Button variant="outline" size="icon" className="h-7 w-7 sm:h-8 sm:w-8" onClick={goToNextWeek}>
               <ChevronRight className="w-4 h-4" />
             </Button>
           </div>
-          <h1 className="font-serif text-xl sm:text-2xl md:text-4xl font-bold text-foreground">{dateRangeLabel}</h1>
+          <h1 className="font-serif text-2xl sm:text-3xl md:text-5xl font-medium leading-[1.05] text-foreground">{dateRangeLabel}</h1>
+
           <p className="text-base sm:text-lg font-medium text-foreground/80">
             {bodies.length === 0 ? "Lade Parlament…" : (selectedBody ? getBodyLabel(selectedBody) : bodyKey)}
           </p>
