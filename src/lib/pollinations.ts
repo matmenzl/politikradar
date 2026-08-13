@@ -17,7 +17,7 @@ export interface PollinationsOptions {
   model?: "flux" | "turbo";
   seed?: number;
   /** Visual style preset, defaults to "editorial" */
-  style?: PollinationsStyleId;
+  style?: PollinationsStyleId | string;
   /** Extra things to avoid, appended to the default negative terms */
   negative?: string;
 }
