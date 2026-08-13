@@ -447,6 +447,33 @@ const EditorialSection = ({ year, week }: EditorialSectionProps) => {
           saving={savingSlides}
         />
       )}
+
+      <Dialog open={!!feedStory} onOpenChange={(open) => !open && setFeedStory(null)}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="font-serif text-lg">Feed-Karussell bearbeiten</DialogTitle>
+            <DialogDescription>
+              JSON-Array mit CarouselSlide-Einträgen (cover, detail, result, cta). Format: portrait (4:5).
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3">
+            <Label htmlFor="feed-json" className="text-xs text-muted-foreground">JSON</Label>
+            <Textarea
+              id="feed-json"
+              value={feedJson}
+              onChange={(e) => setFeedJson(e.target.value)}
+              rows={18}
+              className="font-mono text-xs"
+            />
+          </div>
+          <DialogFooter className="gap-2">
+            <Button variant="outline" onClick={() => setFeedStory(null)}>Abbrechen</Button>
+            <Button onClick={saveFeedSlides} disabled={savingFeed}>
+              {savingFeed ? <Loader2 className="w-4 h-4 animate-spin" /> : "Speichern"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
