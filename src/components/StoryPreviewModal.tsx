@@ -164,18 +164,6 @@ function StoryContent({
                   <Download className="w-3.5 h-3.5" />
                   Slide {i + 1} speichern
                 </Button>
-                {editable && onSlideChange && (
-                  <ImagePromptEditor
-                    slide={slide}
-                    index={i}
-                    onChange={(patch) => onSlideChange(i, patch)}
-                    onApplyStyleToAll={(style) =>
-                      slides.forEach((_, j) =>
-                        onSlideChange(j, { image_style: style, image_url: undefined }),
-                      )
-                    }
-                  />
-                )}
               </div>
 
             </CarouselItem>
