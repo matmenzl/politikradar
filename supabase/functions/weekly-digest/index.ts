@@ -164,7 +164,7 @@ serve(async (req) => {
     let totalVotings = 0;
     let totalAffairs = 0;
     let totalMeetings = 0;
-    const activeBodies: { key: string; name: string; votings: number; affairs: number }[] = [];
+    const activeBodies: { key: string; name: string; votings: number; affairs: number; meetings: number }[] = [];
     const allVotings: (Voting & { bodyName: string })[] = [];
     const allAffairTitles: { id: number; title: string; bodyKey: string }[] = [];
 
@@ -175,12 +175,13 @@ serve(async (req) => {
       totalAffairs += r.affairs.length;
       totalMeetings += r.meetings;
 
-      if (r.votings.length > 0 || r.affairs.length > 0) {
+      if (r.votings.length > 0 || r.affairs.length > 0 || r.meetings > 0) {
         activeBodies.push({
           key: r.bodyKey,
           name: bodyName,
           votings: r.votings.length,
           affairs: r.affairs.length,
+          meetings: r.meetings,
         });
       }
 
@@ -195,7 +196,10 @@ serve(async (req) => {
     }
 
     // Sort active bodies by total activity
-    activeBodies.sort((a, b) => (b.votings + b.affairs) - (a.votings + a.affairs));
+    activeBodies.sort(
+      (a, b) => (b.votings + b.affairs + b.meetings) - (a.votings + a.affairs + a.meetings)
+    );
+
 
     // Find closest votings (smallest margin)
     const closestVotings = allVotings
