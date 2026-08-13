@@ -384,6 +384,8 @@ serve(async (req) => {
       closest_votings: result.closest_votings,
       summary: result.summary,
       date_range: result.date_range,
+      created_at: new Date().toISOString(),
+
     }, { onConflict: "year,week" });
 
     return new Response(JSON.stringify(result), {
