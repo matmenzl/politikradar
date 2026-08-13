@@ -139,7 +139,7 @@ const WeeklyOverview = () => {
               politikradar<span className="text-brand-red">.</span>
             </span>
           </Link>
-          <Button variant="outline" size="sm" className="gap-1.5 sm:gap-2 flex-shrink-0 text-xs sm:text-sm" onClick={() => setShareOpen(true)}>
+          <Button variant="bubble" size="sm" className="gap-1.5 sm:gap-2 flex-shrink-0 text-xs sm:text-sm" onClick={() => setShareOpen(true)}>
             <Share2 className="w-3.5 h-3.5" />
             <span className="hidden xs:inline">Teilen</span>
             <span className="xs:hidden">↗</span>
