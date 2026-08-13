@@ -128,13 +128,23 @@ serve(async (req) => {
       .eq("week", week)
       .maybeSingle();
 
-    if (cached) {
+    const { from, to } = getWeekDateRange(year, week);
+
+    // A cache entry is only trustworthy if it was built AFTER the week ended,
+    // otherwise it may contain incomplete (often empty) data. Fresh-ish entries
+    // for the running/upcoming week are re-used for 3 hours only.
+    const cachedAt = cached?.created_at ? new Date(cached.created_at).getTime() : 0;
+    const weekEnd = new Date(to + "T23:59:59Z").getTime();
+    const now = Date.now();
+    const cacheValid =
+      !!cached && (cachedAt > weekEnd || now - cachedAt < 3 * 60 * 60 * 1000);
+
+    if (cacheValid) {
       return new Response(JSON.stringify(cached), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    const { from, to } = getWeekDateRange(year, week);
 
     // Fetch all bodies
     const bodies = await fetchAllBodies();
