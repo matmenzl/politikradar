@@ -16,7 +16,6 @@ import {
   quote as quoteStyle,
   body as bodyStyle,
   cta as ctaStyle,
-  resultPill,
   isQuote,
 } from "@/lib/storyTheme";
 
@@ -34,6 +33,21 @@ const slideTypeLabel: Record<StorySlide["slide_type"], string> = {
   hook: "Aufmacher", context: "Hintergrund", result: "Ergebnis",
   insight: "Einordnung", cta: "Mehr erfahren", party: "Parteiverhalten",
 };
+
+/** **Betonung** → Newsreader 600, optional in Akzentfarbe (Styleguide: nie ganze Zeile) */
+function Emph({ text, accent }: { text: string; accent?: string }) {
+  return (
+    <>
+      {text.split(/(\*\*[^*]+\*\*)/g).map((part, i) =>
+        part.startsWith("**") && part.endsWith("**") ? (
+          <strong key={i} style={{ fontWeight: 600, color: accent }}>{part.slice(2, -2)}</strong>
+        ) : (
+          <span key={i}>{part}</span>
+        )
+      )}
+    </>
+  );
+}
 
 interface StorySlideCardProps { slide: StorySlide; index: number; total: number; }
 
@@ -88,7 +102,7 @@ const StorySlideCard = forwardRef<HTMLDivElement, StorySlideCardProps>(({ slide,
           <PartyContent slide={slide} s={s} />
         ) : (
           <>
-            <h3 style={headlineStyle("9.5cqw")}>{slide.headline}</h3>
+            <h3 style={headlineStyle("9.5cqw")}><Emph text={slide.headline} accent={s.accent} /></h3>
             <div style={{ width: "9cqw", height: "0.7cqw", backgroundColor: s.accent, margin: "4cqw 0" }} />
             <p style={{
               ...(bodyIsQuote ? quoteStyle("4cqw", 1.35) : bodyStyle("3.7cqw", 1.5)),
@@ -141,7 +155,7 @@ StorySlideCard.displayName = "StorySlideCard";
 function PartyContent({ slide, s }: { slide: StorySlide; s: { accent: string; track: string } }) {
   return (
     <>
-      <h3 style={{ ...headlineStyle("7.5cqw", 1.1), margin: "0 0 5cqw" }}>{slide.headline}</h3>
+      <h3 style={{ ...headlineStyle("7.5cqw", 1.1), margin: "0 0 5cqw" }}><Emph text={slide.headline} /></h3>
       <div className="flex flex-col" style={{ gap: "2.6cqw" }}>
         {slide.partyData?.map((p) => {
           const yesP = p.total > 0 ? Math.round((p.yes / p.total) * 100) : 0;
@@ -154,10 +168,10 @@ function PartyContent({ slide, s }: { slide: StorySlide; s: { accent: string; tr
                 <div style={{ width: `${noP}%`, backgroundColor: BRAND.red }} />
               </div>
               <span
-                className="tabular-nums text-center"
-                style={{ ...resultPill("2.6cqw", "rgba(244,242,236,0.9)", BRAND.ink), width: "12cqw", padding: "0.6cqw 0" }}
+                className="tabular-nums text-right"
+                style={{ fontFamily: SANS, fontWeight: 600, width: "12cqw", fontSize: "2.6cqw", opacity: 0.9 }}
               >
-                {p.yes}:{p.no}
+                {p.yes}/{p.no}
               </span>
             </div>
           );
