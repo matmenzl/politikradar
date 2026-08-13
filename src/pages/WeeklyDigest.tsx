@@ -111,38 +111,41 @@ const WeeklyDigest = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="sticky top-0 z-10 bg-background/80 backdrop-blur-md border-b border-border/50 px-4 md:px-6 py-3 md:py-4">
-        <div className="max-w-4xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <img src={logoImg} alt="PolitikRadar Logo" className="h-8 w-8 object-contain" />
-            <span className="font-serif text-lg font-normal text-foreground">politikradar<span className="text-brand-red">.</span></span>
+      <header className="sticky top-0 z-10 bg-background/90 backdrop-blur-md border-b-2 border-ink px-3 sm:px-4 md:px-6 py-3 md:py-4">
+        <div className="max-w-4xl mx-auto flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 min-w-0">
+            <img src={logoImg} alt="PolitikRadar Logo" className="h-7 w-7 object-contain flex-shrink-0" />
+            <span className="font-serif text-base sm:text-lg font-normal text-foreground truncate">politikradar<span className="text-brand-red">.</span></span>
           </div>
-          <Badge variant="secondary" className="text-xs">Alle Parlamente</Badge>
+          <Link to={withWeek("/weekly")}>
+            <Button variant="bubble" size="sm" className="text-xs sm:text-sm">Alle Parlamente</Button>
+          </Link>
         </div>
       </header>
 
-      <main className="max-w-4xl mx-auto px-4 md:px-6 py-6 md:py-10 space-y-8 md:space-y-12">
+      <main className="max-w-4xl mx-auto px-3 sm:px-4 md:px-6 py-4 sm:py-6 md:py-10 space-y-6 md:space-y-10">
         {/* Week header */}
-        <div className="space-y-2 opacity-0 animate-fade-in" style={{ animationDelay: "0ms" }}>
-          <div className="flex items-center gap-3">
-            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={goToPreviousWeek}>
+        <div className="space-y-1.5 sm:space-y-2 opacity-0 animate-fade-in" style={{ animationDelay: "0ms" }}>
+          <div className="flex items-center gap-2 sm:gap-3">
+            <Button variant="outline" size="icon" className="h-7 w-7 sm:h-8 sm:w-8" onClick={goToPreviousWeek}>
               <ChevronLeft className="w-4 h-4" />
             </Button>
-            <p className="text-xs kicker text-muted-foreground">
-              Kalenderwoche {week}
+            <p className="kicker text-[10px] sm:text-xs text-brand-blue">
+              Kalenderwoche {week} · {year}
             </p>
-            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={goToNextWeek}>
+            <Button variant="outline" size="icon" className="h-7 w-7 sm:h-8 sm:w-8" onClick={goToNextWeek}>
               <ChevronRight className="w-4 h-4" />
             </Button>
           </div>
-          <h1 className="font-serif text-3xl md:text-4xl font-normal text-foreground">
-            🇨🇭 Politikwoche
+          <h1 className="font-serif text-2xl sm:text-3xl md:text-5xl font-normal leading-[1.05] text-foreground">
+            {dateRangeLabel}
           </h1>
-          <p className="text-lg text-foreground/80">{dateRangeLabel}</p>
-          <p className="text-xs text-muted-foreground">
+          <p className="text-base sm:text-lg font-medium text-foreground/80">Politikwoche · alle Parlamente</p>
+          <p className="text-[10px] sm:text-xs text-muted-foreground">
             Diese Kalenderwoche gilt für alle drei Bereiche: Politikwoche, KI-Analyse und Redaktion.
           </p>
         </div>
+
 
 
         <Tabs value={tab} onValueChange={setTab} className="w-full">
@@ -181,7 +184,7 @@ const WeeklyDigest = () => {
             </div>
             <div className="grid gap-5 md:grid-cols-4">
               {[1, 2, 3, 4].map((i) =>
-            <Skeleton key={i} className="h-24 rounded-lg" />
+            <Skeleton key={i} className="h-24 rounded-none" />
             )}
             </div>
           </div>
@@ -197,33 +200,29 @@ const WeeklyDigest = () => {
         {!loading && !error && data &&
         <div className="space-y-8">
             {/* Stats cards */}
-            <div className="grid gap-4 grid-cols-2 md:grid-cols-4 opacity-0 animate-fade-in" style={{ animationDelay: "100ms" }}>
+            <div className="grid gap-3 sm:gap-4 grid-cols-2 md:grid-cols-4 opacity-0 animate-fade-in" style={{ animationDelay: "100ms" }}>
               {[
-            { icon: Building2, label: "Aktive Parlamente", value: data.stats.totalBodies, href: "/list/bodies" },
-            { icon: Vote, label: "Abstimmungen", value: data.stats.totalVotings, href: "/list/votings" },
-            { icon: BarChart3, label: "Geschäfte", value: data.stats.totalAffairs, href: "/list/affairs" },
-            { icon: Activity, label: "Sitzungen", value: data.stats.totalMeetings, href: "/list/meetings" }].
+            { label: "Aktive Parlamente", value: data.stats.totalBodies, tone: "bg-brand-blue-soft text-brand-blue", labelTone: "text-brand-blue", shape: "bubble-plain", href: "/list/bodies" },
+            { label: "Abstimmungen", value: data.stats.totalVotings, tone: "bg-brand-red-soft text-brand-red", labelTone: "text-brand-red-deep", shape: "bubble-plain-alt", href: "/list/votings" },
+            { label: "Geschäfte", value: data.stats.totalAffairs, tone: "bg-brand-green-soft text-brand-green", labelTone: "text-brand-green", shape: "bubble-plain", href: "/list/affairs" },
+            { label: "Sitzungen", value: data.stats.totalMeetings, tone: "bg-secondary text-foreground", labelTone: "text-muted-foreground", shape: "bubble-plain-alt", href: "/list/meetings" }].
             map((stat) =>
-            <Link key={stat.label} to={withWeek(stat.href)}>
-                  <Card className="hover:bg-secondary/30 transition-colors cursor-pointer">
-                    <CardContent className="p-4 text-center">
-                      <stat.icon className="w-5 h-5 mx-auto mb-2 text-muted-foreground" />
-                      <p className="text-3xl font-bold text-foreground">{stat.value}</p>
-                      <p className="text-xs text-muted-foreground mt-1">{stat.label}</p>
-                    </CardContent>
-                  </Card>
+            <Link key={stat.label} to={withWeek(stat.href)} className={`${stat.tone} ${stat.shape} p-3 md:p-4 transition-opacity hover:opacity-80`}>
+                  <p className="font-serif text-xl sm:text-2xl md:text-3xl font-semibold tabular-nums">{stat.value}</p>
+                  <p className={`text-[10px] md:text-xs font-semibold ${stat.labelTone}`}>{stat.label}</p>
                 </Link>
             )}
             </div>
+
 
 
             {/* AI Summary */}
             {data.summary &&
           <Card className="opacity-0 animate-fade-in" style={{ animationDelay: "200ms" }}>
                 <CardHeader className="pb-3">
-                  <div className="flex items-center gap-2 text-muted-foreground">
+                  <div className="flex items-center gap-2">
                     <Sparkles className="w-4 h-4" />
-                    <span className="text-xs kicker">Wochenzusammenfassung</span>
+                    <span className="text-[10px] sm:text-xs kicker text-brand-purple">Wochenzusammenfassung</span>
                   </div>
                   <CardTitle className="font-serif text-xl">Das Wichtigste der Woche</CardTitle>
                 </CardHeader>
@@ -240,7 +239,7 @@ const WeeklyDigest = () => {
                 <CardHeader className="pb-3">
                   <div className="flex items-center gap-2 text-muted-foreground">
                     <TrendingUp className="w-4 h-4" />
-                    <span className="text-xs kicker">Themen-Radar</span>
+                    <span className="text-[10px] sm:text-xs kicker text-brand-green">Themen-Radar</span>
                   </div>
                   <CardTitle className="font-serif text-xl">Meistdiskutierte Themen</CardTitle>
                   <CardDescription className="text-sm">
@@ -259,9 +258,9 @@ const WeeklyDigest = () => {
                                 {topic.count}× in {topic.bodies.length} {topic.bodies.length === 1 ? "Parlament" : "Parlamenten"}
                               </span>
                             </div>
-                            <div className="h-2 bg-secondary rounded-full overflow-hidden">
+                            <div className="h-2 bg-secondary overflow-hidden">
                               <div
-                          className="h-full bg-accent rounded-full transition-all"
+                          className="h-full bg-brand-blue transition-all"
                           style={{ width: `${topic.count / maxTopicCount * 100}%` }} />
 
                             </div>
@@ -299,7 +298,7 @@ const WeeklyDigest = () => {
                 <CardHeader className="pb-3">
                   <div className="flex items-center gap-2 text-muted-foreground">
                     <Vote className="w-4 h-4" />
-                    <span className="text-xs kicker">Knappste Abstimmungen</span>
+                    <span className="text-[10px] sm:text-xs kicker text-brand-red">Knappste Abstimmungen</span>
                   </div>
                   <CardTitle className="font-serif text-xl">Haarscharf entschieden</CardTitle>
                   <CardDescription className="text-sm">
@@ -311,7 +310,7 @@ const WeeklyDigest = () => {
               <Link
                 key={cv.voting.id}
                 to={`/detail/${cv.voting.id}?type=voting&body=${encodeURIComponent(cv.voting.body_key)}`}
-                className="block p-3 -mx-3 rounded-lg hover:bg-secondary/50 transition-colors">
+                className="block py-3 px-1 -mx-1 border-b border-hairline last:border-0 hover:bg-secondary/40 transition-colors">
 
                       <div className="flex items-center justify-between mb-2">
                         <div className="flex-1 min-w-0 mr-3">
@@ -321,7 +320,7 @@ const WeeklyDigest = () => {
                           <p className="text-xs text-muted-foreground">{cv.bodyName}</p>
                         </div>
                         <div className="flex items-center gap-2 flex-shrink-0">
-                          <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${(cv.voting.decision ? ["ja","accepted","angenommen"].includes(cv.voting.decision.toLowerCase()) : cv.voting.results_yes > cv.voting.results_no) ? "bg-brand-green-soft text-brand-green" : "bg-brand-red-soft text-brand-red"}`}>
+                          <span className={`result-pill text-xs ${(cv.voting.decision ? ["ja","accepted","angenommen"].includes(cv.voting.decision.toLowerCase()) : cv.voting.results_yes > cv.voting.results_no) ? "bg-brand-green-soft text-brand-green" : "bg-brand-red-soft text-brand-red"}`}>
                             {cv.voting.results_yes}:{cv.voting.results_no}
                           </span>
                           <Badge variant="outline" className="text-xs">Δ{cv.margin}</Badge>
@@ -345,7 +344,7 @@ const WeeklyDigest = () => {
                 <CardHeader className="pb-3">
                   <div className="flex items-center gap-2 text-muted-foreground">
                     <Building2 className="w-4 h-4" />
-                    <span className="text-xs kicker">Aktivste Parlamente</span>
+                    <span className="text-[10px] sm:text-xs kicker text-brand-blue">Aktivste Parlamente</span>
                   </div>
                   <CardTitle className="font-serif text-xl">Parlamentarische Aktivität</CardTitle>
                 </CardHeader>
@@ -355,7 +354,7 @@ const WeeklyDigest = () => {
                 <Link
                   key={body.key}
                   to={withWeek(`/weekly?body=${encodeURIComponent(body.key)}`)}
-                  className="flex items-center justify-between py-2 px-3 -mx-3 rounded-lg hover:bg-secondary/50 transition-colors">
+                  className="flex items-center justify-between py-2.5 px-1 -mx-1 border-b border-hairline last:border-0 hover:bg-secondary/40 transition-colors">
 
                         <div className="flex items-center gap-3">
                           <span className="text-xs font-medium text-muted-foreground w-5">{i + 1}.</span>
