@@ -12,6 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { Loader2, Search, Sparkles, Trash2, Eye, EyeOff, Home, Pencil } from "lucide-react";
 import StoryPreviewModal, { type StorySlide } from "@/components/StoryPreviewModal";
 import type { CarouselSlide } from "@/components/story/CarouselSlideCard";
+import FeedCarouselEditor from "@/components/admin/FeedCarouselEditor";
 import { getWeekDateRange } from "@/lib/api/openparldata";
 import {
   BASE_URL,
@@ -103,7 +104,7 @@ const EditorialSection = ({ year, week }: EditorialSectionProps) => {
   const [previewStory, setPreviewStory] = useState<StoryPost | null>(null);
   const [savingSlides, setSavingSlides] = useState(false);
   const [feedStory, setFeedStory] = useState<StoryPost | null>(null);
-  const [feedJson, setFeedJson] = useState("");
+  const [feedSlides, setFeedSlides] = useState<CarouselSlide[]>([]);
   const [savingFeed, setSavingFeed] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
@@ -226,19 +227,16 @@ const EditorialSection = ({ year, week }: EditorialSectionProps) => {
 
   const openFeedEditor = (story: StoryPost) => {
     setFeedStory(story);
-    setFeedJson(JSON.stringify(story.feed_slides, null, 2));
+    setFeedSlides(story.feed_slides || []);
   };
 
   const saveFeedSlides = async () => {
     if (!feedStory) return;
-    let parsed: CarouselSlide[];
-    try {
-      parsed = JSON.parse(feedJson);
-      if (!Array.isArray(parsed)) throw new Error("Feed-Slides müssen ein Array sein");
-    } catch (e: any) {
-      toast.error("Ungültiges JSON: " + e.message);
+    if (feedSlides.some((s) => !s.headline?.trim())) {
+      toast.error("Jede Kachel braucht eine Headline");
       return;
     }
+    const parsed = feedSlides;
     setSavingFeed(true);
     const { error } = await supabase
       .from("story_posts")
@@ -477,23 +475,22 @@ const EditorialSection = ({ year, week }: EditorialSectionProps) => {
       )}
 
       <Dialog open={!!feedStory} onOpenChange={(open) => !open && setFeedStory(null)}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="font-serif text-lg">Feed-Karussell bearbeiten</DialogTitle>
             <DialogDescription>
-              JSON-Array mit CarouselSlide-Einträgen (cover, detail, result, cta). Format: portrait (4:5).
+              Kacheln für den Instagram-Feed (Format 4:5). Kachel wählen, Felder ausfüllen –
+              rechts siehst du sofort das Ergebnis.
             </DialogDescription>
           </DialogHeader>
-          <div className="space-y-3">
-            <Label htmlFor="feed-json" className="text-xs text-muted-foreground">JSON</Label>
-            <Textarea
-              id="feed-json"
-              value={feedJson}
-              onChange={(e) => setFeedJson(e.target.value)}
-              rows={18}
-              className="font-mono text-xs"
+          {feedStory && (
+            <FeedCarouselEditor
+              slides={feedSlides}
+              onChange={setFeedSlides}
+              storyTitle={feedStory.title}
+              storySlides={feedStory.slides}
             />
-          </div>
+          )}
           <DialogFooter className="gap-2">
             <Button variant="outline" onClick={() => setFeedStory(null)}>Abbrechen</Button>
             <Button onClick={saveFeedSlides} disabled={savingFeed}>
