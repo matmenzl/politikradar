@@ -236,14 +236,14 @@ const WeeklyOverview = () => {
                 <CardContent className="p-3 sm:p-4 md:p-6 pt-0">
                   <div className="grid grid-cols-3 gap-1.5 sm:gap-2 md:gap-3">
                     {[
-                      { label: "Geschäfte", value: data.totalAffairs, tone: "bg-brand-blue-soft text-brand-blue", href: withWeek(`/list/affairs?body=${encodeURIComponent(bodyKey)}`) },
-                      { label: "Abstimmungen", value: data.totalVotings, tone: "bg-brand-red-soft text-brand-red", href: withWeek(`/list/votings?body=${encodeURIComponent(bodyKey)}`) },
-                      { label: "Sitzungen", value: data.totalMeetings, tone: "bg-brand-green-soft text-brand-green", href: withWeek(`/list/meetings?body=${encodeURIComponent(bodyKey)}`) },
+                      { label: "Geschäfte", value: data.totalAffairs, tone: "bg-brand-red-soft text-brand-red", labelTone: "text-brand-red-deep", shape: "bubble-plain", href: withWeek(`/list/affairs?body=${encodeURIComponent(bodyKey)}`) },
+                      { label: "Abstimmungen", value: data.totalVotings, tone: "bg-brand-blue-soft text-brand-blue", labelTone: "text-brand-blue", shape: "bubble-plain-alt", href: withWeek(`/list/votings?body=${encodeURIComponent(bodyKey)}`) },
+                      { label: "Sitzungen", value: data.totalMeetings, tone: "bg-brand-green-soft text-brand-green", labelTone: "text-brand-green", shape: "bubble-plain", href: withWeek(`/list/meetings?body=${encodeURIComponent(bodyKey)}`) },
 
                     ].map((stat) => (
-                      <Link key={stat.label} to={stat.href} className={`${stat.tone} p-2 md:p-3 transition-opacity hover:opacity-80`}>
-                        <p className="font-serif text-xl sm:text-2xl md:text-3xl font-medium">{stat.value}</p>
-                        <p className="text-[10px] md:text-xs kicker text-foreground/70">{stat.label}</p>
+                      <Link key={stat.label} to={stat.href} className={`${stat.tone} ${stat.shape} p-3 md:p-4 transition-opacity hover:opacity-80`}>
+                        <p className="font-serif text-xl sm:text-2xl md:text-3xl font-semibold tabular-nums">{stat.value}</p>
+                        <p className={`text-[10px] md:text-xs font-semibold ${stat.labelTone}`}>{stat.label}</p>
                       </Link>
                     ))}
 
