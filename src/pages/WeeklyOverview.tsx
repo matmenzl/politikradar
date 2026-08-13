@@ -236,16 +236,17 @@ const WeeklyOverview = () => {
                 <CardContent className="p-3 sm:p-4 md:p-6 pt-0">
                   <div className="grid grid-cols-3 gap-1.5 sm:gap-2 md:gap-3">
                     {[
-                      { label: "Geschäfte", value: data.totalAffairs, href: withWeek(`/list/affairs?body=${encodeURIComponent(bodyKey)}`) },
-                      { label: "Abstimmungen", value: data.totalVotings, href: withWeek(`/list/votings?body=${encodeURIComponent(bodyKey)}`) },
-                      { label: "Sitzungen", value: data.totalMeetings, href: withWeek(`/list/meetings?body=${encodeURIComponent(bodyKey)}`) },
+                      { label: "Geschäfte", value: data.totalAffairs, tone: "bg-brand-blue-soft text-brand-blue", href: withWeek(`/list/affairs?body=${encodeURIComponent(bodyKey)}`) },
+                      { label: "Abstimmungen", value: data.totalVotings, tone: "bg-brand-red-soft text-brand-red", href: withWeek(`/list/votings?body=${encodeURIComponent(bodyKey)}`) },
+                      { label: "Sitzungen", value: data.totalMeetings, tone: "bg-brand-green-soft text-brand-green", href: withWeek(`/list/meetings?body=${encodeURIComponent(bodyKey)}`) },
 
                     ].map((stat) => (
-                      <Link key={stat.label} to={stat.href} className="bg-secondary/50 rounded-lg p-2 md:p-3 hover:bg-secondary/80 transition-colors">
-                        <p className="text-lg sm:text-xl md:text-2xl font-semibold text-foreground">{stat.value}</p>
-                        <p className="text-[10px] md:text-xs text-muted-foreground">{stat.label}</p>
+                      <Link key={stat.label} to={stat.href} className={`${stat.tone} p-2 md:p-3 transition-opacity hover:opacity-80`}>
+                        <p className="font-serif text-xl sm:text-2xl md:text-3xl font-medium">{stat.value}</p>
+                        <p className="text-[10px] md:text-xs font-semibold uppercase tracking-wider text-foreground/70">{stat.label}</p>
                       </Link>
                     ))}
+
                   </div>
                 </CardContent>
               </Card>
