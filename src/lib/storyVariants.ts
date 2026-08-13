@@ -74,6 +74,7 @@ const IMAGE_SPOTS: ImageSpotId[] = ["bottom-right", "top-right", "bottom-left", 
 
 export interface SlideVariant {
   palette: SlidePalette;
+  paletteIndex: number;
   composition: CompositionId;
   headlineShape: string;
   imageShape: string;
@@ -179,6 +180,7 @@ export function composeStoryVariants(slides: VariantInput[], seed: string | numb
 
     return {
       palette,
+      paletteIndex: palettes.indexOf(palette),
       composition,
       headlineShape,
       imageShape,
