@@ -241,7 +241,7 @@ const AiAnalysisSection = ({ year: yearProp, week: weekProp }: AiAnalysisSection
                 </span>
                 <p className="text-xs text-muted-foreground">
                   {step1Done
-                    ? `Analysiert ${Math.min(totalItems, 50)} Einträge nach Social-Media-Potenzial`
+                    ? `Analysiert alle ${totalItems} Einträge nach Social-Media-Potenzial (${Math.ceil(totalItems / 50)} Blöcke)`
                     : "Zuerst Schritt 1 abschliessen"}
                 </p>
               </div>
