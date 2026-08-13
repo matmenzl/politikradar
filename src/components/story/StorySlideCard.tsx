@@ -53,7 +53,8 @@ interface StorySlideCardProps { slide: StorySlide; index: number; total: number;
 
 const StorySlideCard = forwardRef<HTMLDivElement, StorySlideCardProps>(({ slide, index, total }, ref) => {
   const s = slideStyles[slide.slide_type];
-  const showImage = slide.slide_type === "hook"; // Bild nur als Bubble auf dem Hook-Slide
+  // Bild standardmässig nur als Bubble auf dem Hook-Slide, pro Slide übersteuerbar
+  const showImage = slide.image_enabled ?? slide.slide_type === "hook";
   const [imgLoaded, setImgLoaded] = useState(false);
   const [imgFailed, setImgFailed] = useState(false);
 
@@ -61,8 +62,14 @@ const StorySlideCard = forwardRef<HTMLDivElement, StorySlideCardProps>(({ slide,
     if (!showImage) return "";
     if (slide.image_url) return slide.image_url;
     const prompt = slide.image_prompt || fallbackImagePrompt(slide.headline, slide.slide_type);
-    return buildPollinationsUrl(prompt, { seed: slide.image_seed, width: 800, height: 760 });
-  }, [showImage, slide.image_url, slide.image_prompt, slide.image_seed, slide.headline, slide.slide_type]);
+    return buildPollinationsUrl(prompt, {
+      seed: slide.image_seed,
+      width: 800,
+      height: 760,
+      style: slide.image_style,
+      negative: slide.image_negative,
+    });
+  }, [showImage, slide.image_url, slide.image_prompt, slide.image_seed, slide.image_style, slide.image_negative, slide.headline, slide.slide_type]);
 
   useEffect(() => { setImgLoaded(false); setImgFailed(false); }, [imageSrc]);
 
