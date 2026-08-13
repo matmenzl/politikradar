@@ -75,8 +75,9 @@ export default {
       },
       fontFamily: {
         serif: ["Newsreader", "Georgia", "serif"],
-        sans: ["'Hanken Grotesk'", "ui-sans-serif", "system-ui", "sans-serif"],
+        sans: ["'Hanken Grotesk'", "system-ui", "sans-serif"],
       },
+
 
       borderRadius: {
         lg: "var(--radius)",

@@ -115,7 +115,7 @@ const WeeklyDigest = () => {
         <div className="max-w-4xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-2">
             <img src={logoImg} alt="PolitikRadar Logo" className="h-8 w-8 object-contain" />
-            <span className="font-serif text-lg font-semibold text-foreground">PolitikRadar</span>
+            <span className="font-serif text-lg font-medium text-foreground">politikradar<span className="text-brand-red">.</span></span>
           </div>
           <Badge variant="secondary" className="text-xs">Alle Parlamente</Badge>
         </div>
@@ -128,14 +128,14 @@ const WeeklyDigest = () => {
             <Button variant="ghost" size="icon" className="h-8 w-8" onClick={goToPreviousWeek}>
               <ChevronLeft className="w-4 h-4" />
             </Button>
-            <p className="text-xs font-medium uppercase tracking-widest text-muted-foreground">
+            <p className="text-xs kicker text-muted-foreground">
               Kalenderwoche {week}
             </p>
             <Button variant="ghost" size="icon" className="h-8 w-8" onClick={goToNextWeek}>
               <ChevronRight className="w-4 h-4" />
             </Button>
           </div>
-          <h1 className="font-serif text-3xl md:text-4xl font-bold text-foreground">
+          <h1 className="font-serif text-3xl md:text-4xl font-normal text-foreground">
             🇨🇭 Politikwoche
           </h1>
           <p className="text-lg text-foreground/80">{dateRangeLabel}</p>
@@ -223,7 +223,7 @@ const WeeklyDigest = () => {
                 <CardHeader className="pb-3">
                   <div className="flex items-center gap-2 text-muted-foreground">
                     <Sparkles className="w-4 h-4" />
-                    <span className="text-xs font-medium uppercase tracking-wider">Wochenzusammenfassung</span>
+                    <span className="text-xs kicker">Wochenzusammenfassung</span>
                   </div>
                   <CardTitle className="font-serif text-xl">Das Wichtigste der Woche</CardTitle>
                 </CardHeader>
@@ -240,7 +240,7 @@ const WeeklyDigest = () => {
                 <CardHeader className="pb-3">
                   <div className="flex items-center gap-2 text-muted-foreground">
                     <TrendingUp className="w-4 h-4" />
-                    <span className="text-xs font-medium uppercase tracking-wider">Themen-Radar</span>
+                    <span className="text-xs kicker">Themen-Radar</span>
                   </div>
                   <CardTitle className="font-serif text-xl">Meistdiskutierte Themen</CardTitle>
                   <CardDescription className="text-sm">
@@ -299,7 +299,7 @@ const WeeklyDigest = () => {
                 <CardHeader className="pb-3">
                   <div className="flex items-center gap-2 text-muted-foreground">
                     <Vote className="w-4 h-4" />
-                    <span className="text-xs font-medium uppercase tracking-wider">Knappste Abstimmungen</span>
+                    <span className="text-xs kicker">Knappste Abstimmungen</span>
                   </div>
                   <CardTitle className="font-serif text-xl">Haarscharf entschieden</CardTitle>
                   <CardDescription className="text-sm">
@@ -345,7 +345,7 @@ const WeeklyDigest = () => {
                 <CardHeader className="pb-3">
                   <div className="flex items-center gap-2 text-muted-foreground">
                     <Building2 className="w-4 h-4" />
-                    <span className="text-xs font-medium uppercase tracking-wider">Aktivste Parlamente</span>
+                    <span className="text-xs kicker">Aktivste Parlamente</span>
                   </div>
                   <CardTitle className="font-serif text-xl">Parlamentarische Aktivität</CardTitle>
                 </CardHeader>

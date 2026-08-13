@@ -66,7 +66,7 @@ const ParliamentBrowser = () => {
   return (
     <section className="space-y-6">
       <div className="space-y-2">
-        <h2 className="font-serif text-2xl md:text-3xl font-bold text-foreground">
+        <h2 className="font-serif text-2xl md:text-3xl font-normal text-foreground">
           Verfügbare Parlamente
         </h2>
         <p className="text-sm text-muted-foreground">

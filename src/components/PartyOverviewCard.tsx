@@ -57,7 +57,7 @@ const PartyOverviewCard = ({ votings }: Props) => {
       <CardHeader className="pb-3">
         <div className="flex items-center gap-2 text-muted-foreground">
           <Users className="w-4 h-4" />
-          <span className="text-xs font-medium uppercase tracking-wider">Parteien der Woche</span>
+          <span className="text-xs kicker">Parteien der Woche</span>
         </div>
         <CardTitle className="font-serif text-xl leading-snug">Abstimmungsverhalten nach Partei</CardTitle>
         <CardDescription className="text-sm leading-relaxed">

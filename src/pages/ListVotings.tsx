@@ -86,7 +86,7 @@ const ListVotings = () => {
         <div className="space-y-1">
           <div className="flex items-center gap-2">
             <Vote className="w-5 h-5 text-muted-foreground" />
-            <h1 className="font-serif text-2xl font-bold">Abstimmungen</h1>
+            <h1 className="font-serif text-2xl font-normal">Abstimmungen</h1>
           </div>
           <p className="text-sm text-muted-foreground">
             {loading ? "Laden…" : `${filtered.length} von ${votings.length} Abstimmungen`}

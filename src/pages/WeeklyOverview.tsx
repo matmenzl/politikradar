@@ -152,7 +152,7 @@ const WeeklyOverview = () => {
         {/* Parliament selector */}
         <div className="opacity-0 animate-fade-in" style={{ animationDelay: "0ms" }}>
           <div className="flex items-center gap-3 flex-wrap">
-            <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Parlament wechseln</span>
+            <span className="text-xs kicker text-muted-foreground">Parlament wechseln</span>
             <ParliamentPicker
               bodies={bodies}
               value={bodyKey}
@@ -224,7 +224,7 @@ const WeeklyOverview = () => {
                 <CardHeader className="pb-2 md:pb-3 p-3 sm:p-4 md:p-6">
                   <div className="flex items-center gap-2 text-muted-foreground">
                     <Activity className="w-4 h-4 flex-shrink-0" />
-                    <span className="text-[10px] sm:text-xs font-medium uppercase tracking-wider">Wochenüberblick in Zahlen</span>
+                    <span className="text-[10px] sm:text-xs kicker">Wochenüberblick in Zahlen</span>
                   </div>
                   <CardTitle className="font-serif text-base sm:text-lg md:text-xl leading-snug">Gesamtaktivität</CardTitle>
                   <CardDescription className="text-xs sm:text-sm leading-relaxed">
@@ -243,7 +243,7 @@ const WeeklyOverview = () => {
                     ].map((stat) => (
                       <Link key={stat.label} to={stat.href} className={`${stat.tone} p-2 md:p-3 transition-opacity hover:opacity-80`}>
                         <p className="font-serif text-xl sm:text-2xl md:text-3xl font-medium">{stat.value}</p>
-                        <p className="text-[10px] md:text-xs font-semibold uppercase tracking-wider text-foreground/70">{stat.label}</p>
+                        <p className="text-[10px] md:text-xs kicker text-foreground/70">{stat.label}</p>
                       </Link>
                     ))}
 
@@ -257,7 +257,7 @@ const WeeklyOverview = () => {
                 <CardHeader className="pb-2 md:pb-3 p-3 sm:p-4 md:p-6">
                   <div className="flex items-center gap-2 text-muted-foreground">
                     <Vote className="w-4 h-4 flex-shrink-0" />
-                    <span className="text-[10px] sm:text-xs font-medium uppercase tracking-wider">Knappste Abstimmung</span>
+                    <span className="text-[10px] sm:text-xs kicker">Knappste Abstimmung</span>
                   </div>
                   <CardTitle className="font-serif text-base sm:text-lg md:text-xl leading-snug line-clamp-2">
                     {closestVoting ? closestVoting.affair_title_de || closestVoting.title_de || "Abstimmung" : "Keine Abstimmung"}
@@ -285,7 +285,7 @@ const WeeklyOverview = () => {
                 <CardHeader className="pb-2 md:pb-3 p-3 sm:p-4 md:p-6">
                   <div className="flex items-center gap-2 text-muted-foreground">
                     <BarChart3 className="w-4 h-4 flex-shrink-0" />
-                    <span className="text-[10px] sm:text-xs font-medium uppercase tracking-wider">Abstimmungen der Woche</span>
+                    <span className="text-[10px] sm:text-xs kicker">Abstimmungen der Woche</span>
                   </div>
                   <CardTitle className="font-serif text-base sm:text-lg md:text-xl leading-snug">Abstimmungsergebnisse</CardTitle>
                   <CardDescription className="text-[10px] sm:text-xs md:text-sm leading-relaxed">
@@ -319,7 +319,7 @@ const WeeklyOverview = () => {
                   <div className="flex items-center justify-between gap-2">
                     <div className="flex items-center gap-2 text-muted-foreground min-w-0">
                       <FileText className="w-4 h-4 flex-shrink-0" />
-                      <span className="text-[10px] sm:text-xs font-medium uppercase tracking-wider truncate">Geschäfte der Woche</span>
+                      <span className="text-[10px] sm:text-xs kicker truncate">Geschäfte der Woche</span>
                     </div>
                     {taggingLoading && (
                       <div className="flex items-center gap-1.5 text-accent flex-shrink-0">
