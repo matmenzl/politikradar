@@ -1,14 +1,15 @@
 import { useEffect, useState } from "react";
 import {
   fetchBodies,
-  fetchAffairsForWeek,
-  fetchVotingsForWeek,
+  fetchAllAffairsInRange,
+  fetchAllVotingsInRange,
 } from "@/lib/api/openparldata";
 import type { AffairWithBody, VotingWithBody } from "@/components/admin/shared";
 
 /**
  * Loads affairs and votings for a date range across all parliaments.
- * Shared by the public research view and the AI analysis section.
+ * Uses the global, date-sorted API endpoints (few requests) instead of
+ * querying every parliament individually.
  */
 export function useRangeItems(from: string, to: string) {
   const [affairs, setAffairs] = useState<AffairWithBody[]>([]);
@@ -22,30 +23,21 @@ export function useRangeItems(from: string, to: string) {
 
     (async () => {
       try {
-        const bodies = await fetchBodies();
-        const allA: AffairWithBody[] = [];
-        const allV: VotingWithBody[] = [];
-        const batchSize = 5;
-        for (let i = 0; i < bodies.length; i += batchSize) {
-          const batch = bodies.slice(i, i + batchSize);
-          const [aRes, vRes] = await Promise.all([
-            Promise.all(
-              batch.map(async (b) => {
-                const res = await fetchAffairsForWeek(from, to, b.key);
-                return res.data.map((a) => ({ ...a, bodyName: b.name_de || b.key }));
-              })
-            ),
-            Promise.all(
-              batch.map(async (b) => {
-                const res = await fetchVotingsForWeek(from, to, b.key);
-                return res.data.map((v) => ({ ...v, bodyName: b.name_de || b.key }));
-              })
-            ),
-          ]);
-          aRes.forEach((r) => allA.push(...r));
-          vRes.forEach((r) => allV.push(...r));
-        }
+        const [bodies, rawAffairs, rawVotings] = await Promise.all([
+          fetchBodies(),
+          fetchAllAffairsInRange(from, to),
+          fetchAllVotingsInRange(from, to),
+        ]);
         if (cancelled) return;
+
+        const nameByKey = new Map(bodies.map((b) => [b.key, b.name_de || b.key]));
+        const allA: AffairWithBody[] = rawAffairs
+          .filter((a) => nameByKey.has(a.body_key))
+          .map((a) => ({ ...a, bodyName: nameByKey.get(a.body_key)! }));
+        const allV: VotingWithBody[] = rawVotings
+          .filter((v) => nameByKey.has(v.body_key))
+          .map((v) => ({ ...v, bodyName: nameByKey.get(v.body_key)! }));
+
         allA.sort(
           (a, b) => new Date(b.begin_date || "").getTime() - new Date(a.begin_date || "").getTime()
         );

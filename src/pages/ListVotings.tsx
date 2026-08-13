@@ -9,7 +9,7 @@ import {
   getWeekDateRange,
   formatDateRange,
   fetchBodies,
-  fetchVotingsForWeek,
+  fetchAllVotingsInRange,
   isVotingAccepted,
   type Voting,
   type Body,
@@ -35,19 +35,15 @@ const ListVotings = () => {
     setLoading(true);
     (async () => {
       try {
-        const bodies = await fetchBodies();
-        const allVotings: VotingWithBody[] = [];
-        const batchSize = 5;
-        for (let i = 0; i < bodies.length; i += batchSize) {
-          const batch = bodies.slice(i, i + batchSize);
-          const results = await Promise.all(
-            batch.map(async (b) => {
-              const res = await fetchVotingsForWeek(from, to, b.key);
-              return res.data.map((v) => ({ ...v, bodyName: b.name_de || b.key }));
-            })
-          );
-          results.forEach((r) => allVotings.push(...r));
-        }
+        const [bodies, rows] = await Promise.all([
+          fetchBodies(),
+          fetchAllVotingsInRange(from, to),
+        ]);
+        const nameByKey = new Map(bodies.map((b) => [b.key, b.name_de || b.key]));
+        const allVotings: VotingWithBody[] = rows
+          .filter((v) => nameByKey.has(v.body_key))
+          .map((v) => ({ ...v, bodyName: nameByKey.get(v.body_key)! }));
+
         allVotings.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
         setVotings(allVotings);
       } catch (e) {

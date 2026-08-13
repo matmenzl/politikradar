@@ -8,7 +8,7 @@ import {
   getWeekDateRange,
   formatDateRange,
   fetchBodies,
-  fetchMeetingsForWeek,
+  fetchAllMeetingsInRange,
   type Meeting,
 } from "@/lib/api/openparldata";
 import { useWeekParam } from "@/hooks/use-week";
@@ -32,19 +32,15 @@ const ListMeetings = () => {
     setLoading(true);
     (async () => {
       try {
-        const bodies = await fetchBodies();
-        const all: MeetingWithBody[] = [];
-        const batchSize = 5;
-        for (let i = 0; i < bodies.length; i += batchSize) {
-          const batch = bodies.slice(i, i + batchSize);
-          const results = await Promise.all(
-            batch.map(async (b) => {
-              const res = await fetchMeetingsForWeek(from, to, b.key);
-              return res.data.map((m) => ({ ...m, bodyName: b.name_de || b.key }));
-            })
-          );
-          results.forEach((r) => all.push(...r));
-        }
+        const [bodies, rows] = await Promise.all([
+          fetchBodies(),
+          fetchAllMeetingsInRange(from, to),
+        ]);
+        const nameByKey = new Map(bodies.map((b) => [b.key, b.name_de || b.key]));
+        const all: MeetingWithBody[] = rows
+          .filter((m) => nameByKey.has(m.body_key))
+          .map((m) => ({ ...m, bodyName: nameByKey.get(m.body_key)! }));
+
         all.sort((a, b) => new Date(b.begin_date || "").getTime() - new Date(a.begin_date || "").getTime());
         setMeetings(all);
       } catch (e) {
