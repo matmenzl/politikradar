@@ -1,15 +1,13 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
 import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext, type CarouselApi } from "@/components/ui/carousel";
-import { Download, Loader2, ArrowLeft, FileText, RefreshCw, Save } from "lucide-react";
+import { Download, Loader2, ArrowLeft, FileText, Save } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useRef, useCallback, useState, useEffect } from "react";
 import StorySlideCard from "./story/StorySlideCard";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { downloadSingleSlide, downloadAllSlidesAsZip } from "@/lib/exportSlides";
-import { fallbackImagePrompt, randomSeed } from "@/lib/pollinations";
-import { toast } from "sonner";
+import ImagePromptEditor from "./story/ImagePromptEditor";
 
 
 export interface PartyVoteData {

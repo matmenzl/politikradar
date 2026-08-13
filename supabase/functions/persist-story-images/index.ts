@@ -7,14 +7,31 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-const STYLE_PREFIX =
-  "Swiss editorial layout, clean graphic design, minimalist corporate style, muted desaturated colors, no text, no letters, no logos, no watermark, high quality";
+const STYLE_PREFIXES: Record<string, string> = {
+  editorial:
+    "Swiss editorial layout, clean graphic design, minimalist corporate style, muted desaturated colors, generous negative space",
+  documentary:
+    "documentary photography, photojournalism, natural available light, 35mm lens, shallow depth of field, realistic textures, neutral color grading",
+  data:
+    "abstract data visualization, geometric bar and grid shapes, isometric infographic composition, flat vector look, limited color palette",
+  collage:
+    "paper cut-out collage, torn newsprint textures, layered shapes, matte print finish, editorial magazine collage",
+  risograph:
+    "risograph print, two-tone duotone ink, visible halftone grain, slight misregistration, poster art",
+  cinematic:
+    "cinematic still, dramatic directional lighting, high contrast, atmospheric haze, anamorphic framing",
+};
+
+const BASE_NEGATIVE =
+  "no text, no letters, no typography, no captions, no logos, no watermark, no signature, no distorted faces, no extra limbs";
 
 const BUCKET = "story-images";
 const TEN_YEARS = 60 * 60 * 24 * 365 * 10;
 
-function buildUrl(prompt: string, seed: number) {
-  const full = encodeURIComponent(`${STYLE_PREFIX}: ${prompt}`);
+function buildUrl(prompt: string, seed: number, style?: string, negative?: string) {
+  const prefix = STYLE_PREFIXES[style ?? "editorial"] ?? STYLE_PREFIXES.editorial;
+  const negatives = [BASE_NEGATIVE, negative?.trim()].filter(Boolean).join(", ");
+  const full = encodeURIComponent(`${prefix}: ${prompt}. ${negatives}, high quality`);
   return `https://image.pollinations.ai/prompt/${full}?width=1080&height=1920&model=flux&seed=${seed}&nologo=true`;
 }
 
@@ -70,7 +87,9 @@ serve(async (req) => {
         : Math.floor(Math.random() * 1_000_000);
 
       try {
-        const res = await fetch(buildUrl(prompt, seed));
+        const style = typeof slide.image_style === "string" ? slide.image_style : undefined;
+        const negative = typeof slide.image_negative === "string" ? slide.image_negative : undefined;
+        const res = await fetch(buildUrl(prompt, seed, style, negative));
         if (!res.ok) {
           console.error(`Pollinations failed [${res.status}] for slide ${i}`);
           persisted.push(slide);
