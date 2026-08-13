@@ -88,7 +88,8 @@ const StorySlideCard = forwardRef<HTMLDivElement, StorySlideCardProps>(({ slide,
   );
   const p = v.palette;
 
-  const showImage = slide.image_enabled ?? slide.slide_type === "hook";
+  // Bild nur noch, wenn explizit aktiviert (kein automatisches Bild auf Slide 1)
+  const showImage = slide.image_enabled === true && Boolean(slide.image_url);
   const [imgLoaded, setImgLoaded] = useState(false);
   const [imgFailed, setImgFailed] = useState(false);
 
