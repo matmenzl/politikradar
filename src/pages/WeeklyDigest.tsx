@@ -220,9 +220,9 @@ const WeeklyDigest = () => {
             {data.summary &&
           <Card className="opacity-0 animate-fade-in" style={{ animationDelay: "200ms" }}>
                 <CardHeader className="pb-3">
-                  <div className="flex items-center gap-2 text-muted-foreground">
+                  <div className="flex items-center gap-2">
                     <Sparkles className="w-4 h-4" />
-                    <span className="text-xs kicker">Wochenzusammenfassung</span>
+                    <span className="text-[10px] sm:text-xs kicker text-brand-purple">Wochenzusammenfassung</span>
                   </div>
                   <CardTitle className="font-serif text-xl">Das Wichtigste der Woche</CardTitle>
                 </CardHeader>
@@ -239,7 +239,7 @@ const WeeklyDigest = () => {
                 <CardHeader className="pb-3">
                   <div className="flex items-center gap-2 text-muted-foreground">
                     <TrendingUp className="w-4 h-4" />
-                    <span className="text-xs kicker">Themen-Radar</span>
+                    <span className="text-[10px] sm:text-xs kicker text-brand-green">Themen-Radar</span>
                   </div>
                   <CardTitle className="font-serif text-xl">Meistdiskutierte Themen</CardTitle>
                   <CardDescription className="text-sm">
@@ -298,7 +298,7 @@ const WeeklyDigest = () => {
                 <CardHeader className="pb-3">
                   <div className="flex items-center gap-2 text-muted-foreground">
                     <Vote className="w-4 h-4" />
-                    <span className="text-xs kicker">Knappste Abstimmungen</span>
+                    <span className="text-[10px] sm:text-xs kicker text-brand-red">Knappste Abstimmungen</span>
                   </div>
                   <CardTitle className="font-serif text-xl">Haarscharf entschieden</CardTitle>
                   <CardDescription className="text-sm">
@@ -344,7 +344,7 @@ const WeeklyDigest = () => {
                 <CardHeader className="pb-3">
                   <div className="flex items-center gap-2 text-muted-foreground">
                     <Building2 className="w-4 h-4" />
-                    <span className="text-xs kicker">Aktivste Parlamente</span>
+                    <span className="text-[10px] sm:text-xs kicker text-brand-blue">Aktivste Parlamente</span>
                   </div>
                   <CardTitle className="font-serif text-xl">Parlamentarische Aktivität</CardTitle>
                 </CardHeader>
