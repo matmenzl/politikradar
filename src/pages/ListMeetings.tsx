@@ -8,7 +8,7 @@ import {
   getWeekDateRange,
   formatDateRange,
   fetchBodies,
-  fetchMeetingsForWeek,
+  fetchAllMeetingsInRange,
   type Meeting,
 } from "@/lib/api/openparldata";
 import { useWeekParam } from "@/hooks/use-week";
