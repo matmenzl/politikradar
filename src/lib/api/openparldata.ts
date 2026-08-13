@@ -505,6 +505,9 @@ export async function fetchWeeklyData(year: number, week: number, bodyKey: strin
 
 const rangeCache = new Map<string, Promise<any>>();
 
+// The API rejects deep pagination ("offset-cap-exceeded") beyond ~150k.
+const MAX_OFFSET = 120000;
+
 async function findStartOffset(
   endpoint: string,
   params: Record<string, string>,
@@ -517,11 +520,16 @@ async function findStartOffset(
   if (probe.data.length && dateOf(probe.data[0]) <= toDate.getTime()) return { offset: 0, total };
 
   let lo = 0;
-  let hi = Math.max(0, total - 1);
+  let hi = Math.min(Math.max(0, total - 1), MAX_OFFSET);
   while (lo < hi) {
     const mid = Math.floor((lo + hi) / 2);
-    const res = await fetchApi<any>(endpoint, { ...params, limit: "1", offset: String(mid) });
-    const d = res.data.length ? dateOf(res.data[0]) : -Infinity;
+    let d = -Infinity;
+    try {
+      const res = await fetchApi<any>(endpoint, { ...params, limit: "1", offset: String(mid) });
+      d = res.data.length ? dateOf(res.data[0]) : -Infinity;
+    } catch {
+      // treat as out of range
+    }
     if (d > toDate.getTime()) lo = mid + 1;
     else hi = mid;
   }
@@ -542,7 +550,8 @@ async function fetchRange<T>(
   const limit = 500;
   const out: T[] = [];
   let offset = start;
-  while (offset < total) {
+  while (offset < total && offset <= MAX_OFFSET) {
+
     const res = await fetchApi<any>(endpoint, { ...params, limit: String(limit), offset: String(offset) });
     if (!res.data.length) break;
     let done = false;
