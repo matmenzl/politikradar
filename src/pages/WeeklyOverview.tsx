@@ -135,7 +135,7 @@ const WeeklyOverview = () => {
         <div className="max-w-4xl mx-auto flex items-center justify-between gap-2">
           <Link to={withWeek("/")} className="flex items-center gap-1.5 sm:gap-2 text-muted-foreground hover:text-foreground transition-colors min-w-0">
             <ArrowLeft className="w-4 h-4 flex-shrink-0" />
-            <span className="font-serif text-base sm:text-lg font-semibold text-foreground truncate">
+            <span className="font-serif text-base sm:text-lg font-normal text-foreground truncate">
               politikradar<span className="text-brand-red">.</span>
             </span>
           </Link>
@@ -209,7 +209,7 @@ const WeeklyOverview = () => {
             <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-muted">
               <Activity className="w-5 h-5 text-muted-foreground" />
             </div>
-            <p className="text-lg font-serif font-semibold text-foreground">Keine Daten für diese Woche</p>
+            <p className="text-lg font-serif font-normal text-foreground">Keine Daten für diese Woche</p>
             <p className="text-sm text-muted-foreground max-w-md mx-auto">
               Für «{selectedBody ? getBodyLabel(selectedBody) : bodyKey}» liegen in der Kalenderwoche {week} keine parlamentarischen Aktivitäten vor. Versuche eine andere Woche oder ein anderes Parlament.
             </p>

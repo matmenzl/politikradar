@@ -245,7 +245,7 @@ const PersonProfile = () => {
             {totalCastVotes > 0 && (
               <Card>
                 <CardContent className="p-4">
-                  <h3 className="font-serif text-sm font-semibold mb-3">Abstimmungsverhalten (letzte {votes.length})</h3>
+                  <h3 className="font-serif text-sm font-normal mb-3">Abstimmungsverhalten (letzte {votes.length})</h3>
                   <div className="flex h-3 rounded-full overflow-hidden bg-secondary mb-2">
                     <div
                       className="bg-success transition-all"

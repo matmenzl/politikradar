@@ -376,7 +376,7 @@ const WeeklyDigest = () => {
             {data.stats.totalBodies === 0 &&
           <div className="text-center py-16 space-y-3">
                 <Activity className="w-10 h-10 mx-auto text-muted-foreground" />
-                <p className="text-lg font-serif font-semibold">Keine Daten für diese Woche</p>
+                <p className="text-lg font-serif font-normal">Keine Daten für diese Woche</p>
                 <p className="text-sm text-muted-foreground">
                   In der Kalenderwoche {week} wurden keine parlamentarischen Aktivitäten erfasst.
                 </p>

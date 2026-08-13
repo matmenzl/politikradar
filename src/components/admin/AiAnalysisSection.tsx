@@ -298,7 +298,7 @@ const AiAnalysisSection = ({ year: yearProp, week: weekProp }: AiAnalysisSection
                       <p className="text-xs text-muted-foreground mt-2">{s.reason}</p>
                       <div className="flex items-center gap-1.5 mt-1.5">
                         <Lightbulb className="w-3 h-3 text-accent shrink-0" />
-                        <span className="text-xs text-accent font-medium italic">«{s.hook_idea}»</span>
+                        <span className="quote text-xs text-accent">«{s.hook_idea}»</span>
                       </div>
                     </div>
                     <Button

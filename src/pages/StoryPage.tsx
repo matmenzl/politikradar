@@ -66,7 +66,7 @@ const StoryPage = () => {
           <ArrowLeft className="w-4 h-4" />
           <span className="text-sm">Zurück</span>
         </button>
-        <span className="font-serif text-base font-semibold text-foreground truncate max-w-[200px]">Story</span>
+        <span className="font-serif text-base font-normal text-foreground truncate max-w-[200px]">Story</span>
         <div className="w-16" />
       </header>
 

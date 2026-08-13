@@ -143,6 +143,12 @@
 }
 
 @layer components {
+  /* Zitat: Newsreader italic */
+  .quote {
+    @apply font-serif italic;
+    font-weight: 400;
+  }
+
   /* Kicker / Label: Hanken Grotesk 700 uppercase */
   .kicker {
     @apply font-sans font-bold uppercase;
