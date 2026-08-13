@@ -186,5 +186,37 @@
     @apply font-serif tabular-nums;
     font-weight: 500;
   }
+
+  /* ---- Sprechblasen-Formensprache ---- */
+
+  /* Blase mit Schwanz unten links */
+  .bubble {
+    clip-path: polygon(1% 1.5%, 99% 0%, 100% 97%, 55% 98.5%, 53% 100%, 51% 98.5%, 0% 99%);
+  }
+
+  /* Chip / Button mit Mini-Schwanz */
+  .bubble-chip {
+    clip-path: polygon(2% 8%, 98% 0%, 100% 86%, 40% 92%, 36% 100%, 32% 90%, 0% 94%);
+  }
+
+  /* Leicht schiefes Rechteck (Kennzahlen-Kacheln) */
+  .bubble-plain {
+    clip-path: polygon(2% 4%, 98% 0%, 100% 94%, 3% 100%);
+  }
+
+  .bubble-plain-alt {
+    clip-path: polygon(2% 0%, 98% 4%, 100% 100%, 3% 96%);
+  }
+
+  /* Rahmen-Variante */
+  .bubble-frame {
+    clip-path: polygon(3% 1%, 97% 0%, 100% 4%, 99% 96%, 96% 100%, 4% 99%, 0% 95%, 1% 3%);
+  }
+
+  /* Ergebnis-Pill (22px Radius) */
+  .result-pill {
+    @apply font-sans font-bold;
+    border-radius: 22px;
+  }
 }
 
