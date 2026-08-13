@@ -48,7 +48,7 @@ const StorySlideCard = forwardRef<HTMLDivElement, StorySlideCardProps>(({ slide,
   return (
     <div
       ref={ref}
-      className="relative aspect-[9/16] rounded-2xl flex flex-col overflow-hidden select-none"
+      className="relative aspect-[9/16] flex flex-col overflow-hidden select-none"
       style={{ backgroundColor: s.bg, color: s.text, fontFamily: SANS, containerType: "inline-size" }}
     >
       {/* CTA: Rahmen-Variante */}

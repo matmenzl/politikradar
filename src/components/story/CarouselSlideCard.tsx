@@ -40,7 +40,7 @@ const CarouselSlideCard = forwardRef<HTMLDivElement, CarouselSlideCardProps>(
 
     if (slide.slide_type === "cover") {
       return (
-        <div ref={ref} className={`relative ${aspect} rounded-2xl overflow-hidden select-none`} style={{ ...base, backgroundColor: "#F4F2EC" }}>
+        <div ref={ref} className={`relative ${aspect} overflow-hidden select-none`} style={{ ...base, backgroundColor: "#F4F2EC" }}>
           {/* Deko-Bubbles */}
           <div className="absolute" style={{ top: "-6cqw", left: "-8cqw", width: "34cqw", height: "26cqw", backgroundColor: "#F7D344", clipPath: BUBBLE_PLAIN }} />
           <div className="absolute" style={{ top: "-4cqw", right: "-6cqw", width: "28cqw", height: "22cqw", backgroundColor: "#2E7D46", clipPath: BUBBLE_PLAIN }} />
@@ -65,7 +65,7 @@ const CarouselSlideCard = forwardRef<HTMLDivElement, CarouselSlideCardProps>(
 
     if (slide.slide_type === "detail") {
       return (
-        <div ref={ref} className={`relative ${aspect} rounded-2xl overflow-hidden select-none`} style={{ ...base, backgroundColor: "#2151D1", color: "#63B348" }}>
+        <div ref={ref} className={`relative ${aspect} overflow-hidden select-none`} style={{ ...base, backgroundColor: "#2151D1", color: "#63B348" }}>
           <div className="absolute pointer-events-none" style={{ inset: "2.6cqw", border: "1.3cqw solid #63B348", clipPath: FRAME }} />
           <div className="absolute text-center w-full" style={{ top: "7cqw", fontFamily: SERIF, fontWeight: 600, fontSize: "3.1cqw" }}>politikradar.</div>
           <div className="absolute" style={{ left: "10cqw", right: "10cqw", top: "17cqw" }}>
@@ -90,7 +90,7 @@ const CarouselSlideCard = forwardRef<HTMLDivElement, CarouselSlideCardProps>(
       const t = Math.max(v.yes + v.no + v.abstain, 1);
       const accepted = slide.status !== "abgelehnt";
       return (
-        <div ref={ref} className={`relative ${aspect} rounded-2xl overflow-hidden select-none`} style={{ ...base, backgroundColor: "#F7D344", color: "#1A1A1A" }}>
+        <div ref={ref} className={`relative ${aspect} overflow-hidden select-none`} style={{ ...base, backgroundColor: "#F7D344", color: "#1A1A1A" }}>
           <div className="absolute" style={{ top: "7cqw", left: "9cqw", fontFamily: SERIF, fontWeight: 600, fontSize: "3.1cqw" }}>politikradar.</div>
           {slide.kicker && <div className="absolute font-bold uppercase" style={{ top: "7.3cqw", right: "9cqw", fontSize: "2.4cqw", letterSpacing: "0.1em" }}>{slide.kicker}</div>}
           <div className="absolute" style={{ left: "9cqw", right: "9cqw", top: "18cqw" }}>
@@ -115,7 +115,7 @@ const CarouselSlideCard = forwardRef<HTMLDivElement, CarouselSlideCardProps>(
 
     // cta
     return (
-      <div ref={ref} className={`relative ${aspect} rounded-2xl overflow-hidden select-none`} style={{ ...base, backgroundColor: "#7A1E78", color: "#F4F2EC" }}>
+      <div ref={ref} className={`relative ${aspect} overflow-hidden select-none`} style={{ ...base, backgroundColor: "#7A1E78", color: "#F4F2EC" }}>
         <div className="absolute" style={{ top: "-6cqw", right: "-5cqw", width: "30cqw", height: "23cqw", backgroundColor: "#F7D344", clipPath: BUBBLE_PLAIN }} />
         <div className="absolute" style={{ bottom: "-7cqw", left: "-5cqw", width: "34cqw", height: "25cqw", backgroundColor: "#E8442E", clipPath: BUBBLE_PLAIN }} />
         <div className="absolute" style={{ bottom: "-5cqw", right: "11cqw", width: "26cqw", height: "19cqw", backgroundColor: "#63B348", clipPath: BUBBLE_PLAIN }} />
