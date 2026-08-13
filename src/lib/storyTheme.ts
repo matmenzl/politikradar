@@ -78,7 +78,7 @@ export const body = (fontSize: string, lineHeight = 1.4) => ({
 /** Pill / Badge: Hanken Grotesk 600 in Sprechblasen-Chipform */
 export const pill = (fontSize: string, bg: string, color: string) => ({
   fontFamily: SANS,
-  fontWeight: 600 as const,
+  fontWeight: 700 as const,
   fontSize,
   backgroundColor: bg,
   color,
@@ -88,7 +88,7 @@ export const pill = (fontSize: string, bg: string, color: string) => ({
 /** Ergebnis-Label: Sprechblase mit Zacken-Tail, Newsreader 600 (keine runden Ecken) */
 export const resultBubble = (fontSize: string, bg: string, color: string) => ({
   fontFamily: SERIF,
-  fontWeight: 600 as const,
+  fontWeight: 700 as const,
   fontSize,
   backgroundColor: bg,
   color,
@@ -98,7 +98,7 @@ export const resultBubble = (fontSize: string, bg: string, color: string) => ({
 /** Hashtag-Pill: einzige runde Form im System (Radius 22px), tonal + Akzenttext */
 export const hashtagPill = (fontSize: string, bg: string, color: string) => ({
   fontFamily: SANS,
-  fontWeight: 600 as const,
+  fontWeight: 700 as const,
   fontSize,
   backgroundColor: bg,
   color,

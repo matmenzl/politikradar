@@ -40,7 +40,7 @@ function Emph({ text, accent }: { text: string; accent?: string }) {
     <>
       {text.split(/(\*\*[^*]+\*\*)/g).map((part, i) =>
         part.startsWith("**") && part.endsWith("**") ? (
-          <strong key={i} style={{ fontWeight: 600, color: accent }}>{part.slice(2, -2)}</strong>
+          <strong key={i} style={{ fontWeight: 700, color: accent }}>{part.slice(2, -2)}</strong>
         ) : (
           <span key={i}>{part}</span>
         )
@@ -81,10 +81,10 @@ const StorySlideCard = forwardRef<HTMLDivElement, StorySlideCardProps>(({ slide,
 
       {/* Top bar: Kicker + Zähler */}
       <div className="relative z-10 flex items-center justify-between" style={{ padding: "8cqw 9cqw 0" }}>
-        <span style={kickerStyle("2.6cqw", s.accent)}>
+        <span style={kickerStyle("3.1cqw", s.accent)}>
           {slideTypeLabel[slide.slide_type]}
         </span>
-        <span className="tabular-nums" style={{ fontFamily: SANS, fontWeight: 600, fontSize: "2.6cqw", opacity: 0.5 }}>
+        <span className="tabular-nums" style={{ fontFamily: SANS, fontWeight: 700, fontSize: "3cqw", opacity: 0.6 }}>
           {index + 1}/{total}
         </span>
       </div>
@@ -92,7 +92,7 @@ const StorySlideCard = forwardRef<HTMLDivElement, StorySlideCardProps>(({ slide,
       {/* Progress-Segmente */}
       <div className="relative z-10 flex" style={{ gap: "1cqw", padding: "1.6cqw 9cqw 0" }}>
         {Array.from({ length: total }).map((_, i) => (
-          <div key={i} className="flex-1" style={{ height: "0.55cqw", backgroundColor: i <= index ? s.text : s.track }} />
+          <div key={i} className="flex-1" style={{ height: "0.8cqw", backgroundColor: i <= index ? s.text : s.track }} />
         ))}
       </div>
 
@@ -102,10 +102,10 @@ const StorySlideCard = forwardRef<HTMLDivElement, StorySlideCardProps>(({ slide,
           <PartyContent slide={slide} s={s} />
         ) : (
           <>
-            <h3 style={headlineStyle("9.5cqw")}><Emph text={slide.headline} accent={s.accent} /></h3>
-            <div style={{ width: "9cqw", height: "0.7cqw", backgroundColor: s.accent, margin: "4cqw 0" }} />
+            <h3 style={headlineStyle("11cqw")}><Emph text={slide.headline} accent={s.accent} /></h3>
+            <div style={{ width: "11cqw", height: "1cqw", backgroundColor: s.accent, margin: "4cqw 0" }} />
             <p style={{
-              ...(bodyIsQuote ? quoteStyle("4cqw", 1.35) : bodyStyle("3.7cqw", 1.5)),
+              ...(bodyIsQuote ? quoteStyle("5.2cqw", 1.28) : bodyStyle("4.5cqw", 1.4)),
               opacity: 0.95,
               maxWidth: "88%",
             }}>
@@ -114,7 +114,7 @@ const StorySlideCard = forwardRef<HTMLDivElement, StorySlideCardProps>(({ slide,
             {slide.slide_type === "cta" && (
               <div
                 className="self-start"
-                style={{ ...ctaStyle("3.7cqw", s.accent, BRAND.ink), marginTop: "6cqw", padding: "2.4cqw 4.2cqw" }}
+                style={{ ...ctaStyle("4.4cqw", s.accent, BRAND.ink), marginTop: "6cqw", padding: "2.4cqw 4.2cqw" }}
               >
                 politikradar.ch → Story lesen
               </div>
@@ -144,7 +144,7 @@ const StorySlideCard = forwardRef<HTMLDivElement, StorySlideCardProps>(({ slide,
 
       {/* Branding-Footer */}
       <div className="relative z-10 text-center" style={{ paddingBottom: "4.5cqw" }}>
-        <span style={{ fontFamily: SERIF, fontWeight: 600, fontSize: "3.1cqw" }}>politikradar.ch</span>
+        <span style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "3.8cqw" }}>politikradar.ch</span>
       </div>
     </div>
   );
@@ -155,21 +155,21 @@ StorySlideCard.displayName = "StorySlideCard";
 function PartyContent({ slide, s }: { slide: StorySlide; s: { accent: string; track: string } }) {
   return (
     <>
-      <h3 style={{ ...headlineStyle("7.5cqw", 1.1), margin: "0 0 5cqw" }}><Emph text={slide.headline} /></h3>
+      <h3 style={{ ...headlineStyle("8.8cqw", 1.06), margin: "0 0 5cqw" }}><Emph text={slide.headline} /></h3>
       <div className="flex flex-col" style={{ gap: "2.6cqw" }}>
         {slide.partyData?.map((p) => {
           const yesP = p.total > 0 ? Math.round((p.yes / p.total) * 100) : 0;
           const noP = p.total > 0 ? Math.round((p.no / p.total) * 100) : 0;
           return (
             <div key={p.party} className="flex items-center" style={{ gap: "2.4cqw" }}>
-              <span className="text-right truncate" style={{ fontFamily: SANS, fontWeight: 700, width: "13cqw", fontSize: "3cqw" }}>{p.party}</span>
+              <span className="text-right truncate" style={{ fontFamily: SANS, fontWeight: 800, width: "14cqw", fontSize: "3.5cqw" }}>{p.party}</span>
               <div className="flex-1 flex overflow-hidden" style={{ height: "4.4cqw", backgroundColor: s.track }}>
                 <div style={{ width: `${yesP}%`, backgroundColor: BRAND.greenBright }} />
                 <div style={{ width: `${noP}%`, backgroundColor: BRAND.red }} />
               </div>
               <span
                 className="tabular-nums text-right"
-                style={{ fontFamily: SANS, fontWeight: 600, width: "12cqw", fontSize: "2.6cqw", opacity: 0.9 }}
+                style={{ fontFamily: SANS, fontWeight: 700, width: "13cqw", fontSize: "3.1cqw", opacity: 0.95 }}
               >
                 {p.yes}/{p.no}
               </span>
@@ -177,7 +177,7 @@ function PartyContent({ slide, s }: { slide: StorySlide; s: { accent: string; tr
           );
         })}
       </div>
-      <div className="flex" style={{ fontFamily: SANS, fontWeight: 600, gap: "4cqw", marginTop: "3cqw", fontSize: "2.6cqw", opacity: 0.85 }}>
+      <div className="flex" style={{ fontFamily: SANS, fontWeight: 700, gap: "4cqw", marginTop: "3.4cqw", fontSize: "3cqw", opacity: 0.9 }}>
         <span className="flex items-center" style={{ gap: "1.2cqw" }}>
           <span style={{ width: "2.2cqw", height: "2.2cqw", backgroundColor: BRAND.greenBright, display: "inline-block" }} /> Ja
         </span>
