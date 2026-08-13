@@ -8,7 +8,6 @@ import { useRef, useCallback, useMemo, useState, useEffect } from "react";
 import StorySlideCard from "./story/StorySlideCard";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { downloadSingleSlide, downloadAllSlidesAsZip } from "@/lib/exportSlides";
-import ImagePromptEditor from "./story/ImagePromptEditor";
 import { composeStoryVariants, type CompositionId } from "@/lib/storyVariants";
 
 
@@ -164,18 +163,6 @@ function StoryContent({
                   <Download className="w-3.5 h-3.5" />
                   Slide {i + 1} speichern
                 </Button>
-                {editable && onSlideChange && (
-                  <ImagePromptEditor
-                    slide={slide}
-                    index={i}
-                    onChange={(patch) => onSlideChange(i, patch)}
-                    onApplyStyleToAll={(style) =>
-                      slides.forEach((_, j) =>
-                        onSlideChange(j, { image_style: style, image_url: undefined }),
-                      )
-                    }
-                  />
-                )}
               </div>
 
             </CarouselItem>
