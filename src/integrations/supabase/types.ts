@@ -102,6 +102,7 @@ export type Database = {
           affair_id: string | null
           body_key: string | null
           created_at: string
+          feed_slides: Json
           id: string
           published_at: string | null
           show_on_home: boolean
@@ -114,6 +115,7 @@ export type Database = {
           affair_id?: string | null
           body_key?: string | null
           created_at?: string
+          feed_slides?: Json
           id?: string
           published_at?: string | null
           show_on_home?: boolean
@@ -126,6 +128,7 @@ export type Database = {
           affair_id?: string | null
           body_key?: string | null
           created_at?: string
+          feed_slides?: Json
           id?: string
           published_at?: string | null
           show_on_home?: boolean

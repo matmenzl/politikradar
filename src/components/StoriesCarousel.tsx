@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { Sparkles, ExternalLink, Shield } from "lucide-react";
+import { Sparkles, ExternalLink, Shield, Image } from "lucide-react";
 import StoryPreviewModal, { type StorySlide } from "@/components/StoryPreviewModal";
 import StorySlideCard from "@/components/story/StorySlideCard";
+import CarouselSlideCard, { type CarouselSlide } from "@/components/story/CarouselSlideCard";
 import { fetchBodies, getBodyLabel, fetchAffairById, fetchVotingById, getWeekFullDateRange } from "@/lib/api/openparldata";
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -16,6 +17,7 @@ interface StoryPost {
   affair_id: string | null;
   voting_id: string | null;
   slides: StorySlide[];
+  feed_slides: CarouselSlide[];
   published_at: string;
 }
 
@@ -43,7 +45,7 @@ const StoriesCarousel = ({ year, week }: StoriesCarouselProps) => {
 
     supabase
       .from("story_posts")
-      .select("id, title, body_key, affair_id, voting_id, slides, published_at")
+      .select("id, title, body_key, affair_id, voting_id, slides, feed_slides, published_at")
       .eq("status", "published")
       .eq("show_on_home", true)
       .order("published_at", { ascending: false })
@@ -58,6 +60,7 @@ const StoriesCarousel = ({ year, week }: StoriesCarouselProps) => {
           affair_id: d.affair_id,
           voting_id: d.voting_id,
           slides: (d.slides as unknown as StorySlide[]) || [],
+          feed_slides: (d.feed_slides as unknown as CarouselSlide[]) || [],
           published_at: d.published_at || "",
         }));
 
@@ -207,6 +210,41 @@ const StoriesCarousel = ({ year, week }: StoriesCarouselProps) => {
           })}
         </div>
       </div>
+
+      {/* Feed carousel (4:5 portrait) — additional format, defined by editors */}
+      {(() => {
+        const allFeed = stories.flatMap((story) =>
+          story.feed_slides.length > 0
+            ? story.feed_slides.map((slide, i) => ({ story, slide, i, total: story.feed_slides.length }))
+            : []
+        );
+        if (allFeed.length === 0) return null;
+        return (
+          <div className="mt-8">
+            <div className="mb-4">
+              <div className="flex items-center gap-2 text-muted-foreground mb-1">
+                <Image className="w-4 h-4" />
+                <span className="text-xs font-medium uppercase tracking-wider">Feed</span>
+              </div>
+              <h2 className="font-serif text-xl md:text-2xl font-bold text-foreground">Social-Media Feed</h2>
+            </div>
+            <div className="flex gap-4 md:gap-5 overflow-x-auto pb-3 -mx-1 px-1 snap-x snap-mandatory">
+              {allFeed.map(({ story, slide, i, total }) => (
+                <div key={`${story.id}-${i}`} className="flex-shrink-0 w-[200px] md:w-[240px] snap-start">
+                  <button
+                    onClick={() => (isMobile ? navigate(`/story/${story.id}`) : setSelectedStory(story))}
+                    className="w-full group focus:outline-none"
+                  >
+                    <div className="w-full rounded-xl overflow-hidden ring-2 ring-transparent group-hover:ring-accent/50 transition-all shadow-lg">
+                      <CarouselSlideCard slide={slide} index={i} total={total} format="portrait" />
+                    </div>
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      })()}
 
       {selectedStory && (
         <StoryPreviewModal

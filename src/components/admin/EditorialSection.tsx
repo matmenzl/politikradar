@@ -5,9 +5,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Search, Sparkles, Trash2, Eye, EyeOff, Home } from "lucide-react";
+import { Loader2, Search, Sparkles, Trash2, Eye, EyeOff, Home, Pencil } from "lucide-react";
 import StoryPreviewModal, { type StorySlide } from "@/components/StoryPreviewModal";
+import type { CarouselSlide } from "@/components/story/CarouselSlideCard";
 import { getWeekDateRange } from "@/lib/api/openparldata";
 import {
   BASE_URL,
@@ -22,12 +26,14 @@ function StoryRow({
   onTogglePublish,
   onToggleHome,
   onDelete,
+  onEditFeed,
 }: {
   story: StoryPost;
   onPreview: (s: StoryPost) => void;
   onTogglePublish: (s: StoryPost) => void;
   onToggleHome: (s: StoryPost, value: boolean) => void;
   onDelete: (id: string) => void;
+  onEditFeed: (s: StoryPost) => void;
 }) {
   return (
     <div className="flex items-center justify-between gap-3 p-3 rounded-lg border border-border/50 flex-wrap">
@@ -52,6 +58,9 @@ function StoryRow({
           />
         </label>
         <div className="flex items-center gap-1">
+          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => onEditFeed(story)} title="Feed-Karussell">
+            <Pencil className="w-4 h-4" />
+          </Button>
           <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => onPreview(story)} title="Vorschau">
             <Eye className="w-4 h-4" />
           </Button>
@@ -89,6 +98,9 @@ const EditorialSection = ({ year, week }: EditorialSectionProps) => {
   const [loading, setLoading] = useState(true);
   const [previewStory, setPreviewStory] = useState<StoryPost | null>(null);
   const [savingSlides, setSavingSlides] = useState(false);
+  const [feedStory, setFeedStory] = useState<StoryPost | null>(null);
+  const [feedJson, setFeedJson] = useState("");
+  const [savingFeed, setSavingFeed] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [searching, setSearching] = useState(false);
@@ -104,6 +116,7 @@ const EditorialSection = ({ year, week }: EditorialSectionProps) => {
         data.map((d) => ({
           ...d,
           slides: (d.slides as unknown as StorySlide[]) || [],
+          feed_slides: (d.feed_slides as unknown as CarouselSlide[]) || [],
         })) as StoryPost[]
       );
     }
@@ -180,6 +193,36 @@ const EditorialSection = ({ year, week }: EditorialSectionProps) => {
       return;
     }
     toast.success("Story gelöscht");
+    loadStories();
+  };
+
+  const openFeedEditor = (story: StoryPost) => {
+    setFeedStory(story);
+    setFeedJson(JSON.stringify(story.feed_slides, null, 2));
+  };
+
+  const saveFeedSlides = async () => {
+    if (!feedStory) return;
+    let parsed: CarouselSlide[];
+    try {
+      parsed = JSON.parse(feedJson);
+      if (!Array.isArray(parsed)) throw new Error("Feed-Slides müssen ein Array sein");
+    } catch (e: any) {
+      toast.error("Ungültiges JSON: " + e.message);
+      return;
+    }
+    setSavingFeed(true);
+    const { error } = await supabase
+      .from("story_posts")
+      .update({ feed_slides: parsed as unknown as never })
+      .eq("id", feedStory.id);
+    setSavingFeed(false);
+    if (error) {
+      toast.error("Speichern fehlgeschlagen");
+      return;
+    }
+    toast.success("Feed-Karussell gespeichert");
+    setFeedStory(null);
     loadStories();
   };
 
@@ -281,13 +324,14 @@ const EditorialSection = ({ year, week }: EditorialSectionProps) => {
           ) : (
             <div className="space-y-3">
               {weekStories.map((story) => (
-                <StoryRow
+              <StoryRow
                   key={story.id}
                   story={story}
                   onPreview={setPreviewStory}
                   onTogglePublish={togglePublish}
                   onToggleHome={toggleHome}
                   onDelete={deleteStory}
+                  onEditFeed={openFeedEditor}
                 />
               ))}
             </div>
@@ -375,13 +419,14 @@ const EditorialSection = ({ year, week }: EditorialSectionProps) => {
           ) : (
             <div className="space-y-3">
               {olderStories.map((story) => (
-                <StoryRow
+              <StoryRow
                   key={story.id}
                   story={story}
                   onPreview={setPreviewStory}
                   onTogglePublish={togglePublish}
                   onToggleHome={toggleHome}
                   onDelete={deleteStory}
+                  onEditFeed={openFeedEditor}
                 />
               ))}
             </div>
@@ -402,6 +447,33 @@ const EditorialSection = ({ year, week }: EditorialSectionProps) => {
           saving={savingSlides}
         />
       )}
+
+      <Dialog open={!!feedStory} onOpenChange={(open) => !open && setFeedStory(null)}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="font-serif text-lg">Feed-Karussell bearbeiten</DialogTitle>
+            <DialogDescription>
+              JSON-Array mit CarouselSlide-Einträgen (cover, detail, result, cta). Format: portrait (4:5).
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3">
+            <Label htmlFor="feed-json" className="text-xs text-muted-foreground">JSON</Label>
+            <Textarea
+              id="feed-json"
+              value={feedJson}
+              onChange={(e) => setFeedJson(e.target.value)}
+              rows={18}
+              className="font-mono text-xs"
+            />
+          </div>
+          <DialogFooter className="gap-2">
+            <Button variant="outline" onClick={() => setFeedStory(null)}>Abbrechen</Button>
+            <Button onClick={saveFeedSlides} disabled={savingFeed}>
+              {savingFeed ? <Loader2 className="w-4 h-4 animate-spin" /> : "Speichern"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

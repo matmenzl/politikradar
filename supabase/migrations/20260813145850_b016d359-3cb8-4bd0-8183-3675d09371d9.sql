@@ -1,0 +1,1 @@
+ALTER TABLE public.story_posts ADD COLUMN IF NOT EXISTS feed_slides jsonb NOT NULL DEFAULT '[]'::jsonb;

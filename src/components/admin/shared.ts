@@ -2,6 +2,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { fetchBodies, type Affair, type Voting } from "@/lib/api/openparldata";
 import type { StorySlide } from "@/components/StoryPreviewModal";
+import type { CarouselSlide } from "@/components/story/CarouselSlideCard";
 
 export const BASE_URL = "https://api.openparldata.ch/v1";
 
@@ -12,6 +13,7 @@ export interface StoryPost {
   affair_id: string | null;
   voting_id: string | null;
   slides: StorySlide[];
+  feed_slides: CarouselSlide[];
   status: string;
   show_on_home: boolean;
   created_at: string;
