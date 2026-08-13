@@ -23,7 +23,6 @@ import { useWeekParam } from "@/hooks/use-week";
 
 import VoteBar from "@/components/VoteBar";
 import StoriesCarousel from "@/components/StoriesCarousel";
-import WeekContextBar from "@/components/WeekContextBar";
 import logoImg from "@/assets/politikradar_logo.png";
 // Logo imported above
 
@@ -125,28 +124,36 @@ const WeeklyDigest = () => {
 
       <main className="max-w-4xl mx-auto px-3 sm:px-4 md:px-6 py-4 sm:py-6 md:py-10 space-y-6 md:space-y-10">
         {/* Week header */}
-        <div className="space-y-1.5 sm:space-y-2 opacity-0 animate-fade-in" style={{ animationDelay: "0ms" }}>
-          <div className="flex items-center gap-2 sm:gap-3">
-            <Button variant="outline" size="icon" className="h-7 w-7 sm:h-8 sm:w-8" onClick={goToPreviousWeek}>
-              <ChevronLeft className="w-4 h-4" />
-            </Button>
+        <div className="flex flex-wrap items-end justify-between gap-3 opacity-0 animate-fade-in" style={{ animationDelay: "0ms" }}>
+          <div className="space-y-1.5 min-w-0">
             <p className="kicker text-[10px] sm:text-xs text-brand-blue">
               Kalenderwoche {week} · {year}
             </p>
-            <Button variant="outline" size="icon" className="h-7 w-7 sm:h-8 sm:w-8" onClick={goToNextWeek}>
-              <ChevronRight className="w-4 h-4" />
-            </Button>
+            <h1 className="font-serif text-2xl sm:text-3xl md:text-5xl font-normal leading-[1.05] text-foreground">
+              {dateRangeLabel}
+            </h1>
+            <p className="text-sm sm:text-base text-muted-foreground">
+              Politikwoche · alle Parlamente · gilt für alle drei Bereiche
+            </p>
           </div>
-          <h1 className="font-serif text-2xl sm:text-3xl md:text-5xl font-normal leading-[1.05] text-foreground">
-            {dateRangeLabel}
-          </h1>
-          <p className="text-base sm:text-lg font-medium text-foreground/80">Politikwoche · alle Parlamente</p>
-          <p className="text-[10px] sm:text-xs text-muted-foreground">
-            Diese Kalenderwoche gilt für alle drei Bereiche: Politikwoche, KI-Analyse und Redaktion.
-          </p>
+
+          <div className="flex items-center gap-1.5">
+            <button
+              onClick={goToPreviousWeek}
+              aria-label="Vorherige Woche"
+              className="h-[34px] w-[34px] flex items-center justify-center border border-ink/20 bg-background hover:bg-ink hover:text-background transition-colors"
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+            <button
+              onClick={goToNextWeek}
+              aria-label="Nächste Woche"
+              className="h-[34px] w-[34px] flex items-center justify-center border border-ink/20 bg-background hover:bg-ink hover:text-background transition-colors"
+            >
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
         </div>
-
-
 
         <Tabs value={tab} onValueChange={setTab} className="w-full">
           <TabsList className="w-full grid grid-cols-3 h-11">
@@ -165,7 +172,6 @@ const WeeklyDigest = () => {
           </TabsList>
 
           <TabsContent value="woche" className="mt-8 space-y-8 md:space-y-12 focus-visible:outline-none">
-        <WeekContextBar note="Alle Zahlen, Themen und Stories unten beziehen sich auf diese Kalenderwoche." />
         {/* Research: search affairs & votings */}
 
         <div className="opacity-0 animate-fade-in" style={{ animationDelay: "50ms" }}>
@@ -397,12 +403,10 @@ const WeeklyDigest = () => {
 
 
           <TabsContent value="ki" className="mt-8 space-y-4 focus-visible:outline-none">
-            <WeekContextBar note="Die KI-Analyse startet standardmässig mit dieser Kalenderwoche – der Zeitraum lässt sich unten erweitern." />
             {aiLoaded && <AiAnalysisSection year={year} week={week} />}
           </TabsContent>
 
           <TabsContent value="redaktion" className="mt-8 space-y-4 focus-visible:outline-none">
-            <WeekContextBar note="Redaktion zeigt und verwaltet die Stories dieser Kalenderwoche." />
             {editorialLoaded && (
               <>
                 <EditorialSection year={year} week={week} />
