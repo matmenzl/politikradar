@@ -139,7 +139,7 @@ const WeeklyOverview = () => {
               politikradar<span className="text-brand-red">.</span>
             </span>
           </Link>
-          <Button variant="outline" size="sm" className="gap-1.5 sm:gap-2 flex-shrink-0 text-xs sm:text-sm" onClick={() => setShareOpen(true)}>
+          <Button variant="bubble" size="sm" className="gap-1.5 sm:gap-2 flex-shrink-0 text-xs sm:text-sm" onClick={() => setShareOpen(true)}>
             <Share2 className="w-3.5 h-3.5" />
             <span className="hidden xs:inline">Teilen</span>
             <span className="xs:hidden">↗</span>
@@ -168,14 +168,14 @@ const WeeklyOverview = () => {
             <Button variant="outline" size="icon" className="h-7 w-7 sm:h-8 sm:w-8" onClick={goToPreviousWeek}>
               <ChevronLeft className="w-4 h-4" />
             </Button>
-            <p className="text-[10px] sm:text-xs font-bold uppercase tracking-[0.2em] text-brand-blue">
-              Kalenderwoche {week}
+            <p className="kicker text-[10px] sm:text-xs text-brand-blue">
+              Kalenderwoche {week} · {year}
             </p>
             <Button variant="outline" size="icon" className="h-7 w-7 sm:h-8 sm:w-8" onClick={goToNextWeek}>
               <ChevronRight className="w-4 h-4" />
             </Button>
           </div>
-          <h1 className="font-serif text-2xl sm:text-3xl md:text-5xl font-medium leading-[1.05] text-foreground">{dateRangeLabel}</h1>
+          <h1 className="font-serif text-2xl sm:text-3xl md:text-5xl font-normal leading-[1.05] text-foreground">{dateRangeLabel}</h1>
 
           <p className="text-base sm:text-lg font-medium text-foreground/80">
             {bodies.length === 0 ? "Lade Parlament…" : (selectedBody ? getBodyLabel(selectedBody) : bodyKey)}
@@ -236,14 +236,14 @@ const WeeklyOverview = () => {
                 <CardContent className="p-3 sm:p-4 md:p-6 pt-0">
                   <div className="grid grid-cols-3 gap-1.5 sm:gap-2 md:gap-3">
                     {[
-                      { label: "Geschäfte", value: data.totalAffairs, tone: "bg-brand-blue-soft text-brand-blue", href: withWeek(`/list/affairs?body=${encodeURIComponent(bodyKey)}`) },
-                      { label: "Abstimmungen", value: data.totalVotings, tone: "bg-brand-red-soft text-brand-red", href: withWeek(`/list/votings?body=${encodeURIComponent(bodyKey)}`) },
-                      { label: "Sitzungen", value: data.totalMeetings, tone: "bg-brand-green-soft text-brand-green", href: withWeek(`/list/meetings?body=${encodeURIComponent(bodyKey)}`) },
+                      { label: "Geschäfte", value: data.totalAffairs, tone: "bg-brand-red-soft text-brand-red", labelTone: "text-brand-red-deep", shape: "bubble-plain", href: withWeek(`/list/affairs?body=${encodeURIComponent(bodyKey)}`) },
+                      { label: "Abstimmungen", value: data.totalVotings, tone: "bg-brand-blue-soft text-brand-blue", labelTone: "text-brand-blue", shape: "bubble-plain-alt", href: withWeek(`/list/votings?body=${encodeURIComponent(bodyKey)}`) },
+                      { label: "Sitzungen", value: data.totalMeetings, tone: "bg-brand-green-soft text-brand-green", labelTone: "text-brand-green", shape: "bubble-plain", href: withWeek(`/list/meetings?body=${encodeURIComponent(bodyKey)}`) },
 
                     ].map((stat) => (
-                      <Link key={stat.label} to={stat.href} className={`${stat.tone} p-2 md:p-3 transition-opacity hover:opacity-80`}>
-                        <p className="font-serif text-xl sm:text-2xl md:text-3xl font-medium">{stat.value}</p>
-                        <p className="text-[10px] md:text-xs kicker text-foreground/70">{stat.label}</p>
+                      <Link key={stat.label} to={stat.href} className={`${stat.tone} ${stat.shape} p-3 md:p-4 transition-opacity hover:opacity-80`}>
+                        <p className="font-serif text-xl sm:text-2xl md:text-3xl font-semibold tabular-nums">{stat.value}</p>
+                        <p className={`text-[10px] md:text-xs font-semibold ${stat.labelTone}`}>{stat.label}</p>
                       </Link>
                     ))}
 
@@ -257,7 +257,7 @@ const WeeklyOverview = () => {
                 <CardHeader className="pb-2 md:pb-3 p-3 sm:p-4 md:p-6">
                   <div className="flex items-center gap-2 text-muted-foreground">
                     <Vote className="w-4 h-4 flex-shrink-0" />
-                    <span className="text-[10px] sm:text-xs kicker">Knappste Abstimmung</span>
+                    <span className="text-[10px] sm:text-xs kicker text-brand-red">Knappste Abstimmung</span>
                   </div>
                   <CardTitle className="font-serif text-base sm:text-lg md:text-xl leading-snug line-clamp-2">
                     {closestVoting ? closestVoting.affair_title_de || closestVoting.title_de || "Abstimmung" : "Keine Abstimmung"}
@@ -285,7 +285,7 @@ const WeeklyOverview = () => {
                 <CardHeader className="pb-2 md:pb-3 p-3 sm:p-4 md:p-6">
                   <div className="flex items-center gap-2 text-muted-foreground">
                     <BarChart3 className="w-4 h-4 flex-shrink-0" />
-                    <span className="text-[10px] sm:text-xs kicker">Abstimmungen der Woche</span>
+                    <span className="text-[10px] sm:text-xs kicker text-brand-blue">Abstimmungen der Woche</span>
                   </div>
                   <CardTitle className="font-serif text-base sm:text-lg md:text-xl leading-snug">Abstimmungsergebnisse</CardTitle>
                   <CardDescription className="text-[10px] sm:text-xs md:text-sm leading-relaxed">
@@ -297,12 +297,12 @@ const WeeklyOverview = () => {
                 <CardContent className="p-3 sm:p-4 md:p-6 pt-0">
                   <div className="space-y-2 max-h-48 overflow-y-auto">
                     {data.votings.slice(0, 8).map((v) => (
-                      <Link key={v.id} to={`/detail/${v.id}?type=voting&body=${encodeURIComponent(bodyKey)}`} className="flex items-center justify-between py-1.5 border-b border-border/30 last:border-0 hover:bg-secondary/30 rounded px-1 -mx-1 transition-colors gap-2">
+                      <Link key={v.id} to={`/detail/${v.id}?type=voting&body=${encodeURIComponent(bodyKey)}`} className="flex items-center justify-between py-2.5 border-b border-hairline last:border-0 hover:bg-secondary/40 px-1 -mx-1 transition-colors gap-3">
                         <span className="text-xs sm:text-sm text-foreground line-clamp-2 flex-1 min-w-0">
                           {v.affair_title_de || v.title_de || `Abstimmung #${v.id}`}
                         </span>
-                        <span className={`text-[10px] sm:text-xs font-medium px-1.5 sm:px-2 py-0.5 rounded-full flex-shrink-0 ${isVotingAccepted(v) ? "bg-brand-green-soft text-brand-green" : "bg-brand-red-soft text-brand-red"}`}>
-                          {v.results_yes}:{v.results_no}
+                        <span className={`result-pill text-[10px] sm:text-xs px-3 py-1 flex-shrink-0 tabular-nums ${isVotingAccepted(v) ? "bg-brand-green-soft text-brand-green" : "bg-brand-red-soft text-brand-red"}`}>
+                          {v.results_yes} : {v.results_no}
                         </span>
                       </Link>
                     ))}
@@ -319,7 +319,7 @@ const WeeklyOverview = () => {
                   <div className="flex items-center justify-between gap-2">
                     <div className="flex items-center gap-2 text-muted-foreground min-w-0">
                       <FileText className="w-4 h-4 flex-shrink-0" />
-                      <span className="text-[10px] sm:text-xs kicker truncate">Geschäfte der Woche</span>
+                      <span className="text-[10px] sm:text-xs kicker truncate text-brand-purple">Geschäfte der Woche</span>
                     </div>
                     {taggingLoading && (
                       <div className="flex items-center gap-1.5 text-accent flex-shrink-0">
@@ -340,7 +340,7 @@ const WeeklyOverview = () => {
                   {allTags.length > 0 && (
                     <div className="flex flex-wrap gap-1.5">
                       <Badge
-                        variant={selectedTag === null ? "default" : "outline"}
+                        variant={selectedTag === null ? "default" : "topic"}
                         className="cursor-pointer text-xs"
                         onClick={() => setSelectedTag(null)}
                       >
@@ -349,7 +349,7 @@ const WeeklyOverview = () => {
                       {allTags.map((tag) => (
                         <Badge
                           key={tag}
-                          variant={selectedTag === tag ? "default" : "outline"}
+                          variant={selectedTag === tag ? "default" : "topic"}
                           className="cursor-pointer text-xs"
                           onClick={() => setSelectedTag(selectedTag === tag ? null : tag)}
                         >
@@ -362,7 +362,7 @@ const WeeklyOverview = () => {
 
                   <div className="space-y-2 max-h-64 overflow-y-auto">
                     {filteredAffairs.map((a) => (
-                      <Link key={a.id} to={`/detail/${a.id}?type=affair&body=${encodeURIComponent(bodyKey)}`} className="block py-1.5 border-b border-border/30 last:border-0 hover:bg-secondary/30 rounded px-1 -mx-1 transition-colors">
+                      <Link key={a.id} to={`/detail/${a.id}?type=affair&body=${encodeURIComponent(bodyKey)}`} className="block py-2.5 border-b border-hairline last:border-0 hover:bg-secondary/40 px-1 -mx-1 transition-colors">
                         <p className="text-xs sm:text-sm text-foreground line-clamp-2">{a.title_de || `Geschäft #${a.id}`}</p>
                         <div className="flex flex-wrap gap-1.5 mt-1">
                           {a.type_de && <span className="text-xs text-muted-foreground">{a.type_de}</span>}
@@ -370,8 +370,8 @@ const WeeklyOverview = () => {
                           {tagMap[a.id]?.map((tag) => (
                             <Badge
                               key={tag}
-                              variant="secondary"
-                              className="text-[10px] px-1.5 py-0 h-4 cursor-pointer hover:bg-accent hover:text-accent-foreground"
+                              variant="topic"
+                              className="text-[10px] px-2 py-0 h-4 cursor-pointer hover:opacity-80"
                               onClick={(e) => {
                                 e.preventDefault();
                                 setSelectedTag(selectedTag === tag ? null : tag);

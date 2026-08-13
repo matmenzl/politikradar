@@ -15,6 +15,7 @@ const buttonVariants = cva(
         secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/70",
         ghost: "hover:bg-secondary hover:text-foreground",
         link: "text-accent underline-offset-4 hover:underline hover:text-brand-purple",
+        bubble: "bubble-chip bg-ink text-background font-bold hover:bg-ink/85",
       },
       size: {
         default: "h-10 px-4 py-2",

@@ -71,7 +71,12 @@ export default {
           "blue-soft": "hsl(var(--brand-blue-soft))",
           "green-soft": "hsl(var(--brand-green-soft))",
           "purple-soft": "hsl(var(--brand-purple-soft))",
+          "yellow-soft": "hsl(var(--brand-yellow-soft))",
+          pink: "hsl(var(--brand-pink))",
+          "green-bright": "hsl(var(--brand-green-bright))",
+          "red-deep": "hsl(var(--brand-red-deep))",
         },
+        hairline: "hsl(var(--hairline))",
       },
       fontFamily: {
         serif: ["Newsreader", "Georgia", "serif"],
