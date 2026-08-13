@@ -21,6 +21,7 @@ const StoryPage = () => {
   const [api, setApi] = useState<CarouselApi>();
   const [current, setCurrent] = useState(0);
   const slideRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const variants = useMemo(() => composeStoryVariants(slides, id ?? "story"), [slides, id]);
 
   useEffect(() => {
     if (!id) return;
