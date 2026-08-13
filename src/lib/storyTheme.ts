@@ -83,10 +83,20 @@ export const pill = (fontSize: string, bg: string, color: string) => ({
   clipPath: BUBBLE_CHIP,
 });
 
-/** Ergebnis-Pill: Hanken Grotesk 700, 22px Radius (.result-pill) */
-export const resultPill = (fontSize: string, bg: string, color: string) => ({
+/** Ergebnis-Label: Sprechblase mit Zacken-Tail, Newsreader 600 (keine runden Ecken) */
+export const resultBubble = (fontSize: string, bg: string, color: string) => ({
+  fontFamily: SERIF,
+  fontWeight: 600 as const,
+  fontSize,
+  backgroundColor: bg,
+  color,
+  clipPath: BUBBLE_CHIP,
+});
+
+/** Hashtag-Pill: einzige runde Form im System (Radius 22px), tonal + Akzenttext */
+export const hashtagPill = (fontSize: string, bg: string, color: string) => ({
   fontFamily: SANS,
-  fontWeight: 700 as const,
+  fontWeight: 600 as const,
   fontSize,
   backgroundColor: bg,
   color,
