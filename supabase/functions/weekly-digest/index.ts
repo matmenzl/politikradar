@@ -128,13 +128,23 @@ serve(async (req) => {
       .eq("week", week)
       .maybeSingle();
 
-    if (cached) {
+    const { from, to } = getWeekDateRange(year, week);
+
+    // A cache entry is only trustworthy if it was built AFTER the week ended,
+    // otherwise it may contain incomplete (often empty) data. Fresh-ish entries
+    // for the running/upcoming week are re-used for 3 hours only.
+    const cachedAt = cached?.created_at ? new Date(cached.created_at).getTime() : 0;
+    const weekEnd = new Date(to + "T23:59:59Z").getTime();
+    const now = Date.now();
+    const cacheValid =
+      !!cached && (cachedAt > weekEnd || now - cachedAt < 3 * 60 * 60 * 1000);
+
+    if (cacheValid) {
       return new Response(JSON.stringify(cached), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    const { from, to } = getWeekDateRange(year, week);
 
     // Fetch all bodies
     const bodies = await fetchAllBodies();
@@ -154,7 +164,7 @@ serve(async (req) => {
     let totalVotings = 0;
     let totalAffairs = 0;
     let totalMeetings = 0;
-    const activeBodies: { key: string; name: string; votings: number; affairs: number }[] = [];
+    const activeBodies: { key: string; name: string; votings: number; affairs: number; meetings: number }[] = [];
     const allVotings: (Voting & { bodyName: string })[] = [];
     const allAffairTitles: { id: number; title: string; bodyKey: string }[] = [];
 
@@ -165,12 +175,13 @@ serve(async (req) => {
       totalAffairs += r.affairs.length;
       totalMeetings += r.meetings;
 
-      if (r.votings.length > 0 || r.affairs.length > 0) {
+      if (r.votings.length > 0 || r.affairs.length > 0 || r.meetings > 0) {
         activeBodies.push({
           key: r.bodyKey,
           name: bodyName,
           votings: r.votings.length,
           affairs: r.affairs.length,
+          meetings: r.meetings,
         });
       }
 
@@ -185,7 +196,10 @@ serve(async (req) => {
     }
 
     // Sort active bodies by total activity
-    activeBodies.sort((a, b) => (b.votings + b.affairs) - (a.votings + a.affairs));
+    activeBodies.sort(
+      (a, b) => (b.votings + b.affairs + b.meetings) - (a.votings + a.affairs + a.meetings)
+    );
+
 
     // Find closest votings (smallest margin)
     const closestVotings = allVotings
@@ -370,6 +384,8 @@ serve(async (req) => {
       closest_votings: result.closest_votings,
       summary: result.summary,
       date_range: result.date_range,
+      created_at: new Date().toISOString(),
+
     }, { onConflict: "year,week" });
 
     return new Response(JSON.stringify(result), {
