@@ -17,6 +17,7 @@ import PersonProfile from "./pages/PersonProfile";
 import EmbedDetailPage from "./pages/EmbedDetailPage";
 import AdminPage from "./pages/AdminPage";
 import StoryPage from "./pages/StoryPage";
+import TemplateGallery from "./pages/TemplateGallery";
 
 const queryClient = new QueryClient();
 
@@ -29,6 +30,8 @@ const App = () => (
         <Routes>
           {/* Embeds bleiben öffentlich zugänglich */}
           <Route path="/embed/:id" element={<EmbedDetailPage />} />
+          {/* Referenzgalerie für Screenshot-Regression der Social-Media-Templates */}
+          <Route path="/dev/templates" element={<TemplateGallery />} />
 
           <Route
             element={
