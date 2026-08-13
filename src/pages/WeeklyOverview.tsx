@@ -175,7 +175,7 @@ const WeeklyOverview = () => {
               <ChevronRight className="w-4 h-4" />
             </Button>
           </div>
-          <h1 className="font-serif text-2xl sm:text-3xl md:text-5xl font-medium leading-[1.05] text-foreground">{dateRangeLabel}</h1>
+          <h1 className="font-serif text-2xl sm:text-3xl md:text-5xl font-normal leading-[1.05] text-foreground">{dateRangeLabel}</h1>
 
           <p className="text-base sm:text-lg font-medium text-foreground/80">
             {bodies.length === 0 ? "Lade Parlament…" : (selectedBody ? getBodyLabel(selectedBody) : bodyKey)}
