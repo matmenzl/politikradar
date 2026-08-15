@@ -1,24 +1,13 @@
 project_id = "eynghyszcvknnflqphzv"
 
-[functions.tag-affairs]
-verify_jwt = false
-
-[functions.summarize-affair]
-verify_jwt = false
-
-[functions.generate-story]
-verify_jwt = false
-
-[functions.weekly-digest]
-verify_jwt = false
-
 [functions.verify-admin-pin]
 verify_jwt = false
 
-[functions.suggest-stories]
-verify_jwt = false
-[functions.verify-access-code]
+[functions.detect-events]
 verify_jwt = false
 
-[functions.manage-access-codes]
+[functions.score-events]
+verify_jwt = false
+
+[functions.generate-story]
 verify_jwt = false
