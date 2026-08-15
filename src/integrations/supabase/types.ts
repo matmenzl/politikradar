@@ -14,166 +14,273 @@ export type Database = {
   }
   public: {
     Tables: {
-      access_code_events: {
-        Row: {
-          access_code_id: string | null
-          created_at: string
-          event_type: string
-          id: string
-          label: string
-        }
-        Insert: {
-          access_code_id?: string | null
-          created_at?: string
-          event_type?: string
-          id?: string
-          label: string
-        }
-        Update: {
-          access_code_id?: string | null
-          created_at?: string
-          event_type?: string
-          id?: string
-          label?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "access_code_events_access_code_id_fkey"
-            columns: ["access_code_id"]
-            isOneToOne: false
-            referencedRelation: "access_codes"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      access_codes: {
-        Row: {
-          active: boolean
-          code_hash: string
-          created_at: string
-          id: string
-          is_admin: boolean
-          label: string
-          last_used_at: string | null
-        }
-        Insert: {
-          active?: boolean
-          code_hash: string
-          created_at?: string
-          id?: string
-          is_admin?: boolean
-          label: string
-          last_used_at?: string | null
-        }
-        Update: {
-          active?: boolean
-          code_hash?: string
-          created_at?: string
-          id?: string
-          is_admin?: boolean
-          label?: string
-          last_used_at?: string | null
-        }
-        Relationships: []
-      }
-      affair_summaries: {
-        Row: {
-          affair_id: string
-          created_at: string
-          id: string
-          summary: string
-        }
-        Insert: {
-          affair_id: string
-          created_at?: string
-          id?: string
-          summary: string
-        }
-        Update: {
-          affair_id?: string
-          created_at?: string
-          id?: string
-          summary?: string
-        }
-        Relationships: []
-      }
-      story_posts: {
+      events: {
         Row: {
           affair_id: string | null
-          body_key: string | null
+          business_id: string | null
+          canton: string | null
           created_at: string
-          feed_slides: Json
+          dedupe_key: string
+          description: string | null
+          editorial_confidence: number | null
+          event_date: string
+          event_type: string
+          exclusion_reason: string | null
           id: string
-          published_at: string | null
-          show_on_home: boolean
-          slides: Json
-          status: string
+          municipality: string | null
+          parliament: string
+          parliament_key: string | null
+          political_level: string
+          political_relevance: number | null
+          score_factors: Json
+          selection_status: string
+          social_potential: number | null
+          source_id: string | null
           title: string
+          updated_at: string
           voting_id: string | null
         }
         Insert: {
           affair_id?: string | null
-          body_key?: string | null
+          business_id?: string | null
+          canton?: string | null
           created_at?: string
-          feed_slides?: Json
+          dedupe_key: string
+          description?: string | null
+          editorial_confidence?: number | null
+          event_date: string
+          event_type: string
+          exclusion_reason?: string | null
           id?: string
-          published_at?: string | null
-          show_on_home?: boolean
-          slides?: Json
-          status?: string
+          municipality?: string | null
+          parliament: string
+          parliament_key?: string | null
+          political_level?: string
+          political_relevance?: number | null
+          score_factors?: Json
+          selection_status?: string
+          social_potential?: number | null
+          source_id?: string | null
           title: string
+          updated_at?: string
           voting_id?: string | null
         }
         Update: {
           affair_id?: string | null
-          body_key?: string | null
+          business_id?: string | null
+          canton?: string | null
           created_at?: string
-          feed_slides?: Json
+          dedupe_key?: string
+          description?: string | null
+          editorial_confidence?: number | null
+          event_date?: string
+          event_type?: string
+          exclusion_reason?: string | null
           id?: string
-          published_at?: string | null
-          show_on_home?: boolean
-          slides?: Json
-          status?: string
+          municipality?: string | null
+          parliament?: string
+          parliament_key?: string | null
+          political_level?: string
+          political_relevance?: number | null
+          score_factors?: Json
+          selection_status?: string
+          social_potential?: number | null
+          source_id?: string | null
           title?: string
+          updated_at?: string
           voting_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "events_source_id_fkey"
+            columns: ["source_id"]
+            isOneToOne: false
+            referencedRelation: "sources"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      facts: {
+        Row: {
+          created_at: string
+          event_id: string
+          fact_type: string
+          id: string
+          label: string
+          position: number
+          source_id: string | null
+          value: string
+          verified: boolean
+        }
+        Insert: {
+          created_at?: string
+          event_id: string
+          fact_type: string
+          id?: string
+          label: string
+          position?: number
+          source_id?: string | null
+          value: string
+          verified?: boolean
+        }
+        Update: {
+          created_at?: string
+          event_id?: string
+          fact_type?: string
+          id?: string
+          label?: string
+          position?: number
+          source_id?: string | null
+          value?: string
+          verified?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "facts_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "facts_source_id_fkey"
+            columns: ["source_id"]
+            isOneToOne: false
+            referencedRelation: "sources"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      slides: {
+        Row: {
+          body: string | null
+          created_at: string
+          headline: string | null
+          id: string
+          position: number
+          slide_type: string
+          source_id: string | null
+          story_id: string
+          updated_at: string
+          visualization: Json
+        }
+        Insert: {
+          body?: string | null
+          created_at?: string
+          headline?: string | null
+          id?: string
+          position?: number
+          slide_type?: string
+          source_id?: string | null
+          story_id: string
+          updated_at?: string
+          visualization?: Json
+        }
+        Update: {
+          body?: string | null
+          created_at?: string
+          headline?: string | null
+          id?: string
+          position?: number
+          slide_type?: string
+          source_id?: string | null
+          story_id?: string
+          updated_at?: string
+          visualization?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "slides_source_id_fkey"
+            columns: ["source_id"]
+            isOneToOne: false
+            referencedRelation: "sources"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "slides_story_id_fkey"
+            columns: ["story_id"]
+            isOneToOne: false
+            referencedRelation: "stories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sources: {
+        Row: {
+          created_at: string
+          id: string
+          label: string
+          source_type: string
+          url: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          label: string
+          source_type?: string
+          url?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          label?: string
+          source_type?: string
+          url?: string | null
         }
         Relationships: []
       }
-      weekly_digests: {
+      stories: {
         Row: {
-          closest_votings: Json
+          approved_at: string | null
           created_at: string
-          date_range: Json
+          editorial_confidence: number | null
+          event_id: string | null
+          headline: string
           id: string
-          stats: Json
-          summary: string
-          topic_radar: Json
-          week: number
-          year: number
+          political_relevance: number | null
+          published_at: string | null
+          social_potential: number | null
+          status: string
+          summary: string | null
+          updated_at: string
         }
         Insert: {
-          closest_votings?: Json
+          approved_at?: string | null
           created_at?: string
-          date_range?: Json
+          editorial_confidence?: number | null
+          event_id?: string | null
+          headline: string
           id?: string
-          stats?: Json
-          summary?: string
-          topic_radar?: Json
-          week: number
-          year: number
+          political_relevance?: number | null
+          published_at?: string | null
+          social_potential?: number | null
+          status?: string
+          summary?: string | null
+          updated_at?: string
         }
         Update: {
-          closest_votings?: Json
+          approved_at?: string | null
           created_at?: string
-          date_range?: Json
+          editorial_confidence?: number | null
+          event_id?: string | null
+          headline?: string
           id?: string
-          stats?: Json
-          summary?: string
-          topic_radar?: Json
-          week?: number
-          year?: number
+          political_relevance?: number | null
+          published_at?: string | null
+          social_potential?: number | null
+          status?: string
+          summary?: string | null
+          updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "stories_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
