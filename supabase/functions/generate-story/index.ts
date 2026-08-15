@@ -1,159 +1,183 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
+import { corsHeaders, json } from "../_shared/scoring.ts";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
-};
+/** Slide structure of the MVP story outline. */
+const OUTLINE = [
+  { slide_type: "hook", label: "Was ist passiert" },
+  { slide_type: "context", label: "Worum geht es" },
+  { slide_type: "decision", label: "Was wurde beschlossen" },
+  { slide_type: "vote", label: "Wie wurde abgestimmt" },
+  { slide_type: "positions", label: "Wer war dafür, wer dagegen" },
+  { slide_type: "outlook", label: "Was passiert jetzt" },
+  { slide_type: "sources", label: "Quellen" },
+];
 
 serve(async (req) => {
-  if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
-  }
+  if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { title, type, status, votingResults, date, beginDate, endDate, summary, parliament } = await req.json();
-
-    if (!title) {
-      return new Response(JSON.stringify({ error: "title is required" }), {
-        status: 400,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+    const { event_id } = await req.json();
+    if (!event_id || typeof event_id !== "string") {
+      return json({ error: "event_id ist erforderlich" }, 400);
     }
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) {
-      throw new Error("LOVABLE_API_KEY is not configured");
-    }
+    if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY ist nicht konfiguriert");
 
-    // Build context
-    const parts: string[] = [`Titel: ${title}`];
-    if (parliament) parts.push(`Parlament: ${parliament}`);
-    if (type) parts.push(`Geschäftstyp: ${type}`);
-    if (status) parts.push(`Status: ${status}`);
-    if (beginDate) parts.push(`Eingereicht: ${beginDate}`);
-    if (endDate) parts.push(`Abgeschlossen: ${endDate}`);
-    if (date) parts.push(`Datum: ${date}`);
-    if (votingResults) {
-      const accepted = votingResults.accepted ?? (votingResults.yes > votingResults.no);
-      parts.push(
-        `Abstimmungsergebnisse: Ja ${votingResults.yes}, Nein ${votingResults.no}, Enthaltungen ${votingResults.abstention}, Entscheid: ${accepted ? "Angenommen" : "Abgelehnt"}`
-      );
-    }
-    if (summary) parts.push(`Zusammenfassung: ${summary}`);
+    const supabase = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+    );
 
-    const context = parts.join("\n");
+    const { data: event, error: evErr } = await supabase
+      .from("events")
+      .select("*")
+      .eq("id", event_id)
+      .single();
+    if (evErr || !event) return json({ error: "Ereignis nicht gefunden" }, 404);
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    const { data: facts } = await supabase
+      .from("facts")
+      .select("fact_type, label, value")
+      .eq("event_id", event_id)
+      .order("position");
+
+    const { data: source } = event.source_id
+      ? await supabase.from("sources").select("url, label").eq("id", event.source_id).maybeSingle()
+      : { data: null };
+
+    const factLayer = (facts || []).map((f) => `- ${f.label}: ${f.value}`).join("\n");
+    const context = [
+      `Titel: ${event.title}`,
+      `Parlament: ${event.parliament}`,
+      `Ebene: ${event.political_level}`,
+      `Ereignistyp: ${event.event_type}`,
+      `Datum: ${event.event_date}`,
+      event.description ? `Beschreibung: ${event.description}` : "",
+      source?.url ? `Quelle: ${source.url}` : "",
+      "",
+      "Fact Layer (die einzig erlaubten Fakten und Zahlen):",
+      factLayer || "- keine strukturierten Fakten vorhanden",
+    ]
+      .filter(Boolean)
+      .join("\n");
+
+    const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
+      headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
       body: JSON.stringify({
         model: "google/gemini-3-flash-preview",
         messages: [
           {
             role: "system",
             content:
-              "Du erstellst Instagram-Story-Inhalte über Schweizer Parlamentsgeschäfte. Erstelle 4–5 Story-Slides, die das Geschäft als Storytelling aufbereiten. Jeder Slide soll einen klaren Zweck haben. Erwähne immer, in welchem Parlament (z.B. Nationalrat, Kantonsrat Zürich) das Geschäft behandelt wurde – schreibe nicht einfach 'Parlament'. Verwende einfache Sprache, kurze Sätze, und passende Emojis. Die Slides sollen für ein breites Publikum verständlich sein. Liefere zu jedem Slide zusätzlich einen kurzen englischen Bildprompt (image_prompt) für ein abstraktes, redaktionelles Hintergrundbild ohne Text und ohne erkennbare Gesichter.",
+              "Du formulierst aus einem geprüften Fact Layer neutrale Social-Media-Slides über Schweizer Parlamentsgeschäfte. " +
+              "Strikte Regeln: Erfinde keine Zahlen, Namen, Zitate oder Fakten. Verwende ausschliesslich Angaben aus dem Fact Layer. " +
+              "Fehlt eine Information, lasse den Slide-Text allgemein oder schreibe, dass dazu keine Angaben vorliegen. " +
+              "Schreibe neutral, ohne Wertung, in einfacher deutscher Sprache, kurze Sätze, keine Emojis. " +
+              "Nenne immer das konkrete Parlament.",
           },
           {
             role: "user",
-            content: `Erstelle Instagram-Story-Slides für dieses parlamentarische Geschäft:\n\n${context}`,
+            content:
+              `Erstelle die Slide-Texte nach dieser festen Struktur:\n` +
+              OUTLINE.map((o, i) => `${i + 1}. ${o.label} (slide_type: ${o.slide_type})`).join("\n") +
+              `\n\nGrundlage:\n\n${context}`,
           },
         ],
         tools: [
           {
             type: "function",
             function: {
-              name: "create_story_slides",
-              description: "Erstellt eine Reihe von Instagram-Story-Slides für ein parlamentarisches Geschäft.",
+              name: "create_story",
+              description: "Erstellt Headline, Zusammenfassung und Slide-Texte aus dem Fact Layer.",
               parameters: {
                 type: "object",
                 properties: {
+                  headline: { type: "string" },
+                  summary: { type: "string" },
                   slides: {
                     type: "array",
                     items: {
                       type: "object",
                       properties: {
-                        headline: { type: "string", description: "Kurze, aufmerksamkeitsstarke Überschrift (max 60 Zeichen)" },
-                        body: { type: "string", description: "Erklärender Text (max 150 Zeichen)" },
-                        emoji: { type: "string", description: "Ein passendes Emoji für den Slide" },
-                        image_prompt: {
-                          type: "string",
-                          description:
-                            "Kurzer englischer Bildprompt (max 25 Wörter) für ein abstraktes, redaktionelles Hintergrundbild zu diesem Slide. Keine Personen mit erkennbaren Gesichtern, kein Text im Bild.",
-                        },
-                        slide_type: {
-                          type: "string",
-                          enum: ["hook", "context", "result", "insight", "cta"],
-                          description: "Art des Slides: hook (Aufmacher), context (Hintergrund), result (Ergebnis), insight (Einordnung), cta (Handlungsaufforderung)",
-                        },
+                        slide_type: { type: "string" },
+                        headline: { type: "string" },
+                        body: { type: "string" },
                       },
-                      required: ["headline", "body", "emoji", "slide_type", "image_prompt"],
+                      required: ["slide_type", "headline", "body"],
                       additionalProperties: false,
                     },
                   },
                 },
-                required: ["slides"],
+                required: ["headline", "summary", "slides"],
                 additionalProperties: false,
               },
             },
           },
         ],
-        tool_choice: { type: "function", function: { name: "create_story_slides" } },
+        tool_choice: { type: "function", function: { name: "create_story" } },
       }),
     });
 
-    if (!response.ok) {
-      if (response.status === 429) {
-        return new Response(JSON.stringify({ error: "Zu viele Anfragen. Bitte versuche es später erneut." }), {
-          status: 429,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
+    if (res.status === 429) return json({ error: "Rate-Limit erreicht, bitte später erneut versuchen." }, 429);
+    if (res.status === 402) return json({ error: "AI-Guthaben aufgebraucht." }, 402);
+    if (!res.ok) throw new Error(`AI Gateway: ${res.status} ${await res.text()}`);
+
+    const payload = await res.json();
+    const args = payload.choices?.[0]?.message?.tool_calls?.[0]?.function?.arguments;
+    if (!args) throw new Error("Keine Story-Antwort erhalten");
+    const generated = JSON.parse(args);
+
+    const { data: story, error: storyErr } = await supabase
+      .from("stories")
+      .insert({
+        event_id,
+        status: "ai_generated",
+        headline: generated.headline || event.title,
+        summary: generated.summary || null,
+        political_relevance: event.political_relevance,
+        social_potential: event.social_potential,
+        editorial_confidence: event.editorial_confidence,
+      })
+      .select("id")
+      .single();
+    if (storyErr || !story) throw storyErr || new Error("Story konnte nicht angelegt werden");
+
+    const factMap = Object.fromEntries((facts || []).map((f) => [f.fact_type, f.value]));
+    const slides = OUTLINE.map((o, i) => {
+      const g = (generated.slides || []).find((s: { slide_type: string }) => s.slide_type === o.slide_type);
+      let visualization: Record<string, unknown> = {};
+      if (o.slide_type === "vote" && factMap.votes_yes) {
+        visualization = {
+          type: "vote",
+          yes: Number(factMap.votes_yes || 0),
+          no: Number(factMap.votes_no || 0),
+          abstention: Number(factMap.votes_abstention || 0),
+          result: factMap.result || "",
+        };
       }
-      if (response.status === 402) {
-        return new Response(JSON.stringify({ error: "AI-Kontingent aufgebraucht." }), {
-          status: 402,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
+      if (o.slide_type === "sources") {
+        visualization = { type: "sources", url: source?.url || null, label: source?.label || event.parliament };
       }
-      const text = await response.text();
-      console.error("AI gateway error:", response.status, text);
-      return new Response(JSON.stringify({ error: "AI-Fehler" }), {
-        status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-
-    const result = await response.json();
-    const toolCall = result.choices?.[0]?.message?.tool_calls?.[0];
-    
-    if (!toolCall?.function?.arguments) {
-      console.error("No tool call in response:", JSON.stringify(result));
-      return new Response(JSON.stringify({ error: "Keine Story-Slides generiert." }), {
-        status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-
-    const parsed = JSON.parse(toolCall.function.arguments);
-
-    // Stable seed per slide so the same image is reproduced on every render
-    const slides = (parsed.slides ?? []).map((s: Record<string, unknown>) => ({
-      ...s,
-      image_seed: Math.floor(Math.random() * 1_000_000),
-    }));
-
-    return new Response(JSON.stringify({ slides }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      return {
+        story_id: story.id,
+        position: i,
+        slide_type: o.slide_type,
+        headline: g?.headline || o.label,
+        body: g?.body || "",
+        visualization,
+        source_id: event.source_id,
+      };
     });
+
+    await supabase.from("slides").insert(slides);
+    await supabase.from("events").update({ selection_status: "selected" }).eq("id", event_id);
+
+    return json({ story_id: story.id });
   } catch (e) {
-    console.error("generate-story error:", e);
-    return new Response(JSON.stringify({ error: e instanceof Error ? e.message : "Unknown error" }), {
-      status: 500,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    console.error("generate-story", e);
+    return json({ error: e instanceof Error ? e.message : "Unbekannter Fehler" }, 500);
   }
 });
