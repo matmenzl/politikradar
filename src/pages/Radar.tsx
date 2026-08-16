@@ -334,19 +334,6 @@ const Radar = () => {
         </div>
 
         {loading && <p className="text-sm text-muted-foreground">Lade Ereignisse…</p>}
-
-        {!loading && events.length > 0 && (
-          <div className="text-xs text-muted-foreground border border-border bg-card p-3">
-            <span className="font-medium text-foreground">
-              {events.some((e) => e.political_relevance !== null)
-                ? "Bewertete Ereignisse"
-                : "Unbewertete Ereignisse"}
-            </span>
-            {" — "}
-            {events.filter((e) => e.political_relevance !== null).length} von {events.length} für {from} bis {to} bereits bewertet. Die Kategorien (Top Story, Prüfen, etc.) basieren auf diesen gespeicherten Bewertungen. Klicke „Ereignisse bewerten“, um neue Daten zu laden und neu zu bewerten.
-          </div>
-        )}
-
         {!loading && filtered.length === 0 && (
           <p className="text-sm text-muted-foreground">
             Keine Ereignisse im gewählten Zeitraum. Starte mit „OpenParl-Daten laden“.
@@ -356,9 +343,30 @@ const Radar = () => {
         {(["top", "review", "low"] as Priority[]).map((p) =>
           groups[p].length ? (
             <section key={p} className="space-y-2">
-              <h2 className="font-serif text-xl text-foreground">
-                {PRIORITY_LABELS[p]} <span className="text-muted-foreground text-base">({groups[p].length})</span>
-              </h2>
+              {p === "top" ? (
+                <TooltipProvider delayDuration={200}>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <h2 className="font-serif text-xl text-foreground cursor-help">
+                        {PRIORITY_LABELS[p]} <span className="text-muted-foreground text-base">({groups[p].length})</span>
+                      </h2>
+                    </TooltipTrigger>
+                    <TooltipContent side="top" className="max-w-sm">
+                      <p>
+                        {events.some((e) => e.political_relevance !== null)
+                          ? "Bewertete Ereignisse"
+                          : "Unbewertete Ereignisse"}
+                        {" — "}
+                        {events.filter((e) => e.political_relevance !== null).length} von {events.length} für {from} bis {to} bereits bewertet. Die Kategorien basieren auf diesen gespeicherten Bewertungen. Klicke „Ereignisse bewerten“, um neue Daten zu laden und neu zu bewerten.
+                      </p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              ) : (
+                <h2 className="font-serif text-xl text-foreground">
+                  {PRIORITY_LABELS[p]} <span className="text-muted-foreground text-base">({groups[p].length})</span>
+                </h2>
+              )}
               <Accordion type="multiple" className="space-y-2">{groups[p].map(renderEvent)}</Accordion>
             </section>
           ) : null,
