@@ -151,6 +151,30 @@ export type Database = {
           },
         ]
       }
+      scoring_config: {
+        Row: {
+          id: string
+          relevance_weights: Json
+          social_weights: Json
+          thresholds: Json
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          relevance_weights?: Json
+          social_weights?: Json
+          thresholds?: Json
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          relevance_weights?: Json
+          social_weights?: Json
+          thresholds?: Json
+          updated_at?: string
+        }
+        Relationships: []
+      }
       slides: {
         Row: {
           body: string | null
