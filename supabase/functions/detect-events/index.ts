@@ -79,14 +79,14 @@ async function fetchRange<T extends Record<string, unknown>>(
 
 async function fetchBodies(): Promise<Record<string, Body>> {
   const map: Record<string, Body> = {
-    CHE: { key: "CHE", name_de: "Schweiz (Bundesparlament)", type: "country" },
+    CHE: { body_key: "CHE", name_de: "Schweiz (Bundesparlament)", type: "country" },
   };
   let offset = 0;
-  for (let i = 0; i < 10; i++) {
-    const res = await api<Body>("/bodies", { limit: "100", offset: String(offset) });
-    for (const b of res.data || []) map[b.key] = b;
+  for (let i = 0; i < 12; i++) {
+    const res = await api<Body>("/bodies", { limit: "200", offset: String(offset) });
+    for (const b of res.data || []) if (b.body_key) map[String(b.body_key)] = b;
     if (!res.meta?.has_more) break;
-    offset += 100;
+    offset += 200;
   }
   return map;
 }
@@ -97,6 +97,17 @@ const levelOf = (b?: Body) => {
   if (b.type === "canton") return "kanton";
   if (b.type === "city" || b.type === "municipality") return "gemeinde";
   return "unknown";
+};
+
+/** Human readable parliament label, e.g. "Kanton Zürich" or "Adliswil (ZH)". */
+const nameOf = (b: Body | undefined, key: string) => {
+  const base = b?.name_de || b?.name;
+  if (!base) return key;
+  if (b?.type === "canton") return `Kanton ${base}`;
+  if ((b?.type === "city" || b?.type === "municipality") && b?.canton_key) {
+    return base.includes("(") ? base : `${base} (${b.canton_key})`;
+  }
+  return base;
 };
 
 interface CandidateEvent {
