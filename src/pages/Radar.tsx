@@ -334,6 +334,19 @@ const Radar = () => {
         </div>
 
         {loading && <p className="text-sm text-muted-foreground">Lade Ereignisse…</p>}
+
+        {!loading && events.length > 0 && (
+          <div className="text-xs text-muted-foreground border border-border bg-card p-3">
+            <span className="font-medium text-foreground">
+              {events.some((e) => e.political_relevance !== null)
+                ? "Bewertete Ereignisse"
+                : "Unbewertete Ereignisse"}
+            </span>
+            {" — "}
+            {events.filter((e) => e.political_relevance !== null).length} von {events.length} für {from} bis {to} bereits bewertet. Die Kategorien (Top Story, Prüfen, etc.) basieren auf diesen gespeicherten Bewertungen. Klicke „Ereignisse bewerten“, um neue Daten zu laden und neu zu bewerten.
+          </div>
+        )}
+
         {!loading && filtered.length === 0 && (
           <p className="text-sm text-muted-foreground">
             Keine Ereignisse im gewählten Zeitraum. Starte mit „OpenParl-Daten laden“.
