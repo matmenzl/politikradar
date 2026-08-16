@@ -19,6 +19,12 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { ExternalLink, Loader2, RefreshCw, Sparkles } from "lucide-react";
 import {
   FACTOR_LABELS,
@@ -106,6 +112,11 @@ const Radar = () => {
 
   const parliaments = useMemo(
     () => [...new Set(events.map((e) => e.parliament))].sort(),
+    [events],
+  );
+
+  const hasUnscoredEvents = useMemo(
+    () => events.some((e) => e.political_relevance === null),
     [events],
   );
 
@@ -217,12 +228,25 @@ const Radar = () => {
           </label>
           <Button onClick={detect} disabled={detecting}>
             {detecting ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
-            Ereignisse erkennen
+            OpenParl-Daten laden
           </Button>
-          <Button variant="secondary" onClick={score} disabled={scoring}>
-            {scoring ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
-            Bewerten
-          </Button>
+          <TooltipProvider delayDuration={200}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span>
+                  <Button variant="secondary" onClick={score} disabled={scoring || !hasUnscoredEvents}>
+                    {scoring ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
+                    Bewerten
+                  </Button>
+                </span>
+              </TooltipTrigger>
+              <TooltipContent side="top" className="max-w-xs">
+                <p>
+                  Bewertet alle geladenen, noch unbewerteten Ereignisse. Die KI bewertet 11 Faktoren (z. B. Entscheidwirkung, Reichweite, Emotionaler Aufhänger) und berechnet daraus Political Relevance, Social Potential und Editorial Confidence.
+                </p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
 
         <div className="flex flex-wrap gap-3">
@@ -257,7 +281,7 @@ const Radar = () => {
         {loading && <p className="text-sm text-muted-foreground">Lade Ereignisse…</p>}
         {!loading && filtered.length === 0 && (
           <p className="text-sm text-muted-foreground">
-            Keine Ereignisse im gewählten Zeitraum. Starte mit „Ereignisse erkennen“.
+            Keine Ereignisse im gewählten Zeitraum. Starte mit „OpenParl-Daten laden“.
           </p>
         )}
 
