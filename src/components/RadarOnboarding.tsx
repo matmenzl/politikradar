@@ -174,7 +174,7 @@ const RadarOnboarding = forwardRef<RadarOnboardingRef>((_, ref) => {
       )}
 
       <div
-        className="absolute mx-auto max-w-md bg-card text-card-foreground border border-border shadow-xl p-5 space-y-4"
+        className="absolute mx-auto max-w-md bg-card text-card-foreground border border-border shadow-xl p-5 space-y-4 max-h-[80vh] overflow-y-auto overscroll-contain"
         style={cardStyle}
         onClick={(e) => e.stopPropagation()}
       >
