@@ -246,10 +246,10 @@ const Demo = () => {
 
   return (
     <AppShell>
-      <div className="space-y-8">
+      <div className="space-y-6 md:space-y-8">
         <header className="space-y-2">
           <Badge variant="secondary" className="font-sans">Interaktive Demo</Badge>
-          <h1 className="font-serif text-3xl md:text-4xl text-foreground">
+          <h1 className="font-serif text-2xl md:text-4xl text-foreground">
             Von der Recherche zur Top Story
           </h1>
           <p className="text-muted-foreground font-sans max-w-2xl">
@@ -260,7 +260,7 @@ const Demo = () => {
         </header>
 
         {/* Stepper */}
-        <ol className="grid grid-cols-2 md:grid-cols-4 gap-2">
+        <ol className="flex md:grid md:grid-cols-4 gap-2 overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0 pb-1 snap-x">
           {STEPS.map((s, i) => {
             const Icon = s.icon;
             const active = i === step;
@@ -269,7 +269,7 @@ const Demo = () => {
               <li
                 key={s.key}
                 className={[
-                  "flex items-center gap-2 border px-3 py-2 font-sans text-sm",
+                  "flex items-center gap-2 border px-3 py-2 font-sans text-xs md:text-sm shrink-0 snap-start",
                   active
                     ? "border-foreground bg-ink text-paper"
                     : done
@@ -285,16 +285,16 @@ const Demo = () => {
         </ol>
 
         {/* Step 1 */}
-        <section className="border border-border p-4 md:p-6 space-y-4">
-          <div className="flex flex-wrap items-center justify-between gap-3">
+        <section className="border border-border p-3 md:p-6 space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div>
-              <h2 className="font-serif text-xl">1. OpenParl-Daten laden</h2>
+              <h2 className="font-serif text-lg md:text-xl">1. OpenParl-Daten laden</h2>
               <p className="text-sm text-muted-foreground font-sans">
                 Beschlüsse, Abstimmungen und Vorstösse aus Bund, Kantonen und Gemeinden –
                 für den gewählten Zeitraum (10.–14. August 2026).
               </p>
             </div>
-            <Button onClick={runImport} disabled={running || imported > 0} className="font-sans">
+            <Button onClick={runImport} disabled={running || imported > 0} className="font-sans w-full sm:w-auto">
               {running && step === 0 ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
               ) : (
@@ -330,17 +330,17 @@ const Demo = () => {
 
         {/* Step 2 */}
         <section
-          className={`border border-border p-4 md:p-6 space-y-4 ${step < 1 ? "opacity-50 pointer-events-none" : ""}`}
+          className={`border border-border p-3 md:p-6 space-y-4 ${step < 1 ? "opacity-50 pointer-events-none" : ""}`}
         >
-          <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div>
-              <h2 className="font-serif text-xl">2. Ereignisse bewerten</h2>
+              <h2 className="font-serif text-lg md:text-xl">2. Ereignisse bewerten</h2>
               <p className="text-sm text-muted-foreground font-sans">
                 Die KI vergibt pro Ereignis Punkte auf 11 nachvollziehbaren Faktoren –
                 gewichtet nach deinen Kriterien.
               </p>
             </div>
-            <Button onClick={runScore} disabled={running || scored > 0} className="font-sans">
+            <Button onClick={runScore} disabled={running || scored > 0} className="font-sans w-full sm:w-auto">
               {running && step === 1 ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
               ) : (
@@ -357,7 +357,7 @@ const Demo = () => {
                 <div key={e.id} className="border border-border p-3 space-y-2">
                   <p className="font-sans text-sm">{e.title}</p>
                   {isScored ? (
-                    <div className="flex gap-4 text-xs font-sans animate-fade-in">
+                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs font-sans animate-fade-in">
                       <span>
                         Relevanz <strong className="text-foreground">{e.relevance}</strong>
                       </span>
@@ -384,10 +384,10 @@ const Demo = () => {
 
         {/* Step 3 */}
         <section
-          className={`border border-border p-4 md:p-6 space-y-4 ${step < 2 ? "opacity-50 pointer-events-none" : ""}`}
+          className={`border border-border p-3 md:p-6 space-y-4 ${step < 2 ? "opacity-50 pointer-events-none" : ""}`}
         >
           <div>
-            <h2 className="font-serif text-xl">3. Top Story auswählen</h2>
+            <h2 className="font-serif text-lg md:text-xl">3. Top Story auswählen</h2>
             <p className="text-sm text-muted-foreground font-sans">
               Sortiert nach Gesamtpotenzial. Klick auf ein Ereignis zeigt, warum es oben steht.
             </p>
@@ -453,17 +453,17 @@ const Demo = () => {
 
         {/* Step 4 */}
         <section
-          className={`border border-border p-4 md:p-6 space-y-4 ${step < 3 ? "opacity-50 pointer-events-none" : ""}`}
+          className={`border border-border p-3 md:p-6 space-y-4 ${step < 3 ? "opacity-50 pointer-events-none" : ""}`}
         >
-          <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div>
-              <h2 className="font-serif text-xl">4. Story generieren</h2>
+              <h2 className="font-serif text-lg md:text-xl">4. Story generieren</h2>
               <p className="text-sm text-muted-foreground font-sans">
                 Aus den geprüften Fakten entstehen Slides – jede Zahl bleibt an ihre Quelle
                 gebunden.
               </p>
             </div>
-            <Button onClick={runStory} disabled={running || !selected || slides > 0} className="font-sans">
+            <Button onClick={runStory} disabled={running || !selected || slides > 0} className="font-sans w-full sm:w-auto">
               {running && step === 3 ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
               ) : (
@@ -473,7 +473,7 @@ const Demo = () => {
             </Button>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-3">
             {DEMO_SLIDES.map((s, i) => (
               <div
                 key={s.type}
@@ -487,8 +487,8 @@ const Demo = () => {
                 <span className="font-sans text-[10px] uppercase tracking-wide">{s.type}</span>
                 {i < slides ? (
                   <div className="space-y-2">
-                    <p className="font-serif text-lg leading-tight">{s.headline}</p>
-                    <p className="font-sans text-xs leading-snug">{s.body}</p>
+                    <p className="font-serif text-base md:text-lg leading-tight">{s.headline}</p>
+                    <p className="font-sans text-[11px] md:text-xs leading-snug">{s.body}</p>
                   </div>
                 ) : (
                   <FileText className="h-5 w-5 self-center opacity-40" />
@@ -505,12 +505,12 @@ const Demo = () => {
                 publikationsreife Story – statt stundenlanger Recherche.
               </p>
               <div className="flex flex-wrap gap-2">
-                <Button asChild className="font-sans">
+                <Button asChild className="font-sans w-full sm:w-auto">
                   <Link to="/">
                     Mit echten Daten starten <ArrowRight className="h-4 w-4" />
                   </Link>
                 </Button>
-                <Button variant="outline" onClick={reset} className="font-sans">
+                <Button variant="outline" onClick={reset} className="font-sans w-full sm:w-auto">
                   <RotateCcw className="h-4 w-4" /> Demo neu starten
                 </Button>
               </div>
