@@ -32,10 +32,11 @@ interface Affair {
 }
 
 interface Body {
-  key: string;
+  body_key: string;
   name_de?: string;
+  name?: string;
   type?: string;
-  canton?: string;
+  canton_key?: string;
 }
 
 async function api<T>(endpoint: string, params: Record<string, string>): Promise<{ data: T[]; meta: { has_more: boolean } }> {
@@ -78,14 +79,14 @@ async function fetchRange<T extends Record<string, unknown>>(
 
 async function fetchBodies(): Promise<Record<string, Body>> {
   const map: Record<string, Body> = {
-    CHE: { key: "CHE", name_de: "Schweiz (Bundesparlament)", type: "country" },
+    CHE: { body_key: "CHE", name_de: "Schweiz (Bundesparlament)", type: "country" },
   };
   let offset = 0;
-  for (let i = 0; i < 10; i++) {
-    const res = await api<Body>("/bodies", { limit: "100", offset: String(offset) });
-    for (const b of res.data || []) map[b.key] = b;
+  for (let i = 0; i < 12; i++) {
+    const res = await api<Body>("/bodies", { limit: "200", offset: String(offset) });
+    for (const b of res.data || []) if (b.body_key) map[String(b.body_key)] = b;
     if (!res.meta?.has_more) break;
-    offset += 100;
+    offset += 200;
   }
   return map;
 }
@@ -96,6 +97,22 @@ const levelOf = (b?: Body) => {
   if (b.type === "canton") return "kanton";
   if (b.type === "city" || b.type === "municipality") return "gemeinde";
   return "unknown";
+};
+
+/** Cantons missing from the German /bodies listing. */
+const CANTON_FALLBACK: Record<string, string> = {
+  TI: "Tessin", GE: "Genf", VD: "Waadt", NE: "Neuenburg", JU: "Jura",
+};
+
+/** Human readable parliament label, e.g. "Kanton Zürich" or "Adliswil (ZH)". */
+const nameOf = (b: Body | undefined, key: string) => {
+  const base = b?.name_de || b?.name;
+  if (!base) return CANTON_FALLBACK[key] ? `Kanton ${CANTON_FALLBACK[key]}` : key;
+  if (b?.type === "canton") return `Kanton ${base}`;
+  if ((b?.type === "city" || b?.type === "municipality") && b?.canton_key) {
+    return base.includes("(") ? base : `${base} (${b.canton_key})`;
+  }
+  return base;
 };
 
 interface CandidateEvent {
@@ -242,10 +259,10 @@ serve(async (req) => {
     const eventRows = newCandidates.map((c) => {
       const body = bodies[c.parliament_key];
       return {
-        parliament: body?.name_de || c.parliament_key,
+        parliament: nameOf(body, c.parliament_key),
         parliament_key: c.parliament_key,
         political_level: levelOf(body),
-        canton: body?.canton ?? null,
+        canton: body?.canton_key ?? (body?.type === "canton" ? c.parliament_key : null),
         business_id: c.business_id ?? null,
         affair_id: c.affair_id ?? null,
         voting_id: c.voting_id ?? null,
