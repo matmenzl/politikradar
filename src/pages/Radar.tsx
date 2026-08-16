@@ -24,12 +24,6 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { ExternalLink, Info, Loader2, RefreshCw, Sparkles } from "lucide-react";
 import ScoringSettings from "@/components/ScoringSettings";
 import {
