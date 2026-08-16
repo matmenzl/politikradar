@@ -128,10 +128,6 @@ const Radar = () => {
     [events],
   );
 
-  const hasUnscoredEvents = useMemo(
-    () => events.some((e) => e.political_relevance === null),
-    [events],
-  );
 
   const filtered = useMemo(() => {
     const list = events.filter(
