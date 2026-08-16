@@ -44,6 +44,8 @@ const Radar = () => {
   const [sources, setSources] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState<"idle" | "detecting" | "scoring">("idle");
+  const busy = step !== "idle";
+
 
   const [generating, setGenerating] = useState<string | null>(null);
   const [level, setLevel] = useState("all");
