@@ -8,6 +8,7 @@ import PinGate from "./components/PinGate";
 import Radar from "./pages/Radar";
 import StoryStudio from "./pages/StoryStudio";
 import Redaktion from "./pages/Redaktion";
+import Demo from "./pages/Demo";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -23,6 +24,7 @@ const App = () => (
             <Route path="/" element={<Radar />} />
             <Route path="/story/:id" element={<StoryStudio />} />
             <Route path="/redaktion" element={<Redaktion />} />
+            <Route path="/demo" element={<Demo />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </PinGate>
