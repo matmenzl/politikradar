@@ -348,14 +348,17 @@ const Radar = () => {
           groups[p].length ? (
             <section key={p} className="space-y-2">
               {p === "top" ? (
-                <TooltipProvider delayDuration={200}>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <h2 className="font-serif text-xl text-foreground cursor-help">
-                        {PRIORITY_LABELS[p]} <span className="text-muted-foreground text-base">({groups[p].length})</span>
-                      </h2>
-                    </TooltipTrigger>
-                    <TooltipContent side="top" className="max-w-sm">
+                <div className="flex items-center gap-1">
+                  <h2 className="font-serif text-xl text-foreground">
+                    {PRIORITY_LABELS[p]} <span className="text-muted-foreground text-base">({groups[p].length})</span>
+                  </h2>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button variant="ghost" size="icon" className="h-7 w-7" aria-label="Mehr zu Top Storys">
+                        <Info className="w-4 h-4" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent side="top" className="max-w-sm">
                       <p>
                         {events.some((e) => e.political_relevance !== null)
                           ? "Bewertete Ereignisse"
@@ -363,9 +366,9 @@ const Radar = () => {
                         {" — "}
                         {events.filter((e) => e.political_relevance !== null).length} von {events.length} für {from} bis {to} bereits bewertet. Die Kategorien basieren auf diesen gespeicherten Bewertungen. Klicke „Ereignisse bewerten“, um neue Daten zu laden und neu zu bewerten.
                       </p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
+                    </PopoverContent>
+                  </Popover>
+                </div>
               ) : (
                 <h2 className="font-serif text-xl text-foreground">
                   {PRIORITY_LABELS[p]} <span className="text-muted-foreground text-base">({groups[p].length})</span>
