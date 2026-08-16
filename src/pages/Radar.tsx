@@ -19,13 +19,9 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
 import { ExternalLink, Info, Loader2, RefreshCw, Sparkles } from "lucide-react";
 import ScoringSettings from "@/components/ScoringSettings";
+import InfoHint from "@/components/InfoHint";
 import {
   DEFAULT_SCORING,
   FACTOR_INFO,
@@ -179,8 +175,18 @@ const Radar = () => {
           if (typeof value !== "number") return null;
           return (
             <div key={k} className="flex items-center gap-2 text-xs">
-              <span className="flex-1 text-muted-foreground" title={FACTOR_INFO[k]?.hint}>
+              <span className="flex-1 flex items-center gap-1 text-muted-foreground">
                 {FACTOR_INFO[k]?.label ?? k}
+                {FACTOR_INFO[k]?.hint ? (
+                  <InfoHint
+                    label={`Erklärung: ${FACTOR_INFO[k]?.label ?? k}`}
+                    className="min-h-[36px] min-w-[36px] -m-1.5 p-1.5"
+                    trigger={<Info className="w-3.5 h-3.5" aria-hidden="true" />}
+                  >
+                    <p className="font-semibold">{FACTOR_INFO[k]?.label ?? k}</p>
+                    <p className="mt-1 text-muted-foreground">{FACTOR_INFO[k]?.hint}</p>
+                  </InfoHint>
+                ) : null}
               </span>
               <span className="w-10 text-right num text-muted-foreground">
                 {weightShare(weights, k)}%
@@ -279,21 +285,14 @@ const Radar = () => {
                 ? "Bewerten…"
                 : "Ereignisse bewerten"}
           </Button>
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-9 w-9" aria-label="Mehr zur Bewertung">
-                <Info className="w-4 h-4" />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent side="top" className="max-w-xs">
+          <InfoHint label="Mehr zur Bewertung">
               <p>
                 Lädt zuerst Geschäfte und Abstimmungen aus OpenParlData für den gewählten Zeitraum und bewertet sie danach per KI: 11 Faktoren (z. B. Entscheidwirkung, Reichweite, Emotionaler Aufhänger) ergeben Political Relevance, Social Potential und Editorial Confidence.
               </p>
               <p className="mt-2 text-xs text-muted-foreground">
                 Die Kriterien können unter „Kriterien“ angepasst werden.
               </p>
-            </PopoverContent>
-          </Popover>
+          </InfoHint>
           <Button variant="ghost" size="sm" onClick={detect} disabled={busy}>
             <RefreshCw className="w-4 h-4" />
             Nur Daten laden
@@ -346,13 +345,7 @@ const Radar = () => {
                   <h2 className="font-serif text-xl text-foreground">
                     {PRIORITY_LABELS[p]} <span className="text-muted-foreground text-base">({groups[p].length})</span>
                   </h2>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button variant="ghost" size="icon" className="h-7 w-7" aria-label="Mehr zu Top Storys">
-                        <Info className="w-4 h-4" />
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent side="top" className="max-w-sm">
+                  <InfoHint label="Mehr zu Top Storys" contentClassName="w-[min(24rem,calc(100vw-2rem))]">
                       <p>
                         {events.some((e) => e.political_relevance !== null)
                           ? "Bewertete Ereignisse"
@@ -360,8 +353,7 @@ const Radar = () => {
                         {" — "}
                         {events.filter((e) => e.political_relevance !== null).length} von {events.length} für {from} bis {to} bereits bewertet. Die Kategorien basieren auf diesen gespeicherten Bewertungen. Klicke „Ereignisse bewerten“, um neue Daten zu laden und neu zu bewerten.
                       </p>
-                    </PopoverContent>
-                  </Popover>
+                  </InfoHint>
                 </div>
               ) : (
                 <h2 className="font-serif text-xl text-foreground">
