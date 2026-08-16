@@ -80,22 +80,33 @@ const Radar = () => {
   }, [from, to]);
 
   const detect = async () => {
-    setDetecting(true);
+    setStep("detecting");
     const { data, error } = await supabase.functions.invoke("detect-events", { body: { from, to } });
-    setDetecting(false);
+    setStep("idle");
     if (error || data?.error) return toast.error(data?.error || "Ereignis-Erkennung fehlgeschlagen.");
     toast.success(`${data.inserted} neue Ereignisse erkannt (${data.skipped} bereits vorhanden).`);
     load();
   };
 
-  const score = async () => {
-    setScoring(true);
+  const refreshAndScore = async () => {
+    setStep("detecting");
+    const detectRes = await supabase.functions.invoke("detect-events", { body: { from, to } });
+    const detectFailed = detectRes.error || detectRes.data?.error;
+    if (detectFailed) {
+      toast.warning("OpenParl-Daten konnten nicht geladen werden – bewerte vorhandene Ereignisse.");
+    }
+
+    setStep("scoring");
     const { data, error } = await supabase.functions.invoke("score-events", { body: { from, to } });
-    setScoring(false);
+    setStep("idle");
     if (error || data?.error) return toast.error(data?.error || "Bewertung fehlgeschlagen.");
-    toast.success(`${data.scored} Ereignisse bewertet, ${data.excluded} ausgeschlossen.`);
+    const inserted = detectFailed ? 0 : (detectRes.data?.inserted ?? 0);
+    toast.success(
+      `${inserted} neue Ereignisse geladen, ${data.scored} bewertet, ${data.excluded} ausgeschlossen.`,
+    );
     load();
   };
+
 
   const createStory = async (event: EventRow) => {
     setGenerating(event.id);
