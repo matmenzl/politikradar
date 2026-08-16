@@ -75,3 +75,36 @@ export function hardFilter(input: HardFilterInput): string | null {
   if (administrative.some((a) => lower.includes(a))) return "Rein administrativ";
   return null;
 }
+
+export interface ScoringConfig {
+  relevance_weights: Record<string, number>;
+  social_weights: Record<string, number>;
+  thresholds: { top_story: number; review: number };
+}
+
+export const DEFAULT_CONFIG: ScoringConfig = {
+  relevance_weights: { ...RELEVANCE_WEIGHTS },
+  social_weights: { ...SOCIAL_WEIGHTS },
+  thresholds: { ...THRESHOLDS },
+};
+
+/** Loads the editable scoring config, falling back to the defaults. */
+export async function loadScoringConfig(
+  supabase: { from: (t: string) => any },
+): Promise<ScoringConfig> {
+  try {
+    const { data } = await supabase
+      .from("scoring_config")
+      .select("relevance_weights, social_weights, thresholds")
+      .eq("id", "default")
+      .maybeSingle();
+    if (!data) return DEFAULT_CONFIG;
+    return {
+      relevance_weights: data.relevance_weights || DEFAULT_CONFIG.relevance_weights,
+      social_weights: data.social_weights || DEFAULT_CONFIG.social_weights,
+      thresholds: data.thresholds || DEFAULT_CONFIG.thresholds,
+    };
+  } catch (_e) {
+    return DEFAULT_CONFIG;
+  }
+}
