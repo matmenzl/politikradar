@@ -14,12 +14,18 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { ExternalLink, HelpCircle, Info, Loader2, RefreshCw, Sparkles } from "lucide-react";
+import { ExternalLink, HelpCircle, Info, Loader2, RefreshCw, RotateCcw, Sparkles } from "lucide-react";
 import ScoringSettings from "@/components/ScoringSettings";
 import InfoHint from "@/components/InfoHint";
 import RadarOnboarding, { type RadarOnboardingRef } from "@/components/RadarOnboarding";
