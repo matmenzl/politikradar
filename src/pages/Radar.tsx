@@ -19,9 +19,10 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { ExternalLink, Info, Loader2, RefreshCw, Sparkles } from "lucide-react";
+import { ExternalLink, HelpCircle, Info, Loader2, RefreshCw, Sparkles } from "lucide-react";
 import ScoringSettings from "@/components/ScoringSettings";
 import InfoHint from "@/components/InfoHint";
+import RadarOnboarding from "@/components/RadarOnboarding";
 import {
   DEFAULT_SCORING,
   FACTOR_INFO,
