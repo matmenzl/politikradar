@@ -281,7 +281,7 @@ const Radar = () => {
         {loading && <p className="text-sm text-muted-foreground">Lade Ereignisse…</p>}
         {!loading && filtered.length === 0 && (
           <p className="text-sm text-muted-foreground">
-            Keine Ereignisse im gewählten Zeitraum. Starte mit „Ereignisse erkennen“.
+            Keine Ereignisse im gewählten Zeitraum. Starte mit „OpenParl-Daten laden“.
           </p>
         )}
 
