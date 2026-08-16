@@ -254,10 +254,10 @@ serve(async (req) => {
     const eventRows = newCandidates.map((c) => {
       const body = bodies[c.parliament_key];
       return {
-        parliament: body?.name_de || c.parliament_key,
+        parliament: nameOf(body, c.parliament_key),
         parliament_key: c.parliament_key,
         political_level: levelOf(body),
-        canton: body?.canton ?? null,
+        canton: body?.canton_key ?? (body?.type === "canton" ? c.parliament_key : null),
         business_id: c.business_id ?? null,
         affair_id: c.affair_id ?? null,
         voting_id: c.voting_id ?? null,
