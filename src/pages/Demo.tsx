@@ -9,12 +9,14 @@ import {
   CheckCircle2,
   Database,
   FileText,
+  Info,
   Loader2,
   RotateCcw,
   Sparkles,
   Wand2,
 } from "lucide-react";
 import { DEFAULT_SCORING, FACTOR_INFO, weightShare } from "@/lib/scoring";
+import InfoHint from "@/components/InfoHint";
 
 /* ---------------------------------------------------------------- demo data */
 
@@ -437,7 +439,19 @@ const Demo = () => {
                   return (
                     <div key={key} className="space-y-1">
                       <div className="flex items-center justify-between text-xs font-sans">
-                        <span title={info?.hint}>{info?.label ?? key}</span>
+                        <span className="flex items-center gap-1">
+                          {info?.label ?? key}
+                          {info?.hint ? (
+                            <InfoHint
+                              label={`Erklärung: ${info.label}`}
+                              className="min-h-[36px] min-w-[36px] -m-1.5 p-1.5"
+                              trigger={<Info className="w-3.5 h-3.5" aria-hidden="true" />}
+                            >
+                              <p className="font-semibold">{info.label}</p>
+                              <p className="mt-1 text-muted-foreground">{info.hint}</p>
+                            </InfoHint>
+                          ) : null}
+                        </span>
                         <span className="text-muted-foreground">
                           {value} · Gewicht {Math.round(share)}%
                         </span>
