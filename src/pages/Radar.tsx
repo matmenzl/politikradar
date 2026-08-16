@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -19,9 +19,10 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { ExternalLink, Info, Loader2, RefreshCw, Sparkles } from "lucide-react";
+import { ExternalLink, HelpCircle, Info, Loader2, RefreshCw, Sparkles } from "lucide-react";
 import ScoringSettings from "@/components/ScoringSettings";
 import InfoHint from "@/components/InfoHint";
+import RadarOnboarding, { type RadarOnboardingRef } from "@/components/RadarOnboarding";
 import {
   DEFAULT_SCORING,
   FACTOR_INFO,
@@ -54,6 +55,7 @@ const Radar = () => {
   const [level, setLevel] = useState("all");
   const [parliament, setParliament] = useState("all");
   const [sort, setSort] = useState("relevance");
+  const onboardingRef = useRef<RadarOnboardingRef>(null);
 
   const load = async () => {
     setLoading(true);
@@ -260,7 +262,19 @@ const Radar = () => {
   );
 
   return (
-    <AppShell>
+    <AppShell
+      headerAction={
+        <button
+          type="button"
+          aria-label="Radar-Einführung öffnen"
+          onClick={() => onboardingRef.current?.open()}
+          className="inline-flex items-center justify-center min-h-[44px] min-w-[44px] -m-2.5 p-2.5 text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        >
+          <HelpCircle className="w-5 h-5" aria-hidden="true" />
+        </button>
+      }
+    >
+      <RadarOnboarding ref={onboardingRef} />
       <div className="space-y-6">
         <div>
           <span className="text-xs kicker text-muted-foreground">Selection Engine</span>
