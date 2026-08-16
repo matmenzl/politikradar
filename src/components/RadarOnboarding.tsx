@@ -46,6 +46,7 @@ const steps: Step[] = [
 
 export interface RadarOnboardingRef {
   open: () => void;
+  reset: () => void;
 }
 
 type Rect = { top: number; left: number; width: number; height: number };
@@ -58,10 +59,16 @@ const RadarOnboarding = forwardRef<RadarOnboardingRef>((_, ref) => {
   const [rect, setRect] = useState<Rect | null>(null);
   const didAutoOpen = useRef(false);
 
+  const doOpen = useCallback(() => {
+    setStep(0);
+    setOpen(true);
+  }, []);
+
   useImperativeHandle(ref, () => ({
-    open: () => {
-      setStep(0);
-      setOpen(true);
+    open: doOpen,
+    reset: () => {
+      localStorage.removeItem(STORAGE_KEY);
+      doOpen();
     },
   }));
 

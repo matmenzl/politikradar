@@ -14,12 +14,18 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { ExternalLink, HelpCircle, Info, Loader2, RefreshCw, Sparkles } from "lucide-react";
+import { ExternalLink, HelpCircle, Info, Loader2, RefreshCw, RotateCcw, Sparkles } from "lucide-react";
 import ScoringSettings from "@/components/ScoringSettings";
 import InfoHint from "@/components/InfoHint";
 import RadarOnboarding, { type RadarOnboardingRef } from "@/components/RadarOnboarding";
@@ -264,14 +270,27 @@ const Radar = () => {
   return (
     <AppShell
       headerAction={
-        <button
-          type="button"
-          aria-label="Radar-Einführung öffnen"
-          onClick={() => onboardingRef.current?.open()}
-          className="inline-flex items-center justify-center min-h-[44px] min-w-[44px] -m-2.5 p-2.5 text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-        >
-          <HelpCircle className="w-5 h-5" aria-hidden="true" />
-        </button>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button
+              type="button"
+              aria-label="Radar-Hilfe"
+              className="inline-flex items-center justify-center min-h-[44px] min-w-[44px] -m-2.5 p-2.5 text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              <HelpCircle className="w-5 h-5" aria-hidden="true" />
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={() => onboardingRef.current?.open()}>
+              <HelpCircle className="w-4 h-4 mr-2" aria-hidden="true" />
+              Einführung anzeigen
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => onboardingRef.current?.reset()}>
+              <RotateCcw className="w-4 h-4 mr-2" aria-hidden="true" />
+              Onboarding zurücksetzen
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       }
     >
       <RadarOnboarding ref={onboardingRef} />
