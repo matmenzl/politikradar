@@ -237,27 +237,32 @@ const Radar = () => {
             Bis
             <Input type="date" value={to} onChange={(e) => setTo(e.target.value)} className="w-40" />
           </label>
-          <Button onClick={detect} disabled={detecting}>
-            {detecting ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
-            OpenParl-Daten laden
-          </Button>
           <TooltipProvider delayDuration={200}>
             <Tooltip>
               <TooltipTrigger asChild>
                 <span>
-                  <Button variant="secondary" onClick={score} disabled={scoring || !hasUnscoredEvents}>
-                    {scoring ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
-                    Bewerten
+                  <Button onClick={refreshAndScore} disabled={busy}>
+                    {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
+                    {step === "detecting"
+                      ? "Daten laden…"
+                      : step === "scoring"
+                        ? "Bewerten…"
+                        : "Ereignisse bewerten"}
                   </Button>
                 </span>
               </TooltipTrigger>
               <TooltipContent side="top" className="max-w-xs">
                 <p>
-                  Bewertet alle geladenen, noch unbewerteten Ereignisse. Die KI bewertet 11 Faktoren (z. B. Entscheidwirkung, Reichweite, Emotionaler Aufhänger) und berechnet daraus Political Relevance, Social Potential und Editorial Confidence.
+                  Lädt zuerst Geschäfte und Abstimmungen aus OpenParlData für den gewählten Zeitraum und bewertet sie danach per KI: 11 Faktoren (z. B. Entscheidwirkung, Reichweite, Emotionaler Aufhänger) ergeben Political Relevance, Social Potential und Editorial Confidence.
                 </p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
+          <Button variant="ghost" size="sm" onClick={detect} disabled={busy}>
+            <RefreshCw className="w-4 h-4" />
+            Nur Daten laden
+          </Button>
+
         </div>
 
         <div className="flex flex-wrap gap-3">
