@@ -260,7 +260,7 @@ const Radar = () => {
         <div>
           <span className="text-xs kicker text-muted-foreground">Selection Engine</span>
           <h1 className="font-serif text-3xl text-foreground">Radar</h1>
-          <p className="text-sm text-muted-foreground mt-1">Was ist relevant?</p>
+          <p className="text-sm text-muted-foreground mt-1">Weniger Recherche, mehr relevante Politik-Storys.</p>
         </div>
 
         <div className="flex flex-wrap items-end gap-3 border border-border bg-card p-4">
