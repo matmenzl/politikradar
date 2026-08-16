@@ -192,26 +192,50 @@ serve(async (req) => {
       return json({ inserted, skipped, scanned: 0 });
     }
 
-    // Pre-compute dedupe keys and check existing events in one query.
-    const dedupeKeys = candidates.map((c) =>
-      [c.parliament_key, c.business_id || "", c.event_type, c.event_date].join("|")
-    );
-    const { data: existingRows } = await supabase.from("events").select("dedupe_key").in("dedupe_key", dedupeKeys);
-    const existingKeys = new Set((existingRows || []).map((r) => r.dedupe_key));
+    const keyOf = (c: CandidateEvent) =>
+      [c.parliament_key, c.business_id || "", c.event_type, c.event_date].join("|");
 
+    const chunk = <T,>(arr: T[], size: number): T[][] => {
+      const out: T[][] = [];
+      for (let i = 0; i < arr.length; i += size) out.push(arr.slice(i, i + size));
+      return out;
+    };
+
+    // Existing events (chunked .in() to keep the URL small).
+    const existingKeys = new Set<string>();
+    for (const part of chunk([...new Set(candidates.map(keyOf))], 300)) {
+      const { data } = await supabase.from("events").select("dedupe_key").in("dedupe_key", part);
+      for (const r of data || []) existingKeys.add(r.dedupe_key as string);
+    }
+
+    // Filter out already-known events AND duplicates within this batch.
+    const seen = new Set<string>();
     const newCandidates = candidates.filter((c) => {
-      const key = [c.parliament_key, c.business_id || "", c.event_type, c.event_date].join("|");
-      if (existingKeys.has(key)) { skipped++; return false; }
+      const key = keyOf(c);
+      if (existingKeys.has(key) || seen.has(key)) { skipped++; return false; }
+      seen.add(key);
       return true;
     });
 
-    // Batch insert sources for URLs.
+    if (newCandidates.length === 0) {
+      return json({ inserted: 0, skipped, scanned: candidates.length });
+    }
+
+    // Sources: reuse existing rows, insert only missing URLs.
     const urls = [...new Set(newCandidates.map((c) => c.url).filter(Boolean))] as string[];
-    let urlToSourceId: Record<string, string> = {};
-    if (urls.length) {
-      const sourceRows = urls.map((url) => ({ url, label: "Parlamentsseite", source_type: "primary" }));
-      const { data: insertedSources } = await supabase.from("sources").insert(sourceRows).select("id, url");
-      urlToSourceId = Object.fromEntries((insertedSources || []).map((s) => [s.url, s.id]));
+    const urlToSourceId: Record<string, string> = {};
+    for (const part of chunk(urls, 200)) {
+      const { data: found } = await supabase.from("sources").select("id, url").in("url", part);
+      for (const s of found || []) urlToSourceId[s.url as string] = s.id as string;
+      const missing = part.filter((u) => !urlToSourceId[u]);
+      if (missing.length) {
+        const { data: created, error } = await supabase
+          .from("sources")
+          .insert(missing.map((url) => ({ url, label: "Parlamentsseite", source_type: "primary" })))
+          .select("id, url");
+        if (error) console.error("sources insert", error);
+        for (const s of created || []) urlToSourceId[s.url as string] = s.id as string;
+      }
     }
 
     // Batch insert events.
@@ -230,30 +254,41 @@ serve(async (req) => {
         title: c.title,
         description: c.description ?? null,
         source_id: c.url ? urlToSourceId[c.url] ?? null : null,
-        dedupe_key: [c.parliament_key, c.business_id || "", c.event_type, c.event_date].join("|"),
+        dedupe_key: keyOf(c),
       };
     });
 
-    const { data: insertedEvents } = await supabase.from("events").insert(eventRows).select("id, dedupe_key");
-    if (!insertedEvents) {
-      return json({ error: "Ereignisse konnten nicht gespeichert werden." }, 500);
+    const dedupeKeyToEventId: Record<string, string> = {};
+    let lastError: unknown = null;
+    for (const part of chunk(eventRows, 200)) {
+      const { data, error } = await supabase
+        .from("events")
+        .upsert(part, { onConflict: "dedupe_key", ignoreDuplicates: true })
+        .select("id, dedupe_key");
+      if (error) { console.error("events insert", error); lastError = error; continue; }
+      for (const e of data || []) dedupeKeyToEventId[e.dedupe_key as string] = e.id as string;
     }
-    inserted = insertedEvents.length;
+    inserted = Object.keys(dedupeKeyToEventId).length;
 
-    const dedupeKeyToEventId = Object.fromEntries(insertedEvents.map((e) => [e.dedupe_key, e.id]));
+    if (inserted === 0 && lastError) {
+      return json({
+        error: `Ereignisse konnten nicht gespeichert werden: ${
+          (lastError as { message?: string }).message ?? "unbekannt"
+        }`,
+      }, 500);
+    }
 
     // Batch insert facts.
     const factRows = newCandidates.flatMap((c) => {
-      const eventId = dedupeKeyToEventId[
-        [c.parliament_key, c.business_id || "", c.event_type, c.event_date].join("|")
-      ];
+      const eventId = dedupeKeyToEventId[keyOf(c)];
       if (!eventId) return [];
       const sourceId = c.url ? urlToSourceId[c.url] ?? null : null;
       return c.facts.map((f, i) => ({ ...f, event_id: eventId, source_id: sourceId, position: i }));
     });
 
-    if (factRows.length) {
-      await supabase.from("facts").insert(factRows);
+    for (const part of chunk(factRows, 500)) {
+      const { error } = await supabase.from("facts").insert(part);
+      if (error) console.error("facts insert", error);
     }
 
     return json({ inserted, skipped, scanned: candidates.length });
