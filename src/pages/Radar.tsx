@@ -43,8 +43,10 @@ const Radar = () => {
   const [events, setEvents] = useState<EventRow[]>([]);
   const [sources, setSources] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
-  const [detecting, setDetecting] = useState(false);
-  const [scoring, setScoring] = useState(false);
+  const [step, setStep] = useState<"idle" | "detecting" | "scoring">("idle");
+  const busy = step !== "idle";
+
+
   const [generating, setGenerating] = useState<string | null>(null);
   const [level, setLevel] = useState("all");
   const [parliament, setParliament] = useState("all");
@@ -80,22 +82,33 @@ const Radar = () => {
   }, [from, to]);
 
   const detect = async () => {
-    setDetecting(true);
+    setStep("detecting");
     const { data, error } = await supabase.functions.invoke("detect-events", { body: { from, to } });
-    setDetecting(false);
+    setStep("idle");
     if (error || data?.error) return toast.error(data?.error || "Ereignis-Erkennung fehlgeschlagen.");
     toast.success(`${data.inserted} neue Ereignisse erkannt (${data.skipped} bereits vorhanden).`);
     load();
   };
 
-  const score = async () => {
-    setScoring(true);
+  const refreshAndScore = async () => {
+    setStep("detecting");
+    const detectRes = await supabase.functions.invoke("detect-events", { body: { from, to } });
+    const detectFailed = detectRes.error || detectRes.data?.error;
+    if (detectFailed) {
+      toast.warning("OpenParl-Daten konnten nicht geladen werden – bewerte vorhandene Ereignisse.");
+    }
+
+    setStep("scoring");
     const { data, error } = await supabase.functions.invoke("score-events", { body: { from, to } });
-    setScoring(false);
+    setStep("idle");
     if (error || data?.error) return toast.error(data?.error || "Bewertung fehlgeschlagen.");
-    toast.success(`${data.scored} Ereignisse bewertet, ${data.excluded} ausgeschlossen.`);
+    const inserted = detectFailed ? 0 : (detectRes.data?.inserted ?? 0);
+    toast.success(
+      `${inserted} neue Ereignisse geladen, ${data.scored} bewertet, ${data.excluded} ausgeschlossen.`,
+    );
     load();
   };
+
 
   const createStory = async (event: EventRow) => {
     setGenerating(event.id);
@@ -115,10 +128,6 @@ const Radar = () => {
     [events],
   );
 
-  const hasUnscoredEvents = useMemo(
-    () => events.some((e) => e.political_relevance === null),
-    [events],
-  );
 
   const filtered = useMemo(() => {
     const list = events.filter(
@@ -226,27 +235,32 @@ const Radar = () => {
             Bis
             <Input type="date" value={to} onChange={(e) => setTo(e.target.value)} className="w-40" />
           </label>
-          <Button onClick={detect} disabled={detecting}>
-            {detecting ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
-            OpenParl-Daten laden
-          </Button>
           <TooltipProvider delayDuration={200}>
             <Tooltip>
               <TooltipTrigger asChild>
                 <span>
-                  <Button variant="secondary" onClick={score} disabled={scoring || !hasUnscoredEvents}>
-                    {scoring ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
-                    Bewerten
+                  <Button onClick={refreshAndScore} disabled={busy}>
+                    {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
+                    {step === "detecting"
+                      ? "Daten laden…"
+                      : step === "scoring"
+                        ? "Bewerten…"
+                        : "Ereignisse bewerten"}
                   </Button>
                 </span>
               </TooltipTrigger>
               <TooltipContent side="top" className="max-w-xs">
                 <p>
-                  Bewertet alle geladenen, noch unbewerteten Ereignisse. Die KI bewertet 11 Faktoren (z. B. Entscheidwirkung, Reichweite, Emotionaler Aufhänger) und berechnet daraus Political Relevance, Social Potential und Editorial Confidence.
+                  Lädt zuerst Geschäfte und Abstimmungen aus OpenParlData für den gewählten Zeitraum und bewertet sie danach per KI: 11 Faktoren (z. B. Entscheidwirkung, Reichweite, Emotionaler Aufhänger) ergeben Political Relevance, Social Potential und Editorial Confidence.
                 </p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
+          <Button variant="ghost" size="sm" onClick={detect} disabled={busy}>
+            <RefreshCw className="w-4 h-4" />
+            Nur Daten laden
+          </Button>
+
         </div>
 
         <div className="flex flex-wrap gap-3">
