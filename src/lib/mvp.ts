@@ -103,11 +103,17 @@ export const FACTOR_LABELS: Record<string, string> = {
 
 export type Priority = "top" | "review" | "low";
 
-export function priorityOf(e: Pick<EventRow, "political_relevance" | "social_potential">): Priority {
+export function priorityOf(
+  e: Pick<EventRow, "political_relevance" | "social_potential">,
+  thresholds: { top_story: number; review: number } = {
+    top_story: TOP_STORY_THRESHOLD,
+    review: REVIEW_THRESHOLD,
+  },
+): Priority {
   const pr = e.political_relevance ?? 0;
   const sp = e.social_potential ?? 0;
-  if (pr >= TOP_STORY_THRESHOLD && sp >= TOP_STORY_THRESHOLD) return "top";
-  if (pr >= REVIEW_THRESHOLD || sp >= REVIEW_THRESHOLD) return "review";
+  if (pr >= thresholds.top_story && sp >= thresholds.top_story) return "top";
+  if (pr >= thresholds.review || sp >= thresholds.review) return "review";
   return "low";
 }
 

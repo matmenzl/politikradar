@@ -26,8 +26,15 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { ExternalLink, Loader2, RefreshCw, Sparkles } from "lucide-react";
+import ScoringSettings from "@/components/ScoringSettings";
 import {
-  FACTOR_LABELS,
+  DEFAULT_SCORING,
+  FACTOR_INFO,
+  loadScoringConfig,
+  weightShare,
+  type ScoringConfig,
+} from "@/lib/scoring";
+import {
   LEVEL_LABELS,
   PRIORITY_LABELS,
   isoDate,
@@ -45,6 +52,7 @@ const Radar = () => {
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState<"idle" | "detecting" | "scoring">("idle");
   const busy = step !== "idle";
+  const [scoring, setScoringConfig] = useState<ScoringConfig>(DEFAULT_SCORING);
 
 
   const [generating, setGenerating] = useState<string | null>(null);
@@ -75,6 +83,10 @@ const Radar = () => {
     }
     setLoading(false);
   };
+
+  useEffect(() => {
+    loadScoringConfig().then(setScoringConfig);
+  }, []);
 
   useEffect(() => {
     load();
@@ -151,8 +163,39 @@ const Radar = () => {
   for (const e of filtered) {
     if (e.selection_status === "excluded") groups.excluded.push(e);
     else if (e.political_relevance === null) groups.low.push(e);
-    else groups[priorityOf(e)].push(e);
+    else groups[priorityOf(e, scoring.thresholds)].push(e);
   }
+
+  const renderFactorGroup = (
+    e: EventRow,
+    group: "relevance_weights" | "social_weights",
+    title: string,
+  ) => {
+    const weights = scoring[group];
+    return (
+      <div className="space-y-1">
+        <p className="text-xs kicker text-muted-foreground">{title}</p>
+        {Object.keys(weights).map((k) => {
+          const value = e.score_factors?.[k];
+          if (typeof value !== "number") return null;
+          return (
+            <div key={k} className="flex items-center gap-2 text-xs">
+              <span className="flex-1 text-muted-foreground" title={FACTOR_INFO[k]?.hint}>
+                {FACTOR_INFO[k]?.label ?? k}
+              </span>
+              <span className="w-10 text-right num text-muted-foreground">
+                {weightShare(weights, k)}%
+              </span>
+              <div className="w-20 h-1.5 bg-muted">
+                <div className="h-full bg-foreground" style={{ width: `${value}%` }} />
+              </div>
+              <span className="w-8 text-right num">{value}</span>
+            </div>
+          );
+        })}
+      </div>
+    );
+  };
 
   const renderEvent = (e: EventRow) => (
     <AccordionItem key={e.id} value={e.id} className="border border-border bg-card px-4">
@@ -185,15 +228,9 @@ const Radar = () => {
           <p className="text-sm text-foreground">{e.score_factors.rationale as string}</p>
         )}
         {e.political_relevance !== null && (
-          <div className="grid grid-cols-2 gap-x-6 gap-y-1 text-xs">
-            {Object.keys(FACTOR_LABELS).map((k) =>
-              typeof e.score_factors?.[k] === "number" ? (
-                <div key={k} className="flex justify-between border-b border-border/60 py-0.5">
-                  <span className="text-muted-foreground">{FACTOR_LABELS[k]}</span>
-                  <span className="num">{e.score_factors[k] as number}</span>
-                </div>
-              ) : null,
-            )}
+          <div className="grid gap-4 md:grid-cols-2">
+            {renderFactorGroup(e, "relevance_weights", `Politische Relevanz ${e.political_relevance}`)}
+            {renderFactorGroup(e, "social_weights", `Social-Potenzial ${e.social_potential}`)}
           </div>
         )}
         <div className="flex flex-wrap gap-2">
@@ -260,6 +297,7 @@ const Radar = () => {
             <RefreshCw className="w-4 h-4" />
             Nur Daten laden
           </Button>
+          <ScoringSettings onSaved={(c) => { setScoringConfig(c); load(); }} />
 
         </div>
 
