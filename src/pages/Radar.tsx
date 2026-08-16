@@ -277,30 +277,29 @@ const Radar = () => {
             Bis
             <Input type="date" value={to} onChange={(e) => setTo(e.target.value)} className="w-40" />
           </label>
-          <TooltipProvider delayDuration={200}>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <span>
-                  <Button onClick={refreshAndScore} disabled={busy}>
-                    {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
-                    {step === "detecting"
-                      ? "Daten laden…"
-                      : step === "scoring"
-                        ? "Bewerten…"
-                        : "Ereignisse bewerten"}
-                  </Button>
-                </span>
-              </TooltipTrigger>
-              <TooltipContent side="top" className="max-w-xs">
-                <p>
-                  Lädt zuerst Geschäfte und Abstimmungen aus OpenParlData für den gewählten Zeitraum und bewertet sie danach per KI: 11 Faktoren (z. B. Entscheidwirkung, Reichweite, Emotionaler Aufhänger) ergeben Political Relevance, Social Potential und Editorial Confidence.
-                </p>
-                <p className="mt-2 text-xs text-muted-foreground">
-                  Die Kriterien können unter „Kriterien“ angepasst werden.
-                </p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+          <Button onClick={refreshAndScore} disabled={busy}>
+            {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
+            {step === "detecting"
+              ? "Daten laden…"
+              : step === "scoring"
+                ? "Bewerten…"
+                : "Ereignisse bewerten"}
+          </Button>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="ghost" size="icon" className="h-9 w-9" aria-label="Mehr zur Bewertung">
+                <Info className="w-4 h-4" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent side="top" className="max-w-xs">
+              <p>
+                Lädt zuerst Geschäfte und Abstimmungen aus OpenParlData für den gewählten Zeitraum und bewertet sie danach per KI: 11 Faktoren (z. B. Entscheidwirkung, Reichweite, Emotionaler Aufhänger) ergeben Political Relevance, Social Potential und Editorial Confidence.
+              </p>
+              <p className="mt-2 text-xs text-muted-foreground">
+                Die Kriterien können unter „Kriterien“ angepasst werden.
+              </p>
+            </PopoverContent>
+          </Popover>
           <Button variant="ghost" size="sm" onClick={detect} disabled={busy}>
             <RefreshCw className="w-4 h-4" />
             Nur Daten laden
