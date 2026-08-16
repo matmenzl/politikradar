@@ -55,6 +55,7 @@ const Radar = () => {
   const [level, setLevel] = useState("all");
   const [parliament, setParliament] = useState("all");
   const [sort, setSort] = useState("relevance");
+  const [onboardingOpen, setOnboardingOpen] = useState(false);
 
   const load = async () => {
     setLoading(true);
