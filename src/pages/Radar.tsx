@@ -20,12 +20,11 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { ExternalLink, Loader2, RefreshCw, Sparkles } from "lucide-react";
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { ExternalLink, Info, Loader2, RefreshCw, Sparkles } from "lucide-react";
 import ScoringSettings from "@/components/ScoringSettings";
 import {
   DEFAULT_SCORING,
@@ -272,30 +271,29 @@ const Radar = () => {
             Bis
             <Input type="date" value={to} onChange={(e) => setTo(e.target.value)} className="w-40" />
           </label>
-          <TooltipProvider delayDuration={200}>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <span>
-                  <Button onClick={refreshAndScore} disabled={busy}>
-                    {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
-                    {step === "detecting"
-                      ? "Daten laden…"
-                      : step === "scoring"
-                        ? "Bewerten…"
-                        : "Ereignisse bewerten"}
-                  </Button>
-                </span>
-              </TooltipTrigger>
-              <TooltipContent side="top" className="max-w-xs">
-                <p>
-                  Lädt zuerst Geschäfte und Abstimmungen aus OpenParlData für den gewählten Zeitraum und bewertet sie danach per KI: 11 Faktoren (z. B. Entscheidwirkung, Reichweite, Emotionaler Aufhänger) ergeben Political Relevance, Social Potential und Editorial Confidence.
-                </p>
-                <p className="mt-2 text-xs text-muted-foreground">
-                  Die Kriterien können unter „Kriterien“ angepasst werden.
-                </p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+          <Button onClick={refreshAndScore} disabled={busy}>
+            {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
+            {step === "detecting"
+              ? "Daten laden…"
+              : step === "scoring"
+                ? "Bewerten…"
+                : "Ereignisse bewerten"}
+          </Button>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="ghost" size="icon" className="h-9 w-9" aria-label="Mehr zur Bewertung">
+                <Info className="w-4 h-4" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent side="top" className="max-w-xs">
+              <p>
+                Lädt zuerst Geschäfte und Abstimmungen aus OpenParlData für den gewählten Zeitraum und bewertet sie danach per KI: 11 Faktoren (z. B. Entscheidwirkung, Reichweite, Emotionaler Aufhänger) ergeben Political Relevance, Social Potential und Editorial Confidence.
+              </p>
+              <p className="mt-2 text-xs text-muted-foreground">
+                Die Kriterien können unter „Kriterien“ angepasst werden.
+              </p>
+            </PopoverContent>
+          </Popover>
           <Button variant="ghost" size="sm" onClick={detect} disabled={busy}>
             <RefreshCw className="w-4 h-4" />
             Nur Daten laden
@@ -344,14 +342,17 @@ const Radar = () => {
           groups[p].length ? (
             <section key={p} className="space-y-2">
               {p === "top" ? (
-                <TooltipProvider delayDuration={200}>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <h2 className="font-serif text-xl text-foreground cursor-help">
-                        {PRIORITY_LABELS[p]} <span className="text-muted-foreground text-base">({groups[p].length})</span>
-                      </h2>
-                    </TooltipTrigger>
-                    <TooltipContent side="top" className="max-w-sm">
+                <div className="flex items-center gap-1">
+                  <h2 className="font-serif text-xl text-foreground">
+                    {PRIORITY_LABELS[p]} <span className="text-muted-foreground text-base">({groups[p].length})</span>
+                  </h2>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button variant="ghost" size="icon" className="h-7 w-7" aria-label="Mehr zu Top Storys">
+                        <Info className="w-4 h-4" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent side="top" className="max-w-sm">
                       <p>
                         {events.some((e) => e.political_relevance !== null)
                           ? "Bewertete Ereignisse"
@@ -359,9 +360,9 @@ const Radar = () => {
                         {" — "}
                         {events.filter((e) => e.political_relevance !== null).length} von {events.length} für {from} bis {to} bereits bewertet. Die Kategorien basieren auf diesen gespeicherten Bewertungen. Klicke „Ereignisse bewerten“, um neue Daten zu laden und neu zu bewerten.
                       </p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
+                    </PopoverContent>
+                  </Popover>
+                </div>
               ) : (
                 <h2 className="font-serif text-xl text-foreground">
                   {PRIORITY_LABELS[p]} <span className="text-muted-foreground text-base">({groups[p].length})</span>
