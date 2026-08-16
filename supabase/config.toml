@@ -11,3 +11,6 @@ verify_jwt = false
 
 [functions.generate-story]
 verify_jwt = false
+
+[functions.send-topic-alerts]
+verify_jwt = false

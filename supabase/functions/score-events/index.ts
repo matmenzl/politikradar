@@ -7,6 +7,7 @@ import {
   weightedScore,
   loadScoringConfig,
 } from "../_shared/scoring.ts";
+import { TOPIC_KEYS, normalizeTopics } from "../_shared/topics.ts";
 
 const BATCH = 25;
 
@@ -93,7 +94,7 @@ serve(async (req) => {
             {
               role: "system",
               content:
-                "Du bewertest Schweizer parlamentarische Ereignisse für eine Redaktion. Bewerte jeden Eintrag mit Faktoren von 0-100. Sei streng und differenziert; vergib nicht überall ähnliche Werte. Antworte ausschliesslich über das Tool.",
+                `Du bewertest Schweizer parlamentarische Ereignisse für eine Redaktion. Bewerte jeden Eintrag mit Faktoren von 0-100. Sei streng und differenziert; vergib nicht überall ähnliche Werte. Ordne jedem Eintrag zusätzlich 1-3 Themen aus dieser festen Liste zu: ${TOPIC_KEYS.join(", ")}. Antworte ausschliesslich über das Tool.`,
             },
             { role: "user", content: `Bewerte diese Ereignisse:\n\n${list}` },
           ],
@@ -124,12 +125,13 @@ serve(async (req) => {
                           visual_potential: { type: "number" },
                           novelty: { type: "number" },
                           confidence: { type: "number" },
+                          topics: { type: "array", items: { type: "string", enum: [...TOPIC_KEYS] } },
                           rationale: { type: "string" },
                         },
                         required: [
                           "index", "decision_impact", "scope", "controversy", "topic_salience", "process_stage",
                           "emotional_hook", "clarity", "everyday_relevance", "conflict", "visual_potential",
-                          "novelty", "confidence", "rationale",
+                          "novelty", "confidence", "rationale", "topics",
                         ],
                         additionalProperties: false,
                       },
@@ -166,6 +168,7 @@ serve(async (req) => {
             political_relevance: relevance,
             social_potential: social,
             editorial_confidence: confidence,
+            topics: normalizeTopics(r.topics),
             score_factors: { ...r, rationale: r.rationale, thresholds: config.thresholds, weights: { relevance: config.relevance_weights, social: config.social_weights } },
           })
           .eq("id", e.id);
