@@ -8,6 +8,7 @@ import PinGate from "./components/PinGate";
 import Radar from "./pages/Radar";
 import StoryStudio from "./pages/StoryStudio";
 import Redaktion from "./pages/Redaktion";
+import Demo from "./pages/Demo";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
