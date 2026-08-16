@@ -291,7 +291,7 @@ const Radar = () => {
             Bis
             <Input type="date" value={to} onChange={(e) => setTo(e.target.value)} className="w-40" />
           </label>
-          <Button onClick={refreshAndScore} disabled={busy}>
+          <Button data-tour="score-button" onClick={refreshAndScore} disabled={busy}>
             {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
             {step === "detecting"
               ? "Daten laden…"
@@ -353,7 +353,11 @@ const Radar = () => {
 
         {(["top", "review", "low"] as Priority[]).map((p) =>
           groups[p].length ? (
-            <section key={p} className="space-y-2">
+            <section
+              key={p}
+              className="space-y-2"
+              {...(p === "top" ? { "data-tour": "top-stories" } : {})}
+            >
               {p === "top" ? (
                 <div className="flex items-center gap-1">
                   <h2 className="font-serif text-xl text-foreground">
