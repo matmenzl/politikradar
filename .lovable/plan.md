@@ -1,62 +1,61 @@
-# Themen-Profil, Accounts und täglicher Themen-Alert
+# Förderanfrage Stiftung Mercator Schweiz: Einschätzung und Positionierung
 
-## Zur Frage: Gibt es Schlagwörter von OpenParlData?
+## Kurzantwort
 
-Nein. Ein Abruf der Geschäfte (`/affairs`) zeigt: die API liefert pro Geschäft nur `title_*`, `title_long_*`, Geschäftstyp (`type_harmonized_de`, z.B. Motion), Status (`state_name_de`, z.B. Eingereicht), Datum, Parlament und Links. Es gibt kein Themen-, Sachgebiets-, Keyword- oder Tag-Feld. Ein exaktes Matching allein aus der Quelle ist damit nicht möglich.
+Ja, eine Einreichung ist möglich — Förderanfragen sind jederzeit über das Online-Portal möglich, in Form einer kurzen Projektskizze. Es gibt aber zwei harte Hürden, die vorab geklärt werden müssen (siehe „Knackpunkte“).
 
-Lösung: Themen werden bei uns beim Import erzeugt — die KI ordnet jedem Ereignis 1–3 Themen aus einer festen Liste zu und extrahiert zusätzlich 3–8 Stichwörter aus dem Titel. Damit ist das Matching stabil (feste Liste) und trotzdem fein (Stichwörter).
+## Was die Stiftung fördert (Stand ihrer Website)
 
-## Themenliste (fix, erweiterbar)
+Anfragen werden nur in vier Programmen angenommen: **Demokratie**, **Klima**, **Lernen der Zukunft**, **Digitalisierung + Gesellschaft**. Politikradar passt inhaltlich an der Schnittstelle Demokratie × Digitalisierung + Gesellschaft: KI-gestützte Aufbereitung offener Parlamentsdaten für publizistische Öffentlichkeit. Die Stiftung ist zudem Mitinitiantin des Media Forward Fund und vertritt öffentlich die Position „Demokratie braucht Journalismus“ — das Thema ist ihr nachweislich wichtig.
 
-Verkehr & Mobilität · Gesundheit & Krankenkasse · Bildung & Schule · Migration & Asyl · Umwelt & Klima · Energie · Finanzen & Steuern · Wohnen & Raumplanung · Wirtschaft & Arbeit · Soziales & AHV · Sicherheit & Polizei · Landwirtschaft · Digitalisierung & Daten · Aussenpolitik & EU · Kultur & Sport · Gleichstellung · Justiz & Recht
+Bewertungskriterien laut Stiftung:
+1. Inhaltliche und strategische Passung zu einem der vier Programme
+2. Qualität, Professionalität, Wirkungsorientierung (I-O-O-I-Wirkungslogik), plus früh gedachte Verankerung nach der Förderung
+3. Relevanz und systemische Wirkung, neue Ansätze, Experimente ausdrücklich erwünscht
+4. Schweizbezug, überregional oder als Modellprojekt
+5. Kollaboration über Sektorgrenzen hinweg (Medien, Verwaltung, Wissenschaft, Zivilgesellschaft)
 
-## Was gebaut wird
+Nicht gefördert wird u.a.: Parteiprojekte, Bau/Infrastruktur, Einzelstipendien, Grundlagenforschung, Gesundheitsförderung, Armut, Entwicklungszusammenarbeit.
 
-**1. Accounts (nur für Profil und Newsletter)**
-Radar, Story Studio und Redaktion bleiben hinter dem bestehenden PIN. Neu:
-- `/login` mit E-Mail + Passwort und Google-Login, `/reset-password` für Passwort-Reset — beide öffentlich erreichbar.
-- `/profil` nur mit Account.
+## Knackpunkte, die vor der Einreichung zu klären sind
 
-**2. Profil mit Interessen**
-Im Profil hinterlegt man:
-- Parlamente (Mehrfachauswahl aus der bestehenden Parlamentsliste, inkl. „Alle“)
-- Themen aus der festen Liste (Mehrfachauswahl)
-- Optional eigene Stichwörter (Freitext, z.B. „Velo“, „F-35“)
-- Mindest-Relevanz-Score (Standard 60)
-- Abo-Schalter ein/aus, jederzeit abbestellbar
+- **Gemeinnützige Trägerschaft.** Gefördert werden gemeinnützige Projekte und Organisationen bzw. Trägerschaftsmodelle mit gemeinnützigem Charakter. Ein rein kommerzielles Produkt oder eine Einzelperson als Absender ist kein aussichtsreicher Antragsteller. Optionen: Verein gründen, an einen bestehenden gemeinnützigen Träger andocken (z.B. Medienausbildungs- oder Journalismus-Organisation, Fachhochschule/Institut), oder eine Kooperation mit einer NPO als Antragstellerin.
+- **Keine Parteinähe.** Politikradar muss klar überparteilich positioniert sein; die neutrale Farbgebung und die Fakten-Layer-Logik sind dafür ein starkes Argument.
 
-**3. Themen im Radar**
-Themen-Filter und eine Stichwortsuche über Titel/Beschreibung in der Radar-Ansicht; die Themen-Chips erscheinen auf jeder Ereigniskarte.
+## Wie das Projekt positioniert werden sollte
 
-**4. Automatischer Import per Cron**
-Ein geplanter Job (täglich früh morgens) holt neue Geschäfte und Abstimmungen aus OpenParlData für alle relevanten Parlamente, bewertet sie mit dem bestehenden Scoring und klassifiziert dabei Themen und Stichwörter — unabhängig davon, ob jemand die App öffnet.
+Nicht als „Tool für Social-Media-Content“, sondern als **öffentliches Infrastrukturprojekt für lokalen und kantonalen Politikjournalismus**:
 
-**5. Täglicher Digest**
-Ein zweiter Cron-Job (z.B. 07:00) sammelt pro Abonnent alle seit dem letzten Versand neu bewerteten Ereignisse, die zum Profil passen (Parlament UND (Thema ODER Stichwort) UND Score ≥ Schwelle), und verschickt eine E-Mail mit den Treffern (Titel, Parlament, Datum, Score, Link zur Quelle). Keine Treffer = keine Mail. Jede Mail enthält einen Abmelde-Link.
+- **Problem:** Kantonale und kommunale Politik wird immer weniger beobachtet; Redaktionen fehlen Zeit und Ressourcen für systematische Parlamentsrecherche. Das ist eine belegte demokratiepolitische Lücke.
+- **Lösung:** Politikradar überwacht offene Parlamentsdaten (OpenParlData) über alle Ebenen, macht relevante Vorgänge früh sichtbar, erklärt seine Auswahl transparent (nachvollziehbare Bewertungsfaktoren statt Blackbox) und liefert einen faktenbasierten Story-Layer ohne KI-erfundene Zahlen.
+- **Innovation:** Erklärbare KI-Priorisierung plus Fact Layer als Halluzinationsbremse — genau die Art Experiment, die die Stiftung sucht.
+- **Systemische Wirkung:** Skalierbar auf alle Kantone und Gemeinden; als offene Infrastruktur für viele Redaktionen statt für ein Medienhaus.
+- **Schweizbezug:** Föderale Datenlage, überregional angelegt, als Modell für andere Regionen.
+- **Kollaboration:** Medienpartner (Lokalredaktionen), Wissenschaft (Journalismus-Institut, z.B. ZHAW/IAM oder Universität), Open-Data-Community.
+- **Verankerung:** Perspektive nach der Förderung (Redaktionslizenzen, Trägerverein, Open-Source-Betrieb) früh benennen — das wird ausdrücklich verlangt.
 
-## Technische Details
+## Vorgeschlagene Skizze (zwei Seiten, Portal-Eingabe)
 
-- **Datenbank**
-  - `events`: neue Spalten `topics text[]`, `keywords text[]` (GIN-Index für schnelles Matching)
-  - `profiles` (an Account gekoppelt): `display_name`, `email`
-  - `user_preferences`: `user_id`, `parliaments text[]`, `topics text[]`, `keywords text[]`, `min_relevance int`, `digest_enabled bool`, `last_digest_at timestamptz`
-  - `digest_log`: verschickte Digests + enthaltene Event-IDs, verhindert Doppelversand
-  - RLS: jeder liest/schreibt nur eigene Zeilen; Edge Functions nutzen den Service-Zugang. GRANTs pro Tabelle in derselben Migration.
-- **Edge Functions**
-  - `score-events` wird erweitert: das KI-Schema liefert zusätzlich `topics` (aus fixer Liste) und `keywords`; beides wird gespeichert.
-  - Neu `cron-import-events`: ruft `detect-events` + `score-events` für den Vortag über alle indexierten Parlamente.
-  - Neu `send-topic-digest`: baut je Abonnent die Trefferliste und verschickt die Mail über das eingebaute Transaktionsmail-System von Lovable Cloud (kein externer Dienst).
-  - Beide per pg_cron/pg_net geplant.
-- **Frontend**
-  - Neu: `src/pages/Login.tsx`, `src/pages/ResetPassword.tsx`, `src/pages/Profil.tsx`, `src/components/TopicPicker.tsx`, `src/hooks/use-auth.ts`
-  - Angepasst: `src/App.tsx` (öffentliche Routen ausserhalb PinGate), `src/pages/Radar.tsx` (Themenfilter + Suche), `src/components/AppShell.tsx` (Profil-/Login-Link), `src/lib/mvp.ts` (Themenliste)
-- **E-Mail-Versand** benötigt eine verifizierte Absender-Domain in Lovable Cloud; bis dahin ist der Digest technisch fertig, aber nicht zustellbar.
+1. Ausgangslage: Rückgang der Parlamentsberichterstattung in Kantonen/Gemeinden
+2. Vision und Zielgruppe: Lokalredaktionen, freie Journalist:innen, zivilgesellschaftliche Beobachter
+3. Lösung und Innovationsgrad: offene Daten + erklärbare Priorisierung + Fact Layer
+4. Wirkungslogik nach I-O-O-I mit messbaren Indikatoren (z.B. Anzahl Redaktionen, publizierte Beiträge aus Radar-Hinweisen, abgedeckte Parlamente)
+5. Pilotphase 12–18 Monate mit 3–5 Redaktionspartnern
+6. Trägerschaft und Partner
+7. Budget und angefragter Beitrag
+8. Nachhaltigkeit nach Förderende
 
-## Reihenfolge
+## Nächste Schritte
 
-1. Migration (Themenspalten, Profile, Präferenzen, Digest-Log, RLS)
-2. Scoring um Themen/Stichwörter erweitern + Backfill bestehender Ereignisse
-3. Auth-Routen und Profilseite
-4. Themenfilter und Suche im Radar
-5. Cron-Import
-6. Digest-Function inkl. Absender-Domain-Setup und Abmelde-Link
+1. Entscheid zur gemeinnützigen Trägerschaft (Verein oder Partnerorganisation)
+2. Zwei bis drei Redaktions- und einen Wissenschaftspartner für Absichtserklärungen anfragen
+3. Wirkungslogik und Indikatoren ausformulieren (Leitfaden der Stiftung: projekte-mit-wirkung.ch)
+4. Budget nach dem Merkblatt der Stiftung erstellen
+5. Skizze über das Online-Portal einreichen; Rückmeldung erfahrungsgemäss in wenigen Wochen, Förderentscheide je nach Summe in 2–6 Monaten
+6. Parallel prüfen: Media Forward Fund (nächste Ausschreibung ab September 2026) als zweite, thematisch sehr naheliegende Schiene
+
+## Wenn gewünscht, kann ich im Anschluss
+
+- Die zweiseitige Projektskizze als Textdokument ausformulieren
+- Die Wirkungslogik (I-O-O-I) mit Indikatoren tabellarisch aufsetzen
+- Eine öffentliche Projektseite in der App ergänzen, die Mission, Datenquellen und Methodik erklärt — als Referenz für den Antrag
