@@ -14,6 +14,35 @@ export type Database = {
   }
   public: {
     Tables: {
+      alert_deliveries: {
+        Row: {
+          event_id: string
+          id: string
+          sent_at: string
+          user_id: string
+        }
+        Insert: {
+          event_id: string
+          id?: string
+          sent_at?: string
+          user_id: string
+        }
+        Update: {
+          event_id?: string
+          id?: string
+          sent_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "alert_deliveries_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       events: {
         Row: {
           affair_id: string | null
@@ -37,6 +66,7 @@ export type Database = {
           social_potential: number | null
           source_id: string | null
           title: string
+          topics: string[]
           updated_at: string
           voting_id: string | null
         }
@@ -62,6 +92,7 @@ export type Database = {
           social_potential?: number | null
           source_id?: string | null
           title: string
+          topics?: string[]
           updated_at?: string
           voting_id?: string | null
         }
@@ -87,6 +118,7 @@ export type Database = {
           social_potential?: number | null
           source_id?: string | null
           title?: string
+          topics?: string[]
           updated_at?: string
           voting_id?: string | null
         }
@@ -305,6 +337,42 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      subscriber_profiles: {
+        Row: {
+          alerts_enabled: boolean
+          created_at: string
+          email: string
+          keywords: string[]
+          min_relevance: number
+          parliaments: string[]
+          topics: string[]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          alerts_enabled?: boolean
+          created_at?: string
+          email: string
+          keywords?: string[]
+          min_relevance?: number
+          parliaments?: string[]
+          topics?: string[]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          alerts_enabled?: boolean
+          created_at?: string
+          email?: string
+          keywords?: string[]
+          min_relevance?: number
+          parliaments?: string[]
+          topics?: string[]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
     }
     Views: {
