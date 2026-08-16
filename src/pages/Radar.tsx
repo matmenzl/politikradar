@@ -290,6 +290,9 @@ const Radar = () => {
                 <p>
                   Lädt zuerst Geschäfte und Abstimmungen aus OpenParlData für den gewählten Zeitraum und bewertet sie danach per KI: 11 Faktoren (z. B. Entscheidwirkung, Reichweite, Emotionaler Aufhänger) ergeben Political Relevance, Social Potential und Editorial Confidence.
                 </p>
+                <p className="mt-2 text-xs text-muted-foreground">
+                  Die Kriterien können unter „Kriterien“ angepasst werden.
+                </p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
