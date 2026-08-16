@@ -134,12 +134,19 @@ const RadarOnboarding = forwardRef<RadarOnboardingRef>((_, ref) => {
   const Icon = steps[step].icon;
   const isLast = step === steps.length - 1;
 
-  const placeBelow = rect ? rect.top + rect.height + 16 + 220 < window.innerHeight : true;
-  const cardStyle: React.CSSProperties = rect
-    ? placeBelow
+  const CARD_H = 260;
+  const TOP_SAFE = 72;
+  const vh = typeof window !== "undefined" ? window.innerHeight : 800;
+  const fitsBelow = rect ? rect.top + rect.height + PAD + 12 + CARD_H < vh - 16 : false;
+  const fitsAbove = rect ? rect.top - PAD - 12 - CARD_H > TOP_SAFE : false;
+  const cardStyle: React.CSSProperties = !rect
+    ? { left: 16, right: 16, bottom: 24 }
+    : fitsBelow
       ? { top: rect.top + rect.height + PAD + 12, left: 16, right: 16 }
-      : { bottom: window.innerHeight - rect.top + PAD + 12, left: 16, right: 16 }
-    : { left: 16, right: 16, bottom: 24 };
+      : fitsAbove
+        ? { bottom: vh - rect.top + PAD + 12, left: 16, right: 16 }
+        : { left: 16, right: 16, bottom: 16 };
+
 
   return createPortal(
     <div
@@ -167,7 +174,7 @@ const RadarOnboarding = forwardRef<RadarOnboardingRef>((_, ref) => {
       )}
 
       <div
-        className="absolute mx-auto max-w-md bg-card text-card-foreground border border-border shadow-xl p-5 space-y-4"
+        className="absolute mx-auto max-w-md bg-card text-card-foreground border border-border shadow-xl p-5 space-y-4 max-h-[80vh] overflow-y-auto overscroll-contain"
         style={cardStyle}
         onClick={(e) => e.stopPropagation()}
       >
