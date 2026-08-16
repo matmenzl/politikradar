@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useImperativeHandle, useRef, useState, forwardRef } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -33,28 +33,27 @@ const steps = [
   },
 ];
 
-interface RadarOnboardingProps {
-  open?: boolean;
-  onOpenChange?: (open: boolean) => void;
+export interface RadarOnboardingRef {
+  open: () => void;
 }
 
-const RadarOnboarding = ({ open: controlledOpen, onOpenChange }: RadarOnboardingProps) => {
-  const [internalOpen, setInternalOpen] = useState(false);
+const RadarOnboarding = forwardRef<RadarOnboardingRef>((_, ref) => {
+  const [open, setOpen] = useState(false);
   const [step, setStep] = useState(0);
+  const didAutoOpen = useRef(false);
 
-  const open = controlledOpen ?? internalOpen;
-  const setOpen = (value: boolean) => {
-    setInternalOpen(value);
-    onOpenChange?.(value);
-  };
+  useImperativeHandle(ref, () => ({
+    open: () => setOpen(true),
+  }));
 
   useEffect(() => {
-    if (controlledOpen !== undefined) return;
+    if (didAutoOpen.current) return;
     const seen = localStorage.getItem(STORAGE_KEY);
     if (!seen) {
-      setInternalOpen(true);
+      didAutoOpen.current = true;
+      setOpen(true);
     }
-  }, [controlledOpen]);
+  }, []);
 
   const finish = () => {
     localStorage.setItem(STORAGE_KEY, "true");
@@ -142,7 +141,9 @@ const RadarOnboarding = ({ open: controlledOpen, onOpenChange }: RadarOnboarding
       </SheetContent>
     </Sheet>
   );
-};
+});
+
+RadarOnboarding.displayName = "RadarOnboarding";
 
 export default RadarOnboarding;
 export { STORAGE_KEY };
