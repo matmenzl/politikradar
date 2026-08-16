@@ -99,10 +99,15 @@ const levelOf = (b?: Body) => {
   return "unknown";
 };
 
+/** Cantons missing from the German /bodies listing. */
+const CANTON_FALLBACK: Record<string, string> = {
+  TI: "Tessin", GE: "Genf", VD: "Waadt", NE: "Neuenburg", JU: "Jura",
+};
+
 /** Human readable parliament label, e.g. "Kanton Zürich" or "Adliswil (ZH)". */
 const nameOf = (b: Body | undefined, key: string) => {
   const base = b?.name_de || b?.name;
-  if (!base) return key;
+  if (!base) return CANTON_FALLBACK[key] ? `Kanton ${CANTON_FALLBACK[key]}` : key;
   if (b?.type === "canton") return `Kanton ${base}`;
   if ((b?.type === "city" || b?.type === "municipality") && b?.canton_key) {
     return base.includes("(") ? base : `${base} (${b.canton_key})`;
