@@ -228,12 +228,25 @@ const Radar = () => {
           </label>
           <Button onClick={detect} disabled={detecting}>
             {detecting ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
-            Ereignisse erkennen
+            OpenParl-Daten laden
           </Button>
-          <Button variant="secondary" onClick={score} disabled={scoring}>
-            {scoring ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
-            Bewerten
-          </Button>
+          <TooltipProvider delayDuration={200}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span>
+                  <Button variant="secondary" onClick={score} disabled={scoring || !hasUnscoredEvents}>
+                    {scoring ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
+                    Bewerten
+                  </Button>
+                </span>
+              </TooltipTrigger>
+              <TooltipContent side="top" className="max-w-xs">
+                <p>
+                  Bewertet alle geladenen, noch unbewerteten Ereignisse. Die KI bewertet 11 Faktoren (z. B. Entscheidwirkung, Reichweite, Emotionaler Aufhänger) und berechnet daraus Political Relevance, Social Potential und Editorial Confidence.
+                </p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
 
         <div className="flex flex-wrap gap-3">
