@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 const links = [
   { to: "/", label: "Radar", end: true },
   { to: "/redaktion", label: "Redaktion", end: false },
+  { to: "/demo", label: "Demo", end: false },
 ];
 
 const AppShell = ({ children }: { children: ReactNode }) => (

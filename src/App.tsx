@@ -24,6 +24,7 @@ const App = () => (
             <Route path="/" element={<Radar />} />
             <Route path="/story/:id" element={<StoryStudio />} />
             <Route path="/redaktion" element={<Redaktion />} />
+            <Route path="/demo" element={<Demo />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </PinGate>
