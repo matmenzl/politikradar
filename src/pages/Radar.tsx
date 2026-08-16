@@ -43,8 +43,8 @@ const Radar = () => {
   const [events, setEvents] = useState<EventRow[]>([]);
   const [sources, setSources] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
-  const [detecting, setDetecting] = useState(false);
-  const [scoring, setScoring] = useState(false);
+  const [step, setStep] = useState<"idle" | "detecting" | "scoring">("idle");
+
   const [generating, setGenerating] = useState<string | null>(null);
   const [level, setLevel] = useState("all");
   const [parliament, setParliament] = useState("all");
