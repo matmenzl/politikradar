@@ -32,10 +32,11 @@ interface Affair {
 }
 
 interface Body {
-  key: string;
+  body_key: string;
   name_de?: string;
+  name?: string;
   type?: string;
-  canton?: string;
+  canton_key?: string;
 }
 
 async function api<T>(endpoint: string, params: Record<string, string>): Promise<{ data: T[]; meta: { has_more: boolean } }> {
