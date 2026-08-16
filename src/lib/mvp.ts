@@ -19,6 +19,7 @@ export interface EventRow {
   editorial_confidence: number | null;
   score_factors: Record<string, unknown>;
   selection_status: string;
+  topics: string[] | null;
   exclusion_reason: string | null;
 }
 

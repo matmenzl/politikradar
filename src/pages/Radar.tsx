@@ -44,6 +44,7 @@ import {
   type EventRow,
   type Priority,
 } from "@/lib/mvp";
+import { TOPICS, topicLabel } from "@/lib/topics";
 
 const Radar = () => {
   const navigate = useNavigate();
@@ -61,6 +62,8 @@ const Radar = () => {
   const [level, setLevel] = useState("all");
   const [parliament, setParliament] = useState("all");
   const [sort, setSort] = useState("relevance");
+  const [query, setQuery] = useState("");
+  const [topic, setTopic] = useState("all");
   const onboardingRef = useRef<RadarOnboardingRef>(null);
 
   const load = async () => {
@@ -145,17 +148,20 @@ const Radar = () => {
 
 
   const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase();
     const list = events.filter(
       (e) =>
         (level === "all" || e.political_level === level) &&
-        (parliament === "all" || e.parliament === parliament),
+        (parliament === "all" || e.parliament === parliament) &&
+        (topic === "all" || (e.topics ?? []).includes(topic)) &&
+        (!q || `${e.title} ${e.description ?? ""}`.toLowerCase().includes(q)),
     );
     return list.sort((a, b) => {
       if (sort === "date") return b.event_date.localeCompare(a.event_date);
       if (sort === "social") return (b.social_potential ?? -1) - (a.social_potential ?? -1);
       return (b.political_relevance ?? -1) - (a.political_relevance ?? -1);
     });
-  }, [events, level, parliament, sort]);
+  }, [events, level, parliament, sort, query, topic]);
 
   const groups: Record<Priority | "excluded", EventRow[]> = {
     top: [],
@@ -231,6 +237,9 @@ const Radar = () => {
             ) : (
               <Badge variant="outline">Noch nicht bewertet</Badge>
             )}
+            {(e.topics ?? []).map((t) => (
+              <Badge key={t} variant="outline">{topicLabel(t)}</Badge>
+            ))}
             {e.exclusion_reason && <Badge variant="destructive">{e.exclusion_reason}</Badge>}
           </div>
         </div>
