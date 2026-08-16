@@ -335,6 +335,22 @@ const Radar = () => {
         </div>
 
         <div className="flex flex-wrap gap-3">
+          <Input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Nach Stichwort suchen…"
+            className="w-full md:w-64"
+            aria-label="Ereignisse nach Stichwort durchsuchen"
+          />
+          <Select value={topic} onValueChange={setTopic}>
+            <SelectTrigger className="w-52"><SelectValue placeholder="Thema" /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Alle Themen</SelectItem>
+              {TOPICS.map((t) => (
+                <SelectItem key={t.key} value={t.key}>{t.label}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
           <Select value={level} onValueChange={setLevel}>
             <SelectTrigger className="w-44"><SelectValue placeholder="Ebene" /></SelectTrigger>
             <SelectContent>
