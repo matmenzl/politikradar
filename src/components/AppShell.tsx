@@ -6,6 +6,7 @@ const links = [
   { to: "/", label: "Radar", end: true },
   { to: "/redaktion", label: "Redaktion", end: false },
   { to: "/demo", label: "Demo", end: false },
+  { to: "/profil", label: "Profil", end: false },
 ];
 
 const AppShell = ({ children, headerAction }: { children: ReactNode; headerAction?: ReactNode }) => (
