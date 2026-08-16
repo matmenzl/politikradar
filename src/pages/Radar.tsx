@@ -262,7 +262,19 @@ const Radar = () => {
   );
 
   return (
-    <AppShell>
+    <AppShell
+      headerAction={
+        <button
+          type="button"
+          aria-label="Radar-Einführung öffnen"
+          onClick={() => setOnboardingOpen(true)}
+          className="inline-flex items-center justify-center min-h-[44px] min-w-[44px] -m-2.5 p-2.5 text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        >
+          <HelpCircle className="w-5 h-5" aria-hidden="true" />
+        </button>
+      }
+    >
+      <RadarOnboarding open={onboardingOpen} onOpenChange={setOnboardingOpen} />
       <div className="space-y-6">
         <div>
           <span className="text-xs kicker text-muted-foreground">Selection Engine</span>
