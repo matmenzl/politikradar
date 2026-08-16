@@ -5,9 +5,7 @@ import {
   json,
   hardFilter,
   weightedScore,
-  RELEVANCE_WEIGHTS,
-  SOCIAL_WEIGHTS,
-  THRESHOLDS,
+  loadScoringConfig,
 } from "../_shared/scoring.ts";
 
 const BATCH = 25;
@@ -39,6 +37,8 @@ serve(async (req) => {
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
     );
+
+    const config = await loadScoringConfig(supabase);
 
     let q = supabase
       .from("events")
@@ -157,8 +157,8 @@ serve(async (req) => {
       for (const r of results) {
         const e = batch[r.index];
         if (!e) continue;
-        const relevance = weightedScore(r, RELEVANCE_WEIGHTS as unknown as Record<string, number>);
-        const social = weightedScore(r, SOCIAL_WEIGHTS as unknown as Record<string, number>);
+        const relevance = weightedScore(r, config.relevance_weights);
+        const social = weightedScore(r, config.social_weights);
         const confidence = Math.max(0, Math.min(100, Math.round(Number(r.confidence) || 0)));
         await supabase
           .from("events")
@@ -166,7 +166,7 @@ serve(async (req) => {
             political_relevance: relevance,
             social_potential: social,
             editorial_confidence: confidence,
-            score_factors: { ...r, rationale: r.rationale, thresholds: THRESHOLDS },
+            score_factors: { ...r, rationale: r.rationale, thresholds: config.thresholds, weights: { relevance: config.relevance_weights, social: config.social_weights } },
           })
           .eq("id", e.id);
         scored++;
