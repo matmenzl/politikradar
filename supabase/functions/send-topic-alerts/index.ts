@@ -79,10 +79,8 @@ serve(async (req) => {
       preview.push({ email: p.email, count: hits.length });
       if (dryRun) continue;
 
-      const { error: mailError } = await supabase.functions.invoke("send-transactional-email", {
-        body: {
-          templateName: "topic-alert",
-          recipientEmail: p.email,
+      try {
+        const result = await sendTemplateEmail("topic-alert", p.email, {
           idempotencyKey: `topic-alert-${p.user_id}-${hits[0].id}`,
           templateData: {
             items: hits.map((e) => ({
@@ -93,12 +91,16 @@ serve(async (req) => {
               topics: (e.topics ?? []).map((t) => TOPIC_LABELS[t] ?? t),
             })),
           },
-        },
-      });
-      if (mailError) {
+        });
+        if (!result.sent) {
+          console.warn("send-topic-alerts suppressed", p.email);
+          continue;
+        }
+      } catch (mailError) {
         console.error("send-topic-alerts mail", p.email, mailError);
         continue;
       }
+
 
       await supabase
         .from("alert_deliveries")
