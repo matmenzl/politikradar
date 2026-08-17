@@ -1,4 +1,5 @@
 import type { ComponentType } from 'npm:react@18.3.1'
+import { template as topicAlertTemplate } from './topic-alert.tsx'
 
 export interface TemplateEntry {
   component: ComponentType<any>
