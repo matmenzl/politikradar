@@ -7,6 +7,8 @@ project_id = "eynghyszcvknnflqphzv"
     verify_jwt = false
   [functions.generate-story]
     verify_jwt = false
+  [functions.preview-transactional-email]
+    verify_jwt = false
   [functions.score-events]
     verify_jwt = false
   [functions.send-topic-alerts]
