@@ -8,6 +8,7 @@ import {
   Heading,
   Hr,
   Html,
+  Link,
   Preview,
   Section,
   Text,
@@ -20,6 +21,8 @@ interface AlertItem {
   date?: string
   relevance?: number
   topics?: string[]
+  url?: string
+  hasStory?: boolean
 }
 
 interface TopicAlertProps {
@@ -48,16 +51,32 @@ const TopicAlertEmail = ({ items = [] }: TopicAlertProps) => (
               {[item.parliament, item.date].filter(Boolean).join(' · ')}
               {typeof item.relevance === 'number' ? ` · Relevanz ${item.relevance}` : ''}
             </Text>
-            <Text style={title}>{item.title ?? 'Ohne Titel'}</Text>
+            {item.url ? (
+              <Link href={item.url} style={titleLink}>
+                {item.title ?? 'Ohne Titel'}
+              </Link>
+            ) : (
+              <Text style={title}>{item.title ?? 'Ohne Titel'}</Text>
+            )}
             {item.topics && item.topics.length > 0 && (
               <Text style={topics}>{item.topics.join(' · ')}</Text>
+            )}
+            {item.url && (
+              <Text style={ctaWrap}>
+                <Link href={item.url} style={cta}>
+                  {item.hasStory ? 'Story lesen' : 'Geschäft ansehen'}
+                </Link>
+              </Text>
             )}
           </Section>
         ))}
         <Hr style={hr} />
         <Text style={footer}>
           Du erhältst diese Nachricht, weil du in deinem politikradar-Profil Themen,
-          Parlamente oder Stichwörter hinterlegt hast.
+          Parlamente oder Stichwörter hinterlegt hast.{' '}
+          <Link href="https://politikradar.org/profil" style={footerLink}>
+            Einstellungen ändern
+          </Link>
         </Text>
       </Container>
     </Body>
@@ -81,6 +100,7 @@ export const template = {
         date: '2026-08-14',
         relevance: 82,
         topics: ['Verkehr', 'Umwelt'],
+        url: 'https://politikradar.org/g/beispiel',
       },
       {
         title: 'Interpellation zur Finanzierung der Tagesschulen',
@@ -88,6 +108,8 @@ export const template = {
         date: '2026-08-13',
         relevance: 74,
         topics: ['Bildung'],
+        url: 'https://politikradar.org/s/beispiel',
+        hasStory: true,
       },
     ],
   },
@@ -116,6 +138,25 @@ const meta = {
   margin: '0 0 6px',
 }
 const title = { fontSize: '17px', color: '#111111', margin: '0', lineHeight: '1.35' }
+const titleLink = {
+  fontFamily: 'Georgia, serif',
+  fontSize: '17px',
+  color: '#111111',
+  lineHeight: '1.35',
+  textDecoration: 'underline',
+}
+const ctaWrap = { margin: '12px 0 0' }
+const cta = {
+  fontFamily: 'Arial, sans-serif',
+  fontSize: '13px',
+  fontWeight: 700,
+  color: '#ffffff',
+  backgroundColor: '#E84930',
+  padding: '9px 14px',
+  textDecoration: 'none',
+  display: 'inline-block',
+}
+const footerLink = { color: '#8a8a8a', textDecoration: 'underline' }
 const topics = {
   fontFamily: 'Arial, sans-serif',
   fontSize: '12px',
