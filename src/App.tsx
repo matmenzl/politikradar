@@ -29,6 +29,8 @@ const App = () => (
           <Route path="/profil" element={<Profil />} />
           <Route path="/g/:id" element={<PublicEvent />} />
           <Route path="/s/:id" element={<PublicStory />} />
+          <Route path="/__slidetest" element={<SlideTest />} />
+
           <Route
             path="*"
             element={
