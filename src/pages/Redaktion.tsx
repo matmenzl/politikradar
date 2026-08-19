@@ -69,6 +69,8 @@ const Redaktion = () => {
           </Select>
         </div>
 
+        <LinkCheckPanel />
+
         {loading && <p className="text-sm text-muted-foreground">Lade Stories…</p>}
         {!loading && visible.length === 0 && (
           <p className="text-sm text-muted-foreground">
