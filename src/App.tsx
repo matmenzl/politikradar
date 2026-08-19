@@ -3,7 +3,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import PinGate from "./components/PinGate";
+import AuthGate from "./components/AuthGate";
 
 import Radar from "./pages/Radar";
 import StoryStudio from "./pages/StoryStudio";
@@ -15,7 +15,7 @@ import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
-/** Editorial tool stays behind the global PIN; profile & login are public. */
+/** Editorial tool requires a login; profile & login pages are public. */
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
@@ -28,7 +28,7 @@ const App = () => (
           <Route
             path="*"
             element={
-              <PinGate>
+              <AuthGate>
                 <Routes>
                   <Route path="/" element={<Radar />} />
                   <Route path="/story/:id" element={<StoryStudio />} />
@@ -36,7 +36,7 @@ const App = () => (
                   <Route path="/demo" element={<Demo />} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
-              </PinGate>
+              </AuthGate>
             }
           />
         </Routes>
