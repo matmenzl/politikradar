@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Trash2, PenLine } from "lucide-react";
 import { STORY_STATUS, statusLabel, type StoryRow } from "@/lib/mvp";
+import LinkCheckPanel from "@/components/LinkCheckPanel";
 
 const Redaktion = () => {
   const navigate = useNavigate();
@@ -67,6 +68,8 @@ const Redaktion = () => {
             </SelectContent>
           </Select>
         </div>
+
+        <LinkCheckPanel />
 
         {loading && <p className="text-sm text-muted-foreground">Lade Stories…</p>}
         {!loading && visible.length === 0 && (
