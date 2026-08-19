@@ -64,6 +64,27 @@ serve(async (req) => {
     ]);
 
     const eventRows = (events || []) as EventRow[];
+
+    // Test send: one sample alert with the top events, ignoring profiles & delivery history.
+    const testEmail: string | undefined = typeof body.test_email === "string" ? body.test_email : undefined;
+    if (testEmail) {
+      const hits = eventRows.slice(0, 5);
+      if (!hits.length) return json({ error: "Keine Ereignisse im Zeitraum gefunden." }, 400);
+      const result = await sendTemplateEmail("topic-alert", testEmail, {
+        idempotencyKey: `topic-alert-test-${testEmail}-${Date.now()}`,
+        templateData: {
+          items: hits.map((e) => ({
+            title: e.title,
+            parliament: e.parliament,
+            date: e.event_date,
+            relevance: e.political_relevance,
+            topics: (e.topics ?? []).map((t) => TOPIC_LABELS[t] ?? t),
+          })),
+        },
+      });
+      return json({ test: true, email: testEmail, sent: result.sent, items: hits.length });
+    }
+
     let sent = 0;
     const preview: { email: string; count: number }[] = [];
 
