@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { Slider } from "@/components/ui/slider";
-import { Loader2, LogOut, X } from "lucide-react";
+import { ArrowLeft, Loader2, LogOut, X } from "lucide-react";
 import { TOPICS } from "@/lib/topics";
 
 interface ProfileState {
