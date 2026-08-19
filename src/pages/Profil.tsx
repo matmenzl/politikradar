@@ -115,20 +115,28 @@ const Profil = () => {
     <div className="min-h-screen bg-background">
       <header className="sticky top-0 z-10 bg-background/90 backdrop-blur border-b border-border px-4 md:px-6 py-3">
         <div className="max-w-3xl mx-auto flex items-center justify-between gap-3">
-          <span className="font-serif text-lg text-foreground">
+          <Link to="/" className="font-serif text-lg text-foreground hover:opacity-80">
             politikradar<span className="text-brand-red">.</span>
-          </span>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={async () => {
-              await supabase.auth.signOut();
-              navigate("/login");
-            }}
-          >
-            <LogOut className="w-4 h-4" />
-            Abmelden
-          </Button>
+          </Link>
+          <div className="flex items-center gap-1">
+            <Button variant="ghost" size="sm" asChild>
+              <Link to="/">
+                <ArrowLeft className="w-4 h-4" />
+                Zum Radar
+              </Link>
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={async () => {
+                await supabase.auth.signOut();
+                navigate("/login");
+              }}
+            >
+              <LogOut className="w-4 h-4" />
+              Abmelden
+            </Button>
+          </div>
         </div>
       </header>
 
