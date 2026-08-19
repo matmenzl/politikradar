@@ -24,6 +24,37 @@ interface Profile {
   alerts_enabled: boolean;
 }
 
+const SITE_URL = "https://politikradar.org";
+
+/** Maps event ids to the newest published story id (for direct story links). */
+const loadStoryMap = async (supabase: any, eventIds: string[]) => {
+  if (!eventIds.length) return {} as Record<string, string>;
+  const { data } = await supabase
+    .from("stories")
+    .select("id, event_id, published_at")
+    .eq("status", "published")
+    .in("event_id", eventIds)
+    .order("published_at", { ascending: false });
+  const map: Record<string, string> = {};
+  for (const row of data || []) {
+    if (row.event_id && !map[row.event_id]) map[row.event_id] = row.id;
+  }
+  return map;
+};
+
+const itemPayload = (e: EventRow, storyMap: Record<string, string>) => {
+  const storyId = storyMap[e.id];
+  return {
+    title: e.title,
+    parliament: e.parliament,
+    date: e.event_date,
+    relevance: e.political_relevance,
+    topics: (e.topics ?? []).map((t) => TOPIC_LABELS[t] ?? t),
+    url: storyId ? `${SITE_URL}/s/${storyId}` : `${SITE_URL}/g/${e.id}`,
+    hasStory: Boolean(storyId),
+  };
+};
+
 const matches = (e: EventRow, p: Profile) => {
   if ((e.political_relevance ?? 0) < (p.min_relevance ?? 0)) return false;
   if (p.parliaments.length && !p.parliaments.includes(e.parliament)) return false;
@@ -70,17 +101,10 @@ serve(async (req) => {
     if (testEmail) {
       const hits = eventRows.slice(0, 5);
       if (!hits.length) return json({ error: "Keine Ereignisse im Zeitraum gefunden." }, 400);
+      const storyMap = await loadStoryMap(supabase, hits.map((e) => e.id));
       const result = await sendTemplateEmail("topic-alert", testEmail, {
         idempotencyKey: `topic-alert-test-${testEmail}-${Date.now()}`,
-        templateData: {
-          items: hits.map((e) => ({
-            title: e.title,
-            parliament: e.parliament,
-            date: e.event_date,
-            relevance: e.political_relevance,
-            topics: (e.topics ?? []).map((t) => TOPIC_LABELS[t] ?? t),
-          })),
-        },
+        templateData: { items: hits.map((e) => itemPayload(e, storyMap)) },
       });
       return json({ test: true, email: testEmail, sent: result.sent, items: hits.length });
     }
@@ -101,17 +125,10 @@ serve(async (req) => {
       if (dryRun) continue;
 
       try {
+        const storyMap = await loadStoryMap(supabase, hits.map((e) => e.id));
         const result = await sendTemplateEmail("topic-alert", p.email, {
           idempotencyKey: `topic-alert-${p.user_id}-${hits[0].id}`,
-          templateData: {
-            items: hits.map((e) => ({
-              title: e.title,
-              parliament: e.parliament,
-              date: e.event_date,
-              relevance: e.political_relevance,
-              topics: (e.topics ?? []).map((t) => TOPIC_LABELS[t] ?? t),
-            })),
-          },
+          templateData: { items: hits.map((e) => itemPayload(e, storyMap)) },
         });
         if (!result.sent) {
           console.warn("send-topic-alerts suppressed", p.email);
