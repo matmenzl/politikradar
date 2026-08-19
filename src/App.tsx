@@ -11,6 +11,8 @@ import Redaktion from "./pages/Redaktion";
 import Demo from "./pages/Demo";
 import Login from "./pages/Login";
 import Profil from "./pages/Profil";
+import PublicEvent from "./pages/PublicEvent";
+import PublicStory from "./pages/PublicStory";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -25,6 +27,8 @@ const App = () => (
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/profil" element={<Profil />} />
+          <Route path="/g/:id" element={<PublicEvent />} />
+          <Route path="/s/:id" element={<PublicStory />} />
           <Route
             path="*"
             element={
