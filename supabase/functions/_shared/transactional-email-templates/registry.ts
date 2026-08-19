@@ -1,5 +1,6 @@
 import type { ComponentType } from 'npm:react@18.3.1'
 import { template as topicAlertTemplate } from './topic-alert.tsx'
+import { template as accountDeletedTemplate } from './account-deleted.tsx'
 
 export interface TemplateEntry {
   component: ComponentType<any>
@@ -20,4 +21,5 @@ export interface TemplateEntry {
  */
 export const TEMPLATES: Record<string, TemplateEntry> = {
   'topic-alert': topicAlertTemplate,
+  'account-deleted': accountDeletedTemplate,
 }

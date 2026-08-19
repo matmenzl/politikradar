@@ -7,7 +7,18 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { Slider } from "@/components/ui/slider";
-import { ArrowLeft, Loader2, LogOut, X } from "lucide-react";
+import { ArrowLeft, Loader2, LogOut, Trash2, X } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { TOPICS } from "@/lib/topics";
 import { isPreviewEnv } from "@/lib/preview";
 
@@ -36,6 +47,7 @@ const Profil = () => {
   const [keywordDraft, setKeywordDraft] = useState("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -99,6 +111,21 @@ const Profil = () => {
     setSaving(false);
     if (error) return toast.error("Profil konnte nicht gespeichert werden.");
     toast.success("Profil gespeichert. Alerts richten sich ab sofort danach.");
+  };
+
+  const deleteAccount = async () => {
+    setDeleting(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("delete-account");
+      if (error || data?.error) throw error ?? new Error(data.error);
+      await supabase.auth.signOut();
+      toast.success("Profil gelöscht. Eine Bestätigung ist unterwegs an deine E-Mail-Adresse.");
+      navigate("/login", { replace: true });
+    } catch {
+      toast.error("Profil konnte nicht gelöscht werden. Bitte erneut versuchen.");
+    } finally {
+      setDeleting(false);
+    }
   };
 
   const summary = useMemo(
@@ -277,6 +304,36 @@ const Profil = () => {
           {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
           Profil speichern
         </Button>
+
+        <section className="border border-destructive/40 bg-card p-4 space-y-3">
+          <h2 className="font-serif text-xl text-foreground">Profil löschen</h2>
+          <p className="text-sm text-muted-foreground">
+            Dein Konto sowie alle Einstellungen, Themen, Stichwörter und die Alert-Historie
+            werden endgültig gelöscht. Du erhältst eine Bestätigung per E-Mail. Das lässt sich
+            nicht rückgängig machen.
+          </p>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button variant="destructive" disabled={deleting} className="w-full md:w-auto">
+                {deleting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+                Profil endgültig löschen
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Profil wirklich löschen?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Alle Daten zu {email || "diesem Konto"} werden dauerhaft entfernt. Eine
+                  Bestätigung geht an deine E-Mail-Adresse.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Abbrechen</AlertDialogCancel>
+                <AlertDialogAction onClick={deleteAccount}>Endgültig löschen</AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </section>
       </main>
     </div>
   );

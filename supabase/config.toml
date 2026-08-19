@@ -3,6 +3,8 @@ project_id = "eynghyszcvknnflqphzv"
 [functions]
   [functions.auth-email-hook]
     verify_jwt = false
+  [functions.delete-account]
+    verify_jwt = false
   [functions.detect-events]
     verify_jwt = false
   [functions.generate-story]
