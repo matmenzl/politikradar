@@ -15,6 +15,7 @@ Jedes Element im Newsletter wird anklickbar und führt auf eine öffentliche, oh
 - Fakten-Liste aus dem Fact Layer (Label, Wert, verifiziert)
 - Link auf die Originalquelle (Parlaments-Website)
 - Falls eine veröffentlichte Story zum Geschäft existiert: Teaser-Karte mit Link auf die Story-Seite
+- Falls keine Story existiert: CTA „Story erstellen“ → führt ins Story Studio (`/story/…`); wer nicht eingeloggt ist, landet über das Login-Gate zuerst auf `/login` und danach direkt dort
 - CTA unten: „Themen im Profil anpassen“ → `/profil`
 
 **2. Story-Seite `/s/:storyId`**
