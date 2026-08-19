@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 import { corsHeaders, json } from "../_shared/scoring.ts";
+import { guessTopics } from "../_shared/topics.ts";
 
 const BASE_URL = "https://api.openparldata.ch/v1";
 
@@ -272,6 +273,7 @@ serve(async (req) => {
         description: c.description ?? null,
         source_id: c.url ? urlToSourceId[c.url] ?? null : null,
         dedupe_key: keyOf(c),
+        topics: guessTopics(c.title, c.description ?? null),
       };
     });
 
