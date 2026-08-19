@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 import { corsHeaders, json } from "../_shared/scoring.ts";
+import { guessTopics } from "../_shared/topics.ts";
 
 const BASE_URL = "https://api.openparldata.ch/v1";
 
@@ -132,15 +133,44 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { from, to } = await req.json();
-    if (!from || !to || !/^\d{4}-\d{2}-\d{2}$/.test(from) || !/^\d{4}-\d{2}-\d{2}$/.test(to)) {
-      return json({ error: "from und to (YYYY-MM-DD) sind erforderlich" }, 400);
-    }
+    const body = await req.json();
+    const { from, to } = body;
 
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
     );
+
+    // Einmalige Nachbesserung: bestehende Ereignisse ohne Themen nachträglich zuordnen.
+    if (body.mode === "backfill_topics") {
+      let updated = 0;
+      let offset = 0;
+      for (;;) {
+        const { data, error } = await supabase
+          .from("events")
+          .select("id, title, description, topics")
+          .order("event_date", { ascending: false })
+          .range(offset, offset + 499);
+        if (error) throw error;
+        const rows = data || [];
+        if (rows.length === 0) break;
+        for (const r of rows) {
+          if ((r.topics as string[] | null)?.length) continue;
+          const topics = guessTopics(r.title as string, r.description as string | null);
+          if (topics.length === 0) continue;
+          await supabase.from("events").update({ topics }).eq("id", r.id);
+          updated++;
+        }
+        offset += rows.length;
+        if (rows.length < 500) break;
+      }
+      return json({ updated });
+    }
+
+    if (!from || !to || !/^\d{4}-\d{2}-\d{2}$/.test(from) || !/^\d{4}-\d{2}-\d{2}$/.test(to)) {
+      return json({ error: "from und to (YYYY-MM-DD) sind erforderlich" }, 400);
+    }
+
 
     const [bodies, votings, affairs] = await Promise.all([
       fetchBodies(),
@@ -272,6 +302,7 @@ serve(async (req) => {
         description: c.description ?? null,
         source_id: c.url ? urlToSourceId[c.url] ?? null : null,
         dedupe_key: keyOf(c),
+        topics: guessTopics(c.title, c.description ?? null),
       };
     });
 
