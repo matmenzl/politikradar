@@ -9,6 +9,7 @@ import { Switch } from "@/components/ui/switch";
 import { Slider } from "@/components/ui/slider";
 import { ArrowLeft, Loader2, LogOut, X } from "lucide-react";
 import { TOPICS } from "@/lib/topics";
+import { isPreviewEnv } from "@/lib/preview";
 
 interface ProfileState {
   parliaments: string[];
