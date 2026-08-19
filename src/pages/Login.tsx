@@ -4,42 +4,41 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 
-/** Public login / signup for the topic alert newsletter. */
+/** Public passwordless login / signup (magic link) for the topic alert newsletter. */
 const Login = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [sent, setSent] = useState(false);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
       if (data.session) navigate("/profil", { replace: true });
     });
+    const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session) navigate("/profil", { replace: true });
+    });
+    return () => sub.subscription.unsubscribe();
   }, [navigate]);
 
-  const signIn = async (e: FormEvent) => {
+  const sendLink = async (e: FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    setLoading(false);
-    if (error) return toast.error("Anmeldung fehlgeschlagen. E-Mail oder Passwort prüfen.");
-    navigate("/profil");
-  };
-
-  const signUp = async (e: FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    const { error } = await supabase.auth.signUp({
+    const { error } = await supabase.auth.signInWithOtp({
       email,
-      password,
-      options: { emailRedirectTo: `${window.location.origin}/profil` },
+      options: {
+        shouldCreateUser: true,
+        emailRedirectTo: `${window.location.origin}/profil`,
+      },
     });
     setLoading(false);
-    if (error) return toast.error(error.message);
-    toast.success("Konto erstellt. Bitte E-Mail bestätigen, falls eine Nachricht eintrifft.");
-    navigate("/profil");
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    setSent(true);
+    toast.success("Link verschickt. Bitte E-Mail-Postfach prüfen.");
   };
 
   return (
@@ -55,46 +54,38 @@ const Login = () => {
           </p>
         </div>
 
-        <Tabs defaultValue="signin">
-          <TabsList className="w-full">
-            <TabsTrigger value="signin" className="flex-1">Anmelden</TabsTrigger>
-            <TabsTrigger value="signup" className="flex-1">Konto erstellen</TabsTrigger>
-          </TabsList>
-
-          {(["signin", "signup"] as const).map((mode) => (
-            <TabsContent key={mode} value={mode}>
-              <form
-                onSubmit={mode === "signin" ? signIn : signUp}
-                className="space-y-3 border border-border bg-card p-5"
-              >
-                <label className="text-xs kicker text-muted-foreground flex flex-col gap-1">
-                  E-Mail
-                  <Input
-                    type="email"
-                    required
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    autoComplete="email"
-                  />
-                </label>
-                <label className="text-xs kicker text-muted-foreground flex flex-col gap-1">
-                  Passwort
-                  <Input
-                    type="password"
-                    required
-                    minLength={6}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    autoComplete={mode === "signin" ? "current-password" : "new-password"}
-                  />
-                </label>
-                <Button type="submit" className="w-full" disabled={loading}>
-                  {loading ? "Bitte warten…" : mode === "signin" ? "Anmelden" : "Konto erstellen"}
-                </Button>
-              </form>
-            </TabsContent>
-          ))}
-        </Tabs>
+        {sent ? (
+          <div className="space-y-3 border border-border bg-card p-5">
+            <h2 className="font-serif text-xl text-foreground">E-Mail unterwegs</h2>
+            <p className="text-sm text-muted-foreground">
+              Wir haben einen Anmelde-Link an <strong className="text-foreground">{email}</strong> geschickt.
+              Der Link öffnet das Profil direkt — kein Passwort nötig.
+            </p>
+            <Button variant="outline" className="w-full" onClick={() => setSent(false)}>
+              Andere E-Mail verwenden
+            </Button>
+          </div>
+        ) : (
+          <form onSubmit={sendLink} className="space-y-3 border border-border bg-card p-5">
+            <label className="text-xs kicker text-muted-foreground flex flex-col gap-1">
+              E-Mail
+              <Input
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                autoComplete="email"
+                placeholder="name@beispiel.ch"
+              />
+            </label>
+            <Button type="submit" className="w-full" disabled={loading}>
+              {loading ? "Wird gesendet…" : "Anmelde-Link senden"}
+            </Button>
+            <p className="text-xs text-muted-foreground">
+              Anmelden und Registrieren laufen gleich: Wir schicken einen einmaligen Link per E-Mail.
+            </p>
+          </form>
+        )}
       </div>
     </div>
   );
