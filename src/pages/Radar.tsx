@@ -137,6 +137,20 @@ const Radar = () => {
     navigate(`/story/${data.story_id}`);
   };
 
+  // Deeplink aus dem Newsletter: /?event=<id> erstellt direkt eine Story.
+  useEffect(() => {
+    const target = searchParams.get("event");
+    if (!target || generating) return;
+    searchParams.delete("event");
+    setSearchParams(searchParams, { replace: true });
+    (async () => {
+      const { data: ev } = await supabase.from("events").select("*").eq("id", target).maybeSingle();
+      if (!ev) return toast.error("Geschäft nicht gefunden.");
+      createStory(ev as unknown as EventRow);
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const reject = async (event: EventRow) => {
     await supabase.from("events").update({ selection_status: "rejected" }).eq("id", event.id);
     setEvents((prev) => prev.filter((e) => e.id !== event.id));
