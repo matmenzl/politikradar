@@ -3,6 +3,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 import { corsHeaders, json } from "../_shared/scoring.ts";
 import { TOPIC_LABELS } from "../_shared/topics.ts";
 import { sendTemplateEmail } from "../_shared/transactional-email-templates/send-email.ts";
+import { checkDeeplinks, resolveLink, type BrokenLink, type DeeplinkTarget, type LinkCheckResult } from "../_shared/deeplinks.ts";
 
 interface EventRow {
   id: string;
@@ -24,8 +25,6 @@ interface Profile {
   alerts_enabled: boolean;
 }
 
-const SITE_URL = "https://politikradar.org";
-
 /** Maps event ids to the newest published story id (for direct story links). */
 const loadStoryMap = async (supabase: any, eventIds: string[]) => {
   if (!eventIds.length) return {} as Record<string, string>;
@@ -42,17 +41,48 @@ const loadStoryMap = async (supabase: any, eventIds: string[]) => {
   return map;
 };
 
-const itemPayload = (e: EventRow, storyMap: Record<string, string>) => {
-  const storyId = storyMap[e.id];
-  return {
-    title: e.title,
-    parliament: e.parliament,
-    date: e.event_date,
-    relevance: e.political_relevance,
-    topics: (e.topics ?? []).map((t) => TOPIC_LABELS[t] ?? t),
-    url: storyId ? `${SITE_URL}/s/${storyId}` : `${SITE_URL}/g/${e.id}`,
-    hasStory: Boolean(storyId),
-  };
+const itemPayload = (e: EventRow, link: { url: string; hasStory: boolean }) => ({
+  title: e.title,
+  parliament: e.parliament,
+  date: e.event_date,
+  relevance: e.political_relevance,
+  topics: (e.topics ?? []).map((t) => TOPIC_LABELS[t] ?? t),
+  url: link.url,
+  hasStory: link.hasStory,
+});
+
+/**
+ * Validates the deeplinks for a batch of events and keeps only entries with a
+ * working public landing page. Broken ids are returned for reporting.
+ */
+const buildItems = async (supabase: any, hits: EventRow[]) => {
+  const storyMap = await loadStoryMap(supabase, hits.map((e) => e.id));
+  const targets: DeeplinkTarget[] = hits.map((e) => ({ eventId: e.id, storyId: storyMap[e.id] ?? null }));
+  const check: LinkCheckResult = await checkDeeplinks(supabase, targets);
+
+  const items: ReturnType<typeof itemPayload>[] = [];
+  const kept: EventRow[] = [];
+  const dropped: { event_id: string; title: string }[] = [];
+
+  hits.forEach((e, i) => {
+    const link = resolveLink(targets[i], check);
+    if (!link) {
+      dropped.push({ event_id: e.id, title: e.title });
+      return;
+    }
+    items.push(itemPayload(e, link));
+    kept.push(e);
+  });
+
+  return { items, kept, dropped, broken: check.broken };
+};
+
+const logBroken = (scope: string, broken: BrokenLink[], dropped: { event_id: string }[]) => {
+  if (!broken.length) return;
+  console.error(
+    `send-topic-alerts link-check ${scope}: ${broken.length} fehlerhafte Deeplinks, ${dropped.length} Einträge entfernt`,
+    broken.map((b) => `${b.kind}:${b.id} (${b.reason})`).join(", "),
+  );
 };
 
 const matches = (e: EventRow, p: Profile) => {
@@ -101,16 +131,29 @@ serve(async (req) => {
     if (testEmail) {
       const hits = eventRows.slice(0, 5);
       if (!hits.length) return json({ error: "Keine Ereignisse im Zeitraum gefunden." }, 400);
-      const storyMap = await loadStoryMap(supabase, hits.map((e) => e.id));
+      const { items, dropped, broken } = await buildItems(supabase, hits);
+      logBroken(`test:${testEmail}`, broken, dropped);
+      if (!items.length) {
+        return json({ error: "Alle Deeplinks im Zeitraum sind fehlerhaft.", broken_links: broken, dropped }, 400);
+      }
       const result = await sendTemplateEmail("topic-alert", testEmail, {
         idempotencyKey: `topic-alert-test-${testEmail}-${Date.now()}`,
-        templateData: { items: hits.map((e) => itemPayload(e, storyMap)) },
+        templateData: { items },
       });
-      return json({ test: true, email: testEmail, sent: result.sent, items: hits.length });
+      return json({
+        test: true,
+        email: testEmail,
+        sent: result.sent,
+        items: items.length,
+        broken_links: broken,
+        dropped,
+      });
     }
 
     let sent = 0;
     const preview: { email: string; count: number }[] = [];
+    const brokenLinks: (BrokenLink & { email: string })[] = [];
+    const droppedItems: { email: string; event_id: string; title: string }[] = [];
 
     for (const p of (profiles || []) as Profile[]) {
       const { data: delivered } = await supabase
@@ -121,14 +164,20 @@ serve(async (req) => {
 
       const hits = eventRows.filter((e) => !seen.has(e.id) && matches(e, p)).slice(0, 8);
       if (!hits.length) continue;
-      preview.push({ email: p.email, count: hits.length });
+
+      const { items, kept, dropped, broken } = await buildItems(supabase, hits);
+      logBroken(p.email, broken, dropped);
+      brokenLinks.push(...broken.map((b) => ({ ...b, email: p.email })));
+      droppedItems.push(...dropped.map((d) => ({ ...d, email: p.email })));
+
+      if (!items.length) continue;
+      preview.push({ email: p.email, count: items.length });
       if (dryRun) continue;
 
       try {
-        const storyMap = await loadStoryMap(supabase, hits.map((e) => e.id));
         const result = await sendTemplateEmail("topic-alert", p.email, {
-          idempotencyKey: `topic-alert-${p.user_id}-${hits[0].id}`,
-          templateData: { items: hits.map((e) => itemPayload(e, storyMap)) },
+          idempotencyKey: `topic-alert-${p.user_id}-${kept[0].id}`,
+          templateData: { items },
         });
         if (!result.sent) {
           console.warn("send-topic-alerts suppressed", p.email);
@@ -139,16 +188,23 @@ serve(async (req) => {
         continue;
       }
 
-
       await supabase
         .from("alert_deliveries")
-        .upsert(hits.map((e) => ({ user_id: p.user_id, event_id: e.id })), {
+        .upsert(kept.map((e) => ({ user_id: p.user_id, event_id: e.id })), {
           onConflict: "user_id,event_id",
         });
       sent++;
     }
 
-    return json({ sent, profiles: profiles?.length ?? 0, events: eventRows.length, dry_run: dryRun, preview });
+    return json({
+      sent,
+      profiles: profiles?.length ?? 0,
+      events: eventRows.length,
+      dry_run: dryRun,
+      preview,
+      broken_links: brokenLinks,
+      dropped: droppedItems,
+    });
   } catch (e) {
     console.error("send-topic-alerts", e);
     return json({ error: e instanceof Error ? e.message : "Unbekannter Fehler" }, 500);
