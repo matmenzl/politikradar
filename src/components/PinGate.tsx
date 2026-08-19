@@ -3,12 +3,15 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Lock } from "lucide-react";
+import { isPreviewEnv } from "@/lib/preview";
 
 const STORAGE_KEY = "politikradar_pin_ok";
 
-/** Global PIN protection for the whole editorial tool. */
+/** Global PIN protection for the whole editorial tool. Skipped in the Lovable preview. */
 const PinGate = ({ children }: { children: ReactNode }) => {
-  const [unlocked, setUnlocked] = useState(() => sessionStorage.getItem(STORAGE_KEY) === "1");
+  const [unlocked, setUnlocked] = useState(
+    () => isPreviewEnv() || sessionStorage.getItem(STORAGE_KEY) === "1",
+  );
   const [pin, setPin] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
