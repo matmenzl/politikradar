@@ -112,6 +112,21 @@ const Profil = () => {
     toast.success("Profil gespeichert. Alerts richten sich ab sofort danach.");
   };
 
+  const deleteAccount = async () => {
+    setDeleting(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("delete-account");
+      if (error || data?.error) throw error ?? new Error(data.error);
+      await supabase.auth.signOut();
+      toast.success("Profil gelöscht. Eine Bestätigung ist unterwegs an deine E-Mail-Adresse.");
+      navigate("/login", { replace: true });
+    } catch {
+      toast.error("Profil konnte nicht gelöscht werden. Bitte erneut versuchen.");
+    } finally {
+      setDeleting(false);
+    }
+  };
+
   const summary = useMemo(
     () =>
       `${profile.topics.length} Themen · ${profile.parliaments.length || "alle"} Parlamente · ${profile.keywords.length} Stichwörter`,
