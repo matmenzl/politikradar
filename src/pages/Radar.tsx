@@ -161,6 +161,14 @@ const Radar = () => {
     [events],
   );
 
+  // Themen entstehen erst bei der Bewertung – Zähler zeigen, was im Zeitraum verfügbar ist.
+  const topicCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    for (const e of events) for (const t of e.topics ?? []) counts[t] = (counts[t] ?? 0) + 1;
+    return counts;
+  }, [events]);
+
+
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -370,11 +378,17 @@ const Radar = () => {
             <SelectTrigger className="w-52"><SelectValue placeholder="Thema" /></SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Alle Themen</SelectItem>
-              {TOPICS.map((t) => (
-                <SelectItem key={t.key} value={t.key}>{t.label}</SelectItem>
-              ))}
+              {TOPICS.map((t) => {
+                const count = topicCounts[t.key] ?? 0;
+                return (
+                  <SelectItem key={t.key} value={t.key} disabled={count === 0}>
+                    {t.label} ({count})
+                  </SelectItem>
+                );
+              })}
             </SelectContent>
           </Select>
+
           <Select value={level} onValueChange={setLevel}>
             <SelectTrigger className="w-44"><SelectValue placeholder="Ebene" /></SelectTrigger>
             <SelectContent>
