@@ -9,6 +9,7 @@ import { Switch } from "@/components/ui/switch";
 import { Slider } from "@/components/ui/slider";
 import { ArrowLeft, Loader2, LogOut, X } from "lucide-react";
 import { TOPICS } from "@/lib/topics";
+import { isPreviewEnv } from "@/lib/preview";
 
 interface ProfileState {
   parliaments: string[];
@@ -41,12 +42,15 @@ const Profil = () => {
     (async () => {
       const { data } = await supabase.auth.getSession();
       const session = data.session;
-      if (!session) return navigate("/login", { replace: true });
+      // In der Lovable-Preview ist die Seite auch ohne Login sichtbar.
+      if (!session && !isPreviewEnv()) return navigate("/login", { replace: true });
       if (!active) return;
-      setEmail(session.user.email ?? "");
+      setEmail(session?.user.email ?? "");
 
       const [{ data: row }, { data: events }] = await Promise.all([
-        supabase.from("subscriber_profiles").select("*").eq("user_id", session.user.id).maybeSingle(),
+        session
+          ? supabase.from("subscriber_profiles").select("*").eq("user_id", session.user.id).maybeSingle()
+          : Promise.resolve({ data: null }),
         supabase.from("events").select("parliament").limit(1000),
       ]);
       if (!active) return;
