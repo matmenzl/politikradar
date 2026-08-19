@@ -277,6 +277,36 @@ const Profil = () => {
           {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
           Profil speichern
         </Button>
+
+        <section className="border border-destructive/40 bg-card p-4 space-y-3">
+          <h2 className="font-serif text-xl text-foreground">Profil löschen</h2>
+          <p className="text-sm text-muted-foreground">
+            Dein Konto sowie alle Einstellungen, Themen, Stichwörter und die Alert-Historie
+            werden endgültig gelöscht. Du erhältst eine Bestätigung per E-Mail. Das lässt sich
+            nicht rückgängig machen.
+          </p>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button variant="destructive" disabled={deleting} className="w-full md:w-auto">
+                {deleting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+                Profil endgültig löschen
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Profil wirklich löschen?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Alle Daten zu {email || "diesem Konto"} werden dauerhaft entfernt. Eine
+                  Bestätigung geht an deine E-Mail-Adresse.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Abbrechen</AlertDialogCancel>
+                <AlertDialogAction onClick={deleteAccount}>Endgültig löschen</AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </section>
       </main>
     </div>
   );
