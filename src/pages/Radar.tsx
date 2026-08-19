@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import AppShell from "@/components/AppShell";
@@ -48,6 +48,7 @@ import { TOPICS, topicLabel } from "@/lib/topics";
 
 const Radar = () => {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [from, setFrom] = useState(isoDate(-14));
   const [to, setTo] = useState(isoDate(0));
   const [events, setEvents] = useState<EventRow[]>([]);
