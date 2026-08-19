@@ -22,7 +22,7 @@ const Login = () => {
       if (session) navigate(from, { replace: true });
     });
     return () => sub.subscription.unsubscribe();
-  }, [navigate]);
+  }, [navigate, from]);
 
   const sendLink = async (e: FormEvent) => {
     e.preventDefault();
