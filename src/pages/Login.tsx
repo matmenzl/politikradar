@@ -1,5 +1,5 @@
 import { useEffect, useState, type FormEvent } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -8,19 +8,21 @@ import { Input } from "@/components/ui/input";
 /** Public passwordless login / signup (magic link) for the topic alert newsletter. */
 const Login = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const from = (location.state as { from?: string } | null)?.from ?? "/profil";
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
-      if (data.session) navigate("/profil", { replace: true });
+      if (data.session) navigate(from, { replace: true });
     });
     const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (session) navigate("/profil", { replace: true });
+      if (session) navigate(from, { replace: true });
     });
     return () => sub.subscription.unsubscribe();
-  }, [navigate]);
+  }, [navigate, from]);
 
   const sendLink = async (e: FormEvent) => {
     e.preventDefault();
@@ -29,7 +31,7 @@ const Login = () => {
       email,
       options: {
         shouldCreateUser: true,
-        emailRedirectTo: `${window.location.origin}/profil`,
+        emailRedirectTo: `${window.location.origin}${from}`,
       },
     });
     setLoading(false);
