@@ -11,6 +11,7 @@ import Redaktion from "./pages/Redaktion";
 import Demo from "./pages/Demo";
 import Login from "./pages/Login";
 import Profil from "./pages/Profil";
+import SlideTest from "./pages/__SlideTest";
 import PublicEvent from "./pages/PublicEvent";
 import PublicStory from "./pages/PublicStory";
 import NotFound from "./pages/NotFound";
