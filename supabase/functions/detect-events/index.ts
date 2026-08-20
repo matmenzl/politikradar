@@ -310,6 +310,7 @@ serve(async (req) => {
         event_date: c.event_date,
         title: c.title,
         description: c.description ?? null,
+        affair_state: c.affair_state ?? null,
         source_id: c.url ? urlToSourceId[c.url] ?? null : null,
         dedupe_key: keyOf(c),
         topics: guessTopics(c.title, c.description ?? null),
