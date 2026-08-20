@@ -110,7 +110,11 @@ const Radar = () => {
     toast.success(
       `${data.inserted} Ereignisse geladen (inkl. Themen), ${data.skipped} bereits vorhanden.`,
     );
-    load();
+    const rows = await load();
+    const { data: session } = await supabase.auth.getSession();
+    if (!session.session && (rows?.length ?? 0) === 0 && (data.inserted + data.skipped) > 0) {
+      toast.info("Zum Anzeigen der Ereignisse bitte anmelden.");
+    }
   };
 
   const score = async () => {
