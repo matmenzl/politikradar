@@ -86,7 +86,21 @@ const AuthGate = ({ children }: { children: ReactNode }) => {
     );
   }
 
-  return <>{children}</>;
+  return (
+    <>
+      {previewSignedOut && (
+        <div className="bg-foreground text-background px-4 py-2 text-xs flex flex-wrap items-center justify-center gap-2">
+          <span>
+            Nicht angemeldet – Ereignisse und Einstellungen bleiben aus Datenschutzgründen leer.
+          </span>
+          <Link to="/login" className="underline underline-offset-2 font-medium">
+            Anmelden
+          </Link>
+        </div>
+      )}
+      {children}
+    </>
+  );
 };
 
 export default AuthGate;
