@@ -28,6 +28,8 @@ import {
 import { ExternalLink, HelpCircle, Info, Loader2, RefreshCw, RotateCcw, Sparkles } from "lucide-react";
 import ScoringSettings from "@/components/ScoringSettings";
 import InfoHint from "@/components/InfoHint";
+import AffairTimeline from "@/components/AffairTimeline";
+
 import RadarOnboarding, { type RadarOnboardingRef } from "@/components/RadarOnboarding";
 import {
   DEFAULT_SCORING,
