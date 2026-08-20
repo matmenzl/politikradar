@@ -28,7 +28,11 @@ interface Affair {
   begin_date?: string;
   end_date?: string;
   status_de?: string;
+  state_name_de?: string;
+  state_name_harmonized_de?: string;
   type_de?: string;
+  type_name_de?: string;
+  type_harmonized_de?: string;
   url_external_de?: string;
 }
 
