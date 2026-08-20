@@ -127,6 +127,17 @@ const PublicEvent = () => {
           </section>
         )}
 
+        <AffairTimeline
+          eventId={event.id}
+          businessType={
+            facts.find((f) => f.fact_type === "affair_type")?.value ?? event.event_type
+          }
+          fallbackDate={event.event_date}
+          fallbackState={facts.find((f) => f.fact_type === "status")?.value ?? null}
+        />
+
+
+
         {sourceUrl && (
           <a
             href={sourceUrl}
