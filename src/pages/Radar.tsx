@@ -105,7 +105,18 @@ const Radar = () => {
     const { data, error } = await supabase.functions.invoke("detect-events", { body: { from, to } });
     setStep("idle");
     if (error || data?.error) return toast.error(data?.error || "Ereignis-Erkennung fehlgeschlagen.");
-    toast.success(`${data.inserted} neue Ereignisse erkannt (${data.skipped} bereits vorhanden).`);
+    toast.success(
+      `${data.inserted} Ereignisse geladen (inkl. Themen), ${data.skipped} bereits vorhanden.`,
+    );
+    load();
+  };
+
+  const score = async () => {
+    setStep("scoring");
+    const { data, error } = await supabase.functions.invoke("score-events", { body: { from, to } });
+    setStep("idle");
+    if (error || data?.error) return toast.error(data?.error || "Bewertung fehlgeschlagen.");
+    toast.success(`${data.scored} Ereignisse bewertet, ${data.excluded} ausgeschlossen.`);
     load();
   };
 
@@ -123,10 +134,11 @@ const Radar = () => {
     if (error || data?.error) return toast.error(data?.error || "Bewertung fehlgeschlagen.");
     const inserted = detectFailed ? 0 : (detectRes.data?.inserted ?? 0);
     toast.success(
-      `${inserted} neue Ereignisse geladen, ${data.scored} bewertet, ${data.excluded} ausgeschlossen.`,
+      `${inserted} Ereignisse geladen (inkl. Themen), ${data.scored} bewertet, ${data.excluded} ausgeschlossen.`,
     );
     load();
   };
+
 
 
   const createStory = async (event: EventRow) => {
