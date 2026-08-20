@@ -173,12 +173,20 @@ const Radar = () => {
     [events],
   );
 
-  // Themen entstehen erst bei der Bewertung – Zähler zeigen, was im Zeitraum verfügbar ist.
+  // Themen entstehen bereits beim Laden (Stichwortlogik) – die Bewertung verfeinert sie.
   const topicCounts = useMemo(() => {
     const counts: Record<string, number> = {};
     for (const e of events) for (const t of e.topics ?? []) counts[t] = (counts[t] ?? 0) + 1;
     return counts;
   }, [events]);
+
+  const scoredCount = useMemo(
+    () => events.filter((e) => e.political_relevance !== null).length,
+    [events],
+  );
+  const unscoredCount = events.length - scoredCount;
+
+
 
 
 
