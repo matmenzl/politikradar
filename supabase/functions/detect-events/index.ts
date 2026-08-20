@@ -219,19 +219,23 @@ serve(async (req) => {
 
     for (const a of affairs) {
       if (!a.title_de) continue;
+      const affairState = a.state_name_harmonized_de || a.state_name_de || a.status_de;
+      const affairType = a.type_harmonized_de || a.type_name_de || a.type_de;
       candidates.push({
         parliament_key: a.body_key,
         event_type: "affair",
         event_date: String(a.end_date || a.begin_date).slice(0, 10),
         title: a.title_de,
-        description: a.status_de,
+        description: affairState,
+        affair_state: affairState,
+        affair_type: affairType,
         business_id: a.external_id || String(a.id),
         affair_id: String(a.id),
         url: a.url_external_de,
         facts: [
           { fact_type: "date", label: "Datum", value: String(a.begin_date || "").slice(0, 10) },
-          ...(a.type_de ? [{ fact_type: "affair_type", label: "Geschäftstyp", value: a.type_de }] : []),
-          ...(a.status_de ? [{ fact_type: "status", label: "Status", value: a.status_de }] : []),
+          ...(affairType ? [{ fact_type: "affair_type", label: "Geschäftstyp", value: affairType }] : []),
+          ...(affairState ? [{ fact_type: "status", label: "Status", value: affairState }] : []),
         ],
       });
     }
