@@ -292,6 +292,12 @@ const Radar = () => {
         {typeof e.score_factors?.rationale === "string" && (
           <p className="text-sm text-foreground">{e.score_factors.rationale as string}</p>
         )}
+        <AffairTimeline
+          eventId={e.id}
+          businessType={e.description || e.event_type}
+          fallbackDate={e.event_date}
+        />
+
         {e.political_relevance !== null && (
           <div className="grid gap-4 md:grid-cols-2">
             {renderFactorGroup(e, "relevance_weights", `Politische Relevanz ${e.political_relevance}`)}
