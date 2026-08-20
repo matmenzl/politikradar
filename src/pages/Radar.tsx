@@ -105,7 +105,18 @@ const Radar = () => {
     const { data, error } = await supabase.functions.invoke("detect-events", { body: { from, to } });
     setStep("idle");
     if (error || data?.error) return toast.error(data?.error || "Ereignis-Erkennung fehlgeschlagen.");
-    toast.success(`${data.inserted} neue Ereignisse erkannt (${data.skipped} bereits vorhanden).`);
+    toast.success(
+      `${data.inserted} Ereignisse geladen (inkl. Themen), ${data.skipped} bereits vorhanden.`,
+    );
+    load();
+  };
+
+  const score = async () => {
+    setStep("scoring");
+    const { data, error } = await supabase.functions.invoke("score-events", { body: { from, to } });
+    setStep("idle");
+    if (error || data?.error) return toast.error(data?.error || "Bewertung fehlgeschlagen.");
+    toast.success(`${data.scored} Ereignisse bewertet, ${data.excluded} ausgeschlossen.`);
     load();
   };
 
@@ -123,10 +134,11 @@ const Radar = () => {
     if (error || data?.error) return toast.error(data?.error || "Bewertung fehlgeschlagen.");
     const inserted = detectFailed ? 0 : (detectRes.data?.inserted ?? 0);
     toast.success(
-      `${inserted} neue Ereignisse geladen, ${data.scored} bewertet, ${data.excluded} ausgeschlossen.`,
+      `${inserted} Ereignisse geladen (inkl. Themen), ${data.scored} bewertet, ${data.excluded} ausgeschlossen.`,
     );
     load();
   };
+
 
 
   const createStory = async (event: EventRow) => {
@@ -161,12 +173,20 @@ const Radar = () => {
     [events],
   );
 
-  // Themen entstehen erst bei der Bewertung – Zähler zeigen, was im Zeitraum verfügbar ist.
+  // Themen entstehen bereits beim Laden (Stichwortlogik) – die Bewertung verfeinert sie.
   const topicCounts = useMemo(() => {
     const counts: Record<string, number> = {};
     for (const e of events) for (const t of e.topics ?? []) counts[t] = (counts[t] ?? 0) + 1;
     return counts;
   }, [events]);
+
+  const scoredCount = useMemo(
+    () => events.filter((e) => e.political_relevance !== null).length,
+    [events],
+  );
+  const unscoredCount = events.length - scoredCount;
+
+
 
 
 
@@ -333,38 +353,115 @@ const Radar = () => {
           <p className="text-sm text-muted-foreground mt-1">Weniger Recherche, mehr relevante Politik-Storys.</p>
         </div>
 
-        <div className="flex flex-wrap items-end gap-3 border border-border bg-card p-4">
-          <label className="text-xs kicker text-muted-foreground flex flex-col gap-1">
-            Von
-            <Input type="date" value={from} onChange={(e) => setFrom(e.target.value)} className="w-40" />
-          </label>
-          <label className="text-xs kicker text-muted-foreground flex flex-col gap-1">
-            Bis
-            <Input type="date" value={to} onChange={(e) => setTo(e.target.value)} className="w-40" />
-          </label>
-          <Button data-tour="score-button" onClick={refreshAndScore} disabled={busy}>
-            {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
-            {step === "detecting"
-              ? "Daten laden…"
-              : step === "scoring"
-                ? "Bewerten…"
-                : "Ereignisse bewerten"}
-          </Button>
-          <InfoHint label="Mehr zur Bewertung">
-              <p>
-                Lädt zuerst Geschäfte und Abstimmungen aus OpenParlData für den gewählten Zeitraum und bewertet sie danach per KI: 11 Faktoren (z. B. Entscheidwirkung, Reichweite, Emotionaler Aufhänger) ergeben Political Relevance, Social Potential und Editorial Confidence.
+        <div className="space-y-3">
+          <div className="grid gap-3 md:grid-cols-3">
+            {/* Schritt 1 */}
+            <section
+              className={[
+                "border p-4 space-y-3 bg-card",
+                step === "detecting" ? "border-foreground" : "border-border",
+              ].join(" ")}
+            >
+              <div className="flex items-center gap-2">
+                <span className="inline-flex h-6 w-6 items-center justify-center border border-border text-xs font-semibold">1</span>
+                <h2 className="font-serif text-lg">Daten laden</h2>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                Geschäfte und Abstimmungen aus OpenParlData für den Zeitraum. Themen werden
+                hier bereits vergeben – der Themenfilter greift sofort.
               </p>
-              <p className="mt-2 text-xs text-muted-foreground">
-                Die Kriterien können unter „Kriterien“ angepasst werden.
+              <div className="flex flex-wrap items-end gap-3">
+                <label className="text-xs kicker text-muted-foreground flex flex-col gap-1">
+                  Von
+                  <Input type="date" value={from} onChange={(e) => setFrom(e.target.value)} className="w-36" />
+                </label>
+                <label className="text-xs kicker text-muted-foreground flex flex-col gap-1">
+                  Bis
+                  <Input type="date" value={to} onChange={(e) => setTo(e.target.value)} className="w-36" />
+                </label>
+              </div>
+              <Button variant="outline" size="sm" onClick={detect} disabled={busy}>
+                {step === "detecting" ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <RefreshCw className="w-4 h-4" />
+                )}
+                {step === "detecting" ? "Daten laden…" : "Daten laden"}
+              </Button>
+              <p className="text-xs text-muted-foreground">
+                {events.length} Ereignisse im Zeitraum
               </p>
-          </InfoHint>
-          <Button variant="ghost" size="sm" onClick={detect} disabled={busy}>
-            <RefreshCw className="w-4 h-4" />
-            Nur Daten laden
-          </Button>
-          <ScoringSettings onSaved={(c) => { setScoringConfig(c); load(); }} />
+            </section>
 
+            {/* Schritt 2 */}
+            <section
+              className={[
+                "border p-4 space-y-3 bg-card",
+                step === "scoring" ? "border-foreground" : "border-border",
+                events.length === 0 && !busy ? "opacity-60" : "",
+              ].join(" ")}
+            >
+              <div className="flex items-center gap-2">
+                <span className="inline-flex h-6 w-6 items-center justify-center border border-border text-xs font-semibold">2</span>
+                <h2 className="font-serif text-lg">Bewerten</h2>
+                <InfoHint label="Mehr zur Bewertung">
+                  <p>
+                    Die KI bewertet die geladenen Ereignisse anhand von 11 Faktoren (z. B.
+                    Entscheidwirkung, Reichweite, Emotionaler Aufhänger) und berechnet daraus
+                    Political Relevance, Social Potential und Editorial Confidence. Die beim
+                    Laden vergebenen Themen werden dabei verfeinert, nicht ersetzt.
+                  </p>
+                  <p className="mt-2 text-xs text-muted-foreground">
+                    Die Kriterien können unter „Kriterien“ angepasst werden.
+                  </p>
+                </InfoHint>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                KI-Scores für Relevanz, Social-Potenzial und Confidence. Themen werden dabei
+                präzisiert.
+              </p>
+              <Button variant="outline" size="sm" onClick={score} disabled={busy || events.length === 0}>
+                {step === "scoring" ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Sparkles className="w-4 h-4" />
+                )}
+                {step === "scoring" ? "Bewerten…" : "Bewerten"}
+              </Button>
+              <p className="text-xs text-muted-foreground">
+                {scoredCount} bewertet · {unscoredCount} offen
+              </p>
+            </section>
+
+            {/* Schritt 3 */}
+            <section className="border border-border bg-card p-4 space-y-3">
+              <div className="flex items-center gap-2">
+                <span className="inline-flex h-6 w-6 items-center justify-center border border-border text-xs font-semibold">3</span>
+                <h2 className="font-serif text-lg">Filtern & auswählen</h2>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                Unten nach Thema, Ebene, Parlament oder Stichwort filtern und die passende
+                Story auswählen.
+              </p>
+              <ScoringSettings onSaved={(c) => { setScoringConfig(c); load(); }} />
+            </section>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-3">
+            <Button data-tour="score-button" onClick={refreshAndScore} disabled={busy}>
+              {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
+              {step === "detecting"
+                ? "Daten laden…"
+                : step === "scoring"
+                  ? "Bewerten…"
+                  : "Beides ausführen"}
+            </Button>
+            <span className="text-xs text-muted-foreground">
+              Schritt 1 und 2 nacheinander für den gewählten Zeitraum.
+            </span>
+          </div>
         </div>
+
 
         <div className="flex flex-wrap gap-3">
           <Input
@@ -416,13 +513,17 @@ const Radar = () => {
             </SelectContent>
           </Select>
         </div>
+        <p className="text-xs text-muted-foreground -mt-1">
+          Themen entstehen beim Laden (Schritt 1), die KI-Bewertung (Schritt 2) verfeinert sie.
+        </p>
 
         {loading && <p className="text-sm text-muted-foreground">Lade Ereignisse…</p>}
         {!loading && filtered.length === 0 && (
           <p className="text-sm text-muted-foreground">
-            Keine Ereignisse im gewählten Zeitraum. Starte mit „OpenParl-Daten laden“.
+            Keine Ereignisse im gewählten Zeitraum. Starte mit Schritt 1 „Daten laden“.
           </p>
         )}
+
 
         {(["top", "review", "low"] as Priority[]).map((p) =>
           groups[p].length ? (
