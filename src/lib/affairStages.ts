@@ -101,24 +101,40 @@ export function buildTimeline(
     return a.position - b.position;
   });
 
-  const currentIndex = sorted.length - 1;
-  const display: DisplayStep[] = sorted.map((s, i) => ({
+  // OpenParlData repeats identical steps (one row per session day) — collapse runs.
+  const collapsed: TimelineStep[] = [];
+  const untilDates: (string | null)[] = [];
+  for (const s of sorted) {
+    const prev = collapsed[collapsed.length - 1];
+    if (prev && NORM(prev.title) === NORM(s.title) && prev.actor === s.actor) {
+      untilDates[collapsed.length - 1] = s.date;
+      prev.last = prev.last || s.last;
+      continue;
+    }
+    collapsed.push({ ...s });
+    untilDates.push(null);
+  }
+
+  const currentIndex = collapsed.length - 1;
+  const display: DisplayStep[] = collapsed.map((s, i) => ({
     title: s.title,
     date: s.date,
+    untilDate: untilDates[i],
     actor: s.actor,
     state: i === currentIndex ? "current" : "done",
   }));
 
   const stages = stagesFor(businessType);
-  const lastTitle = sorted[currentIndex]?.title ?? "";
+  const lastTitle = collapsed[currentIndex]?.title ?? "";
   const closed = FINAL_STEP.test(lastTitle);
 
   if (!stages || closed) return { steps: display, hasForecast: false };
 
   const reached = Math.max(
     -1,
-    ...sorted.map((s) => stageIndexFor(s.title, stages)),
+    ...collapsed.map((s) => stageIndexFor(s.title, stages)),
   );
+
   const upcoming = stages.slice(reached + 1).map<DisplayStep>((title) => ({
     title,
     date: null,
