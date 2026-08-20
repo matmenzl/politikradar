@@ -126,6 +126,8 @@ interface CandidateEvent {
   event_date: string;
   title: string;
   description?: string;
+  affair_state?: string;
+  affair_type?: string;
   business_id?: string;
   affair_id?: string;
   voting_id?: string;
