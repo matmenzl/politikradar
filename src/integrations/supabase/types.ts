@@ -46,6 +46,7 @@ export type Database = {
       events: {
         Row: {
           affair_id: string | null
+          affair_state: string | null
           business_id: string | null
           canton: string | null
           created_at: string
@@ -65,6 +66,8 @@ export type Database = {
           selection_status: string
           social_potential: number | null
           source_id: string | null
+          timeline: Json
+          timeline_synced_at: string | null
           title: string
           topics: string[]
           updated_at: string
@@ -72,6 +75,7 @@ export type Database = {
         }
         Insert: {
           affair_id?: string | null
+          affair_state?: string | null
           business_id?: string | null
           canton?: string | null
           created_at?: string
@@ -91,6 +95,8 @@ export type Database = {
           selection_status?: string
           social_potential?: number | null
           source_id?: string | null
+          timeline?: Json
+          timeline_synced_at?: string | null
           title: string
           topics?: string[]
           updated_at?: string
@@ -98,6 +104,7 @@ export type Database = {
         }
         Update: {
           affair_id?: string | null
+          affair_state?: string | null
           business_id?: string | null
           canton?: string | null
           created_at?: string
@@ -117,6 +124,8 @@ export type Database = {
           selection_status?: string
           social_potential?: number | null
           source_id?: string | null
+          timeline?: Json
+          timeline_synced_at?: string | null
           title?: string
           topics?: string[]
           updated_at?: string

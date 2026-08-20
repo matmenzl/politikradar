@@ -21,6 +21,7 @@ export interface EventRow {
   selection_status: string;
   topics: string[] | null;
   exclusion_reason: string | null;
+  affair_state?: string | null;
 }
 
 export interface FactRow {

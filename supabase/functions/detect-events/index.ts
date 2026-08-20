@@ -28,7 +28,11 @@ interface Affair {
   begin_date?: string;
   end_date?: string;
   status_de?: string;
+  state_name_de?: string;
+  state_name_harmonized_de?: string;
   type_de?: string;
+  type_name_de?: string;
+  type_harmonized_de?: string;
   url_external_de?: string;
 }
 
@@ -122,6 +126,8 @@ interface CandidateEvent {
   event_date: string;
   title: string;
   description?: string;
+  affair_state?: string;
+  affair_type?: string;
   business_id?: string;
   affair_id?: string;
   voting_id?: string;
@@ -215,19 +221,23 @@ serve(async (req) => {
 
     for (const a of affairs) {
       if (!a.title_de) continue;
+      const affairState = a.state_name_harmonized_de || a.state_name_de || a.status_de;
+      const affairType = a.type_harmonized_de || a.type_name_de || a.type_de;
       candidates.push({
         parliament_key: a.body_key,
         event_type: "affair",
         event_date: String(a.end_date || a.begin_date).slice(0, 10),
         title: a.title_de,
-        description: a.status_de,
+        description: affairState,
+        affair_state: affairState,
+        affair_type: affairType,
         business_id: a.external_id || String(a.id),
         affair_id: String(a.id),
         url: a.url_external_de,
         facts: [
           { fact_type: "date", label: "Datum", value: String(a.begin_date || "").slice(0, 10) },
-          ...(a.type_de ? [{ fact_type: "affair_type", label: "Geschäftstyp", value: a.type_de }] : []),
-          ...(a.status_de ? [{ fact_type: "status", label: "Status", value: a.status_de }] : []),
+          ...(affairType ? [{ fact_type: "affair_type", label: "Geschäftstyp", value: affairType }] : []),
+          ...(affairState ? [{ fact_type: "status", label: "Status", value: affairState }] : []),
         ],
       });
     }
@@ -300,6 +310,7 @@ serve(async (req) => {
         event_date: c.event_date,
         title: c.title,
         description: c.description ?? null,
+        affair_state: c.affair_state ?? null,
         source_id: c.url ? urlToSourceId[c.url] ?? null : null,
         dedupe_key: keyOf(c),
         topics: guessTopics(c.title, c.description ?? null),

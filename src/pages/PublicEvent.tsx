@@ -2,12 +2,14 @@ import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import PublicShell from "@/components/PublicShell";
+import AffairTimeline from "@/components/AffairTimeline";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ArrowRight, ExternalLink, Sparkles } from "lucide-react";
 import { usePageMeta } from "@/lib/seo";
 import { topicLabel } from "@/lib/topics";
 import type { EventRow, FactRow, StoryRow } from "@/lib/mvp";
+
 
 /** Public, login-free landing page for a single parliamentary item (newsletter target). */
 const PublicEvent = () => {
@@ -124,6 +126,17 @@ const PublicEvent = () => {
             </dl>
           </section>
         )}
+
+        <AffairTimeline
+          eventId={event.id}
+          businessType={
+            facts.find((f) => f.fact_type === "affair_type")?.value ?? event.event_type
+          }
+          fallbackDate={event.event_date}
+          fallbackState={facts.find((f) => f.fact_type === "status")?.value ?? null}
+        />
+
+
 
         {sourceUrl && (
           <a
