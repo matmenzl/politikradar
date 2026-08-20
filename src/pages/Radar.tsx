@@ -513,13 +513,17 @@ const Radar = () => {
             </SelectContent>
           </Select>
         </div>
+        <p className="text-xs text-muted-foreground -mt-1">
+          Themen entstehen beim Laden (Schritt 1), die KI-Bewertung (Schritt 2) verfeinert sie.
+        </p>
 
         {loading && <p className="text-sm text-muted-foreground">Lade Ereignisse…</p>}
         {!loading && filtered.length === 0 && (
           <p className="text-sm text-muted-foreground">
-            Keine Ereignisse im gewählten Zeitraum. Starte mit „OpenParl-Daten laden“.
+            Keine Ereignisse im gewählten Zeitraum. Starte mit Schritt 1 „Daten laden“.
           </p>
         )}
+
 
         {(["top", "review", "low"] as Priority[]).map((p) =>
           groups[p].length ? (
