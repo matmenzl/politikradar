@@ -137,7 +137,9 @@ const AffairTimeline = ({ eventId, businessType, fallbackDate, fallbackState }: 
                 <p className="text-xs text-muted-foreground mt-0.5">
                   {[
                     current ? "Aktueller Stand" : upcoming ? "voraussichtlich" : null,
-                    formatStepDate(s.date),
+                    s.untilDate && s.untilDate !== s.date
+                      ? `${formatStepDate(s.date)} – ${formatStepDate(s.untilDate)}`
+                      : formatStepDate(s.date),
                     s.actor,
                   ]
                     .filter(Boolean)
