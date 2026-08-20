@@ -79,10 +79,11 @@ const Radar = () => {
       .neq("selection_status", "rejected")
       .order("event_date", { ascending: false })
       .limit(500);
+    let rows: EventRow[] = [];
     if (error) {
       toast.error("Ereignisse konnten nicht geladen werden.");
     } else {
-      const rows = (data || []) as unknown as EventRow[];
+      rows = (data || []) as unknown as EventRow[];
       setEvents(rows);
       const ids = [...new Set(rows.map((e) => e.source_id).filter(Boolean))] as string[];
       if (ids.length) {
@@ -91,6 +92,7 @@ const Radar = () => {
       }
     }
     setLoading(false);
+    return rows;
   };
 
   useEffect(() => {
@@ -110,7 +112,11 @@ const Radar = () => {
     toast.success(
       `${data.inserted} Ereignisse geladen (inkl. Themen), ${data.skipped} bereits vorhanden.`,
     );
-    load();
+    const rows = await load();
+    const { data: session } = await supabase.auth.getSession();
+    if (!session.session && (rows?.length ?? 0) === 0 && (data.inserted + data.skipped) > 0) {
+      toast.info("Zum Anzeigen der Ereignisse bitte anmelden.");
+    }
   };
 
   const score = async () => {

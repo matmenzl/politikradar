@@ -11,6 +11,25 @@ const AuthGate = ({ children }: { children: ReactNode }) => {
   const [status, setStatus] = useState<"loading" | "in" | "out" | "forbidden">(
     bypass ? "in" : "loading",
   );
+  // In preview the gate is skipped, but the database still applies row-level
+  // security — without a session no events are readable.
+  const [previewSignedOut, setPreviewSignedOut] = useState(false);
+
+  useEffect(() => {
+    if (!bypass) return;
+    let active = true;
+    const sync = (hasSession: boolean) => {
+      if (active) setPreviewSignedOut(!hasSession);
+    };
+    const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
+      setTimeout(() => sync(!!session), 0);
+    });
+    supabase.auth.getSession().then(({ data }) => sync(!!data.session));
+    return () => {
+      active = false;
+      sub.subscription.unsubscribe();
+    };
+  }, [bypass]);
 
   useEffect(() => {
     if (bypass) return;
@@ -67,7 +86,21 @@ const AuthGate = ({ children }: { children: ReactNode }) => {
     );
   }
 
-  return <>{children}</>;
+  return (
+    <>
+      {previewSignedOut && (
+        <div className="bg-foreground text-background px-4 py-2 text-xs flex flex-wrap items-center justify-center gap-2">
+          <span>
+            Nicht angemeldet – Ereignisse und Einstellungen bleiben aus Datenschutzgründen leer.
+          </span>
+          <Link to="/login" className="underline underline-offset-2 font-medium">
+            Anmelden
+          </Link>
+        </div>
+      )}
+      {children}
+    </>
+  );
 };
 
 export default AuthGate;
