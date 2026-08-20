@@ -79,10 +79,11 @@ const Radar = () => {
       .neq("selection_status", "rejected")
       .order("event_date", { ascending: false })
       .limit(500);
+    let rows: EventRow[] = [];
     if (error) {
       toast.error("Ereignisse konnten nicht geladen werden.");
     } else {
-      const rows = (data || []) as unknown as EventRow[];
+      rows = (data || []) as unknown as EventRow[];
       setEvents(rows);
       const ids = [...new Set(rows.map((e) => e.source_id).filter(Boolean))] as string[];
       if (ids.length) {
@@ -91,6 +92,7 @@ const Radar = () => {
       }
     }
     setLoading(false);
+    return rows;
   };
 
   useEffect(() => {
