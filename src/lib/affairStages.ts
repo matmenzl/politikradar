@@ -12,6 +12,8 @@ export interface TimelineStep {
 export interface DisplayStep {
   title: string;
   date: string | null;
+  /** Last date of a collapsed run of identical steps (data often repeats). */
+  untilDate?: string | null;
   actor: string | null;
   state: "done" | "current" | "upcoming";
 }
